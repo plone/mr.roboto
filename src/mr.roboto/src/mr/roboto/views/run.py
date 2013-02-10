@@ -65,6 +65,9 @@ def runFunctionPushTests(request):
     target_branch = payload['pull_request']['base']['ref']
     pull_state = payload['pull_request']['state']
 
+    logger.info("Found pull request %s on package %s"
+                % (pull_number, repo_name))
+
     pull_request_message = """Domo arigato."""
 
     # Check local db for registered jobs
