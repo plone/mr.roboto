@@ -29,7 +29,7 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
     else:
         url_to_callback = request.registry.settings['callback_url'] + 'corepull?pull=' + ident
         job_xml = create_jenkins_job_xml(
-            'Pull Request ' + pull_request,
+            'Pull Request %s' % pull_request,
             '2.7',
             'no-reply@plone.org',
             git_branch=branch,
