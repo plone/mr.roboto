@@ -17,11 +17,15 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
     """
     Pull requests jenkins job
     """
-    # We need to create the job with the checkout of the pull request
-    ident = 'pull-request-' + pull_request
 
-    if request.jenkins.job_exists(ident):
-        request.jenkins.build_job(ident, params)
+    jenkins = request.registry.settings['jenkins']
+
+    # We need to create the job with the checkout of the pull request
+    ident = 'pull-request-%s' % pull_request
+    if branch:
+        ident = '%s-%s' % (ident, branch)
+    if jenkins.job_exists(ident):
+        jenkins.build_job(ident, params)
 
     else:
         url_to_callback = request.registry.settings['callback_url'] + 'corepull?pull=' + ident
