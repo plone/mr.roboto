@@ -177,7 +177,7 @@ def createGithubPostCommitHooksView(request):
                 # We are going to store the new hooks
                 add_log(request, 'github', 'Creating hook ' + commit_url + ' and ' + pull_url)
                 gh_repo.create_hook('web', {'url': commit_url}, 'push', True)
-                gh_repo.create_hook('web', {'url': pull_url}, 'push', True)
+                gh_repo.create_hook('web', {'url': pull_url}, 'pull_request', True)
             except:
                 add_log(request, 'github', 'Problems on ' + repo)
 
