@@ -44,6 +44,7 @@ setup(name='mr.roboto',
           'lxml',
           'pyramid_mailer',
           'WebTest',
+          'pytest',
       ],
       entry_points="""\
       [paste.app_factory]
