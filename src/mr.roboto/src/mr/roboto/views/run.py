@@ -86,8 +86,6 @@ def runFunctionPushTests(request):
     logger.info("Found pull request %s on package %s"
                 % (pull_number, repo_name))
 
-    pull_request_message = """Domo arigato."""
-
     # Check local db for registered jobs
     pulls_db = request.registry.settings['pulls']
     pull_info = pulls_db.get(pull_id)
