@@ -163,7 +163,7 @@ def createGithubPostCommitHooksView(request):
     pull_url = roboto_url + 'run/pullrequest?token=' + request.registry.settings['api_key']
 
     for repo in repos:
-        try:
+        if repo:
             gh_repo = github.get_repo(repo)
             for hook in gh_repo.get_hooks():
                 add_log(request, 'github', 'Removing hook ' + str(hook.config))
@@ -174,8 +174,6 @@ def createGithubPostCommitHooksView(request):
             gh_repo.create_hook('web', {'url': commit_url}, 'push', True)
             gh_repo.create_hook('web', {'url': pull_url}, 'push', True)
 
-        except:
-            add_log(request, 'github', 'Error on repo ' + repo)
 # Example payload Push
 
 # {
