@@ -27,10 +27,11 @@ createGithubPostCommitHooks = Service(
     description="Creates github post-commit hooks."
 )
 
-
+roboto_url = "http://jenkins2.plone.org:6543/"
 
 COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3']
 
+ACTUAL_HOOKS_INSTALL_ON = '4.3'
 
 def add_log(request, who, message):
     logger.info("Run Core Tests : " + who + " " + message)
@@ -150,8 +151,27 @@ def runFunctionPushTests(request):
 @createGithubPostCommitHooks.post()
 @validatetoken
 def createGithubPostCommitHooksView(request):
-    pass
+    # We should remove all the actual hooks
+    github = request.registry.settings['github']
 
+    buildout = PloneCoreBuildout(ACTUAL_HOOKS_INSTALL_ON)
+    sources = buildout.sources
+
+    repos = [x.path for x in sources.values()]
+
+    commit_url = roboto_url + 'run/corecommit?token=' + request.registry.settings['api_key']
+    pull_url = roboto_url + 'run/pullrequest?token=' + request.registry.settings['api_key']
+
+    for repo in repos:
+        gh_repo = github.get_repo(repo)
+        for hook in gh_repo.get_hooks():
+            add_log('github', 'Removing hook ' + hook.config)
+            hook.delete()
+
+        # We are going to store the new hooks
+        add_log('github', 'Creating hook ' + hook.config)
+        gh_repo.create_hook('web', {'url': commit_url}, 'push', True)
+        gh_repo.create_hook('web', {'url': pull_url}, 'push', True)
 
 # Example payload Push
 
