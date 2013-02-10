@@ -81,7 +81,7 @@ def jenkins_job(request, job, callback_url, params=None):
     else:
         endpoint = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')
         if len(endpoint) == 1:
-            endpoint.text = callback_url
+            endpoint[0].text = callback_url
 
     # We are going to add a publisher call to url
 

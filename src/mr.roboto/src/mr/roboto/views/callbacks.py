@@ -29,7 +29,7 @@ def functionCallbackPull(request):
 
     """
     answer = request.json_body
-    pull_number = request.GET('pull')
+    pull_number = request.GET['pull']
     pull = request.registry.settings['github'].get_pull(pull_number)
     jk_job = answer['name']
     full_url = answer['full_url']
