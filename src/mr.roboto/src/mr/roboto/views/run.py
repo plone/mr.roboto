@@ -29,9 +29,11 @@ createGithubPostCommitHooks = Service(
 
 
 
-jenkins_jobs = ['plone-4.3', 'plone-4.2']
-
 COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3']
+
+
+def add_log(request, who, message):
+    logger.info("Run Core Tests : " + who + " " + message)
 
 
 @runCoreTests.post()
@@ -45,15 +47,17 @@ def runFunctionCoreTests(request):
     # Going to run the core-dev tests
     for commit in payload['commits']:
         who = commit['name'] + '<' + commit['author'] + '>'
-    logger.info("Run Core Tests : " + who + " " + 'Commit trigger on core-dev')
+    message = 'Commit trigger on core-dev'
+    add_log(request, who, message)
     # We need to run the core-dev tests
     # with a callback with the last commit hash
     # we should store all of them but right now is ok
     last_commit = payload['commits'][0]['id']
     url = request.registry.settings['callback_url'] + 'corecommit?commit_hash=' + last_commit
 
-    for job in jenkins_jobs:
-        jenkins_job(request, job, url)
+    for job in COREDEV_BRANCHES_TO_CHECK:
+        name_jk_job = 'plone-' + job
+        jenkins_job(request, name_jk_job, url)
 
 
 @runPushTests.post()
