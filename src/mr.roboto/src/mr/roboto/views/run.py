@@ -3,6 +3,7 @@ from cornice import Service
 from mr.roboto.security import validatetoken
 from mr.roboto.jenkinsutil import jenkins_job
 from mr.roboto.jenkinsutil import jenkins_pull_job
+from mr.roboto.jenkinsutil import jenkins_remove_job
 from mr.roboto.utils import add_log
 from mr.roboto.buildout import PloneCoreBuildout
 import logging
@@ -128,10 +129,11 @@ def runFunctionPushTests(request):
     else:
         if pull_info is not None:
             # Consider this a merged pull
-            # TODO: Remove job from Jenkins
-            # TODO: Remove entry from db.
-
-            pass
+            # Remove job(s) from Jenkins
+            for jenkins_identifier in pull_info['jenkins_urls']:
+                jenkins_remove_job(jenkins_identifier)
+            # Remove entry from db.
+            pulls_db.delete(pull_id)
 
 
 
