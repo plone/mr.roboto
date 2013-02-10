@@ -26,7 +26,6 @@ def main(global_config, **settings):
     config.registry.settings['core'] = ReposDB(settings['core_repos_db'])
     config.registry.settings['pulls'] = PullsDB(settings['core_pulls_db'])
 
-    config.registry.settings['log_file'] = settings['log_file']
 
     # adds cornice
     config.include("cornice")

@@ -2,9 +2,10 @@
 from cornice import Service
 from mr.roboto.security import validatetoken
 from mr.roboto.jenkinsutil import jenkins_job
-from mr.roboto.utils import add_log
 from mr.roboto.buildout import PloneCoreBuildout
+import logging
 
+logger = logging.getLogger('mr.roboto')
 
 runCoreTests = Service(
     name='Run core tests',
@@ -37,7 +38,7 @@ def runFunctionCoreTests(request):
         who = commit['name'] + '<' + commit['author'] + '>'
     message = 'Commit trigger on core-dev'
     add_log(request, who, message)
-
+    logger.info("Run Core Tests : " + who + " " + message)
     # We need to run the core-dev tests
     jenkins = request.registry.settings['jenkins']
     # with a callback with the last commit hash
