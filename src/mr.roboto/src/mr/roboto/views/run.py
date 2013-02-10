@@ -4,7 +4,6 @@ from mr.roboto.security import validatetoken
 from mr.roboto.jenkinsutil import jenkins_job
 from mr.roboto.jenkinsutil import jenkins_pull_job
 from mr.roboto.jenkinsutil import jenkins_remove_job
-from mr.roboto.utils import add_log
 from mr.roboto.buildout import PloneCoreBuildout
 import logging
 
@@ -39,11 +38,8 @@ def runFunctionCoreTests(request):
     # Going to run the core-dev tests
     for commit in payload['commits']:
         who = commit['name'] + '<' + commit['author'] + '>'
-    message = 'Commit trigger on core-dev'
-    add_log(request, who, message)
-    logger.info("Run Core Tests : " + who + " " + message)
+    logger.info("Run Core Tests : " + who + " " + 'Commit trigger on core-dev')
     # We need to run the core-dev tests
-    jenkins = request.registry.settings['jenkins']
     # with a callback with the last commit hash
     # we should store all of them but right now is ok
     last_commit = payload['commits'][0]['id']
@@ -59,7 +55,7 @@ def runFunctionPushTests(request):
     """
     When we are called by GH we want to run the jenkins core-dev builds
     """
-    add_log(request, "github", "Sent us a pull request.")
+    logger.info("Github sent us a pull request.")
 
     payload = request.json_body
     repo_name = payload['repository']['full_name']
@@ -82,7 +78,7 @@ def runFunctionPushTests(request):
             # Consider this a new pull.
             # Check to see which coredev branches (if any) use this package
             # branch.
-            add_log(request, "mr.roboto", "Checking coredev branches.")
+            logger.info("Checking coredev branches.")
             jenkins_urls = []
             for branch in COREDEV_BRANCHES_TO_CHECK:
                 core_buildout = PloneCoreBuildout(branch)
@@ -98,8 +94,8 @@ def runFunctionPushTests(request):
             # Add entry to db
             pull_info = pulls_db.set(pull_id, jenkins_urls, [])
 
-        # Check contributors    
-        add_log(request, "mr.roboto", "Getting github repository.")
+        # Check contributors
+        logger.info("Getting github repository.")
         github = request.registry.settings['github']
         repository = github.get_repo(repo_name)
         pull = repository.get_pull(pull_number)
@@ -108,7 +104,7 @@ def runFunctionPushTests(request):
         checked_committers = pull_info.seen_committers
         for committer in committers:
             if committer.login not in checked_committers:
-                add_log(request, "mr.roboto", "Checking contributor rights for %s." % committer.login)
+                logger.info("Checking contributor rights for %s." % committer.login)
                 # Check all new committers for Plone contributor rights
                 if not github.is_core_contributor(committer.login):
                     msg = """@%s, it looks like you haven't signed \
