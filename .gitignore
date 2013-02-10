@@ -1,0 +1,8 @@
+bin
+eggs
+parts
+*.egg-info
+.DS_Store
+develop-eggs
+production.ini
+*.pyc
