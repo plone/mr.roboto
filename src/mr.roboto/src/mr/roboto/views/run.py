@@ -36,6 +36,7 @@ PYTHON_VERSIONS = ['2.6', '2.7']
 
 ACTUAL_HOOKS_INSTALL_ON = '4.3'
 
+
 def add_log(request, who, message):
     logger.info("Run Core Tests : " + who + " " + message)
 
@@ -171,7 +172,7 @@ def createGithubPostCommitHooksView(request):
 
     for repo in repos:
         if repo:
-            try: 
+            try:
                 add_log(request, 'github', 'Working on ' + repo)
                 gh_repo = github.get_repo(repo)
                 for hook in gh_repo.get_hooks():

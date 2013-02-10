@@ -63,7 +63,6 @@ def postNewCorePackage(request):
     return {'status': 'added'}
 
 
-
 @kgs.get()
 def getKGSPackages(request):
     """Returns de last KGS from core-dev
