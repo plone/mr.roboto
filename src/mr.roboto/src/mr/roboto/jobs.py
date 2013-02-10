@@ -13,7 +13,7 @@ def create_jenkins_job_xml(display_name,
                            pull=None):
 
     command = "%s bootstrap.py\n" % python_version
-    command += "bin/buildout -c %s" % buildout
+    command += "bin/buildout -c %s\n" % buildout
 
     command += "bin/jenkins-alltests -1"
 
