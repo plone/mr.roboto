@@ -86,6 +86,7 @@ def runFunctionPushTests(request):
             for branch in COREDEV_BRANCHES_TO_CHECK:
                 core_buildout = PloneCoreBuildout(branch)
                 if core_buildout.get_package_branch(package_name) == target_branch:
+                    logger.info('Package branch is used by coredev %s' % branch)
                     # Create job
                     job_url = jenkins_pull_job(request, pull_id, branch)
                     jenkins_urls.append(job_url)
