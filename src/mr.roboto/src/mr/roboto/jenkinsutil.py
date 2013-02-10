@@ -1,5 +1,5 @@
 from lxml import etree
-import StringIO
+from StringIO import StringIO
 from mr.roboto.jobs import create_jenkins_job_xml
 
 
