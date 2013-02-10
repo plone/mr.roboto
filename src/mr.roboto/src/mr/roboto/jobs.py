@@ -19,7 +19,7 @@ def create_jenkins_job_xml(displayname,
     command += "bin/jenkins-alltests -1"
 
 
-    result = render('mr.roboto:templates/plone.xml',
+    result = render('mr.roboto:templates/plone.pt',
         {'url_to_callback': url_to_callback,
          'displayName': displayname,
          'email_notification_recipients': email_notification_recipients,
