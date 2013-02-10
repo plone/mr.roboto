@@ -38,9 +38,9 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
             pull=ident)
         # create a callback
         # upload to jenkins
-        request.jenkins.create_job(ident, job_xml)
-        request.jenkins.build_job(ident, params)
-    info = request.jenkins.get_job_info(ident)
+        jenkins.create_job(ident, job_xml)
+        jenkins.build_job(ident, params)
+    info = jenkins.get_job_info(ident)
     return info.url
 
 
