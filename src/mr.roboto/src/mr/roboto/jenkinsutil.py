@@ -61,7 +61,7 @@ def jenkins_job(request, job, callback_url, params=None):
     xml_object = etree.parse(f)
     isthere = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty')
     if len(isthere) == 0:
-        properties = xml_object.xpath('/project/properties/')
+        properties = xml_object.xpath('/project/properties')
         listener = """<com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.4">
          <endpoints>
           <com.tikal.hudson.plugins.notification.Endpoint>
