@@ -40,7 +40,7 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
         jenkins.create_job(ident, job_xml)
         jenkins.build_job(ident, params)
     info = jenkins.get_job_info(ident)
-    return info.url
+    return info['url']
 
 
 def jenkins_job(request, job, callback_url, params=None):
