@@ -36,10 +36,10 @@ class PullsDB(object):
 
     def __init__(self, filename):
         self._filename = filename
-        f = open(filename, 'w+')
+        f = open(filename, 'r')
         content = f.read()
         if content != '':
-            self._db = json.loads(f.read())
+            self._db = json.loads(content)
         else:
             self._db = {}
         f.close()
