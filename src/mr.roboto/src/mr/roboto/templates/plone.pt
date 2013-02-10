@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description></description>
-  <displayName>${displayName}</displayName>
+  <displayName>${display_name}</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <tal:block condition="callback_url">

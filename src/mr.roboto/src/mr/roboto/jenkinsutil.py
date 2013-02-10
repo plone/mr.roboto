@@ -27,13 +27,13 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
         jenkins.build_job(ident, params)
 
     else:
-        url_to_callback = request.registry.settings['callback_url'] + 'corepull?pull=' + ident
+        callback_url = request.registry.settings['callback_url'] + 'corepull?pull=' + ident
         job_xml = create_jenkins_job_xml(
             'Pull Request %s' % pull_request,
             '2.7',
             'no-reply@plone.org',
             git_branch=branch,
-            url_to_callback=url_to_callback,
+            callback_url=callback_url,
             pull=ident)
         # create a callback
         # upload to jenkins
@@ -43,7 +43,7 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
     return info.url
 
 
-def jenkins_job(request, job, url_to_callback, params=None):
+def jenkins_job(request, job, callback_url, params=None):
     """
     Generic jenkins call job
     """
@@ -61,7 +61,7 @@ def jenkins_job(request, job, url_to_callback, params=None):
     xml_object = etree.parse(f)
     endpoint = xml_object.parse('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')
     if len(endpoint) == 1:
-        endpoint.text = url_to_callback
+        endpoint.text = callback_url
 
     # We are going to add a publisher call to url
 
