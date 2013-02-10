@@ -8,4 +8,7 @@ production.ini
 *.pyc
 .installed.cfg
 .mr.developer.cfg
+include/
+lib/
+local/
 
