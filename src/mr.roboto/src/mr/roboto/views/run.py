@@ -6,6 +6,7 @@ from mr.roboto.jenkinsutil import jenkins_pull_job
 from mr.roboto.jenkinsutil import jenkins_remove_job
 from mr.roboto.buildout import PloneCoreBuildout
 import logging
+import json
 
 logger = logging.getLogger('mr.roboto')
 
@@ -43,7 +44,7 @@ def runFunctionCoreTests(request):
     """
     When we are called by GH we want to run the jenkins core-dev builds
     """
-    payload = request.json_body
+    payload = json.loads(request.POST['payload'])
 
     # Going to run the core-dev tests
     for commit in payload['commits']:
@@ -69,7 +70,7 @@ def runFunctionPushTests(request):
     """
     logger.info("Github sent us a pull request.")
 
-    payload = request.json_body
+    payload = json.loads(request.POST['payload'])
     repo_name = payload['repository']['full_name']
     pull_number = payload['number']
     pull_id = payload['pull_request']['id']
@@ -161,6 +162,8 @@ def createGithubPostCommitHooksView(request):
 
     commit_url = roboto_url + 'run/corecommit?token=' + request.registry.settings['api_key']
     pull_url = roboto_url + 'run/pullrequest?token=' + request.registry.settings['api_key']
+
+    repos.append('plone/buildout.coredev')
 
     for repo in repos:
         if repo:
