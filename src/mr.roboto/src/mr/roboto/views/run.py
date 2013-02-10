@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
-from plonejenkins.middleware.security import validatetoken
-from plonejenkins.middleware.jenkinsutil import jenkins_job
-from plonejenkins.middleware.utils import add_log
-from plonejenkins.middleware.buildout import PloneCoreBuildout
+from mr.roboto.security import validatetoken
+from mr.roboto.jenkinsutil import jenkins_job
+from mr.roboto.utils import add_log
+from mr.roboto.buildout import PloneCoreBuildout
 
 
 runCoreTests = Service(

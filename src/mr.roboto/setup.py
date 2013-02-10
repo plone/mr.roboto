@@ -14,7 +14,7 @@ long_description = (
     open('CHANGES.txt').read()
     + '\n')
 
-setup(name='plonejenkins.middleware',
+setup(name='mr.roboto',
       version=version,
       description="Plone Jenkins Middleware",
       long_description=long_description,
@@ -30,7 +30,7 @@ setup(name='plonejenkins.middleware',
       license='gpl',
       packages=find_packages('src'),
       package_dir = {'': 'src'},
-      namespace_packages=['plonejenkins'],
+      namespace_packages=['mr'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
@@ -47,6 +47,6 @@ setup(name='plonejenkins.middleware',
       ],
       entry_points="""\
       [paste.app_factory]
-      main = plonejenkins.middleware:main
+      main = mr.roboto:main
       """,
       )

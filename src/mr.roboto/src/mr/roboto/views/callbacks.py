@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
-from plonejenkins.middleware.security import validatejenkins
+from mr.roboto.security import validatejenkins
 
 callbackCommit = Service(name='Callback for commits', path='/callback/corecommit',
                     description="Callback for commits jobs on jenkins")

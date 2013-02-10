@@ -1,6 +1,6 @@
 from lxml import etree
 import StringIO
-from plonejenkins.middleware.jobs import create_jenkins_job_xml
+from mr.roboto.jobs import create_jenkins_job_xml
 
 
 def jenkins_remove_job(request, pull_request):

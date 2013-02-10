@@ -2,9 +2,9 @@ from pyramid.config import Configurator
 
 from security import RequestWithAttributes
 
-from plonejenkins.middleware.db import ReposDB, PullsDB
+from mr.roboto.db import ReposDB, PullsDB
 
-from plonejenkins.middleware.plonegithub import PloneGithub
+from mr.roboto.plonegithub import PloneGithub
 from jenkins import Jenkins
 
 
@@ -31,7 +31,7 @@ def main(global_config, **settings):
     # adds cornice
     config.include("cornice")
 
-    config.scan("plonejenkins.middleware.views")
+    config.scan("mr.roboto.views")
 
     config.end()
 

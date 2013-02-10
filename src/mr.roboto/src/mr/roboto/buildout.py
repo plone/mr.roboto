@@ -6,7 +6,7 @@ from shutil import rmtree
 from tempfile import mkdtemp
 import logging
 
-logger = logging.getLogger('plonejenkins.middleware')
+logger = logging.getLogger('mr.roboto')
 
 
 class Source():
