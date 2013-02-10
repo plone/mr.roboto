@@ -2,7 +2,9 @@
 from cornice import Service
 from mr.roboto.security import validatetoken
 from mr.roboto.jenkinsutil import jenkins_job
-from mr.roboto.jenkinsutil import jenkins_pull_job
+from mr.roboto.jenkinsutil import jenkins_create_pull_job
+from mr.roboto.jenkinsutil import jenkins_get_job_url
+from mr.roboto.jenkinsutil import jenkins_build_job
 from mr.roboto.jenkinsutil import jenkins_remove_job
 from mr.roboto.buildout import PloneCoreBuildout
 import logging
@@ -98,15 +100,17 @@ def runFunctionPushTests(request):
             # Check to see which coredev branches (if any) use this package
             # branch.
             logger.info("Checking coredev branches.")
-            jenkins_urls = []
+            matched_branches = {}
             for branch in COREDEV_BRANCHES_TO_CHECK:
                 core_buildout = PloneCoreBuildout(branch)
                 if core_buildout.get_package_branch(package_name) == target_branch:
                     logger.info('Package branch is used by coredev %s' % branch)
+
                     # Create job
-                    job_url = jenkins_pull_job(request, pull_id, branch)
-                    jenkins_urls.append(job_url)
-            if not jenkins_urls:
+                    job_id = jenkins_create_pull_job(request, pull_id, branch)
+                    if job_id:
+                        matched_branches[branch] = job_id
+            if not matched_branches:
                 # Coredev doesn't use this package or branch. Ignore
                 return
 
@@ -119,7 +123,7 @@ def runFunctionPushTests(request):
             pull_request_message += "I'll also keep track of any future changes made to this pull request or to the Plone core build. If you'd like to manually run the merge tests at any point, you can do so via the %(link_str)s above." % {'link_str': link_str}
 
             # Add entry to db
-            pull_info = pulls_db.set(pull_id, jenkins_urls, [])
+            pull_info = pulls_db.set(pull_id, matched_branches.values(), [])
 
         # Check contributors
         logger.info("Getting github repository.")
@@ -138,13 +142,16 @@ def runFunctionPushTests(request):
                             the Plone contributor agreement. You can find it at \
                             https://buildoutcoredev.readthedocs.org/en/latest/agreement.html\
                             . If you've already done so, let me know and I'll \
-                            double-check.\n""" % committer.login
-                pull_request_message += msg
+                            double-check.\n""" % committer
+                    pull_request_message += msg
 
-                checked_committers.append(committer.login)
-        pulls_db.set(pull_id, pull_info.jenkins_url, checked_committers)
+                checked_committers.append(committer)
+        pulls_db.set(pull_id, pull_info['jenkins_jobs'], checked_committers)
 
-        # TODO: Run jobs
+        # Run jobs
+        for job_id in pull_info['jenkins_jobs']:
+            logger.info("Running job %s" % job_id)
+            jenkins_build_job(request, job_id)
 
         # Add a comment to the pull request.
         print pull_request_message
@@ -154,8 +161,8 @@ def runFunctionPushTests(request):
         if pull_info is not None:
             # Consider this a merged pull
             # Remove job(s) from Jenkins
-            for jenkins_identifier in pull_info['jenkins_urls']:
-                jenkins_remove_job(jenkins_identifier)
+            for jenkins_identifier in pull_info['jenkins_jobs']:
+                jenkins_remove_job(request, jenkins_identifier)
             # Remove entry from db.
             pulls_db.delete(pull_id)
 

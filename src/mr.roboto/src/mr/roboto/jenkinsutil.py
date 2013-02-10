@@ -9,10 +9,20 @@ def jenkins_remove_job(request, identifier):
     """
     jenkins = request.registry.settings['jenkins']
     jenkins.delete_job(identifier)
-    pass
 
 
-def jenkins_pull_job(request, pull_request, branch=None, params=None):
+def jenkins_build_job(request, identifier, params=None):
+    jenkins = request.registry.settings['jenkins']
+    jenkins.build_job(identifier, params)
+
+
+def jenkins_get_job_url(request, identifier):
+    jenkins = request.registry.settings['jenkins']
+    info = jenkins.get_job_info(identifier)
+    return info['url']
+
+
+def jenkins_create_pull_job(request, pull_request, branch=None, params=None):
     """
     Pull requests jenkins job
     """
@@ -23,10 +33,7 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
     ident = 'pull-request-%s' % pull_request
     if branch:
         ident = '%s-%s' % (ident, branch)
-    if jenkins.job_exists(ident):
-        jenkins.build_job(ident, params)
-
-    else:
+    if not jenkins.job_exists(ident):
         callback_url = request.registry.settings['callback_url'] + 'corepull?pull=' + ident
         job_xml = create_jenkins_job_xml(
             'Pull Request %s' % pull_request,
@@ -38,9 +45,8 @@ def jenkins_pull_job(request, pull_request, branch=None, params=None):
         # create a callback
         # upload to jenkins
         jenkins.create_job(ident, job_xml)
-        jenkins.build_job(ident, params)
-    info = jenkins.get_job_info(ident)
-    return info['url']
+
+    return ident
 
 
 def jenkins_job(request, job, callback_url, params=None):
