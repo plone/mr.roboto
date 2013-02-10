@@ -48,7 +48,7 @@ def runFunctionCoreTests(request):
 
     # Going to run the core-dev tests
     for commit in payload['commits']:
-        who = commit['name'] + '<' + commit['author'] + '>'
+        who = commit['committer']['name'] + '<' + commit['committer']['email'] + '>'
     message = 'Commit trigger on core-dev'
     add_log(request, who, message)
     # We need to run the core-dev tests
