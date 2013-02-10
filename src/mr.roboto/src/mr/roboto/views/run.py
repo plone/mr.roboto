@@ -165,7 +165,7 @@ def createGithubPostCommitHooksView(request):
     for repo in repos:
         gh_repo = github.get_repo(repo)
         for hook in gh_repo.get_hooks():
-            add_log('github', 'Removing hook ' + hook.config)
+            add_log('github', 'Removing hook ' + hook.config['url'])
             hook.delete()
 
         # We are going to store the new hooks
