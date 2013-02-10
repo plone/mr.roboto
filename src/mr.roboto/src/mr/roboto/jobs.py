@@ -24,6 +24,7 @@ def create_jenkins_job_xml(display_name,
                      'git_url': git_url,
                      'git_branch': git_branch,
                      'node': node,
-                     'command': command})
+                     'command': command,
+                     'dollar': '$'})
 
     return result
