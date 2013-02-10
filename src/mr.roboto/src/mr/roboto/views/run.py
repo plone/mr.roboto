@@ -64,11 +64,7 @@ def runFunctionPushTests(request):
     pull_id = payload['pull_request']['id']
     package_name = payload['pull_request']['base']['repo']['name']
     target_branch = payload['pull_request']['base']['ref']
-
-    add_log(request, "mr.roboto", "Getting github repository.")
-    github = request.registry.settings['github']
-    repository = github.get_repo(repo_name)
-    pull = repository.get_pull(pull_number)
+    pull_state = payload['pull_request']['state']
 
     pull_request_message = """Domo arigato."""
 
@@ -77,9 +73,8 @@ def runFunctionPushTests(request):
     pull_info = pulls_db.get(pull_id)
 
     pull_request_message = ""
-
     # Check state of pull request ('open' or 'closed')
-    if pull.state == "open":
+    if pull_state == "open":
         if pull_info is None:
             # Consider this a new pull.
             # Check to see which coredev branches (if any) use this package
@@ -100,7 +95,11 @@ def runFunctionPushTests(request):
             # Add entry to db
             pull_info = pulls_db.set(pull_id, jenkins_urls, [])
 
-        # Check contributors
+        # Check contributors    
+        add_log(request, "mr.roboto", "Getting github repository.")
+        github = request.registry.settings['github']
+        repository = github.get_repo(repo_name)
+        pull = repository.get_pull(pull_number)
         committers = dict([(a.committer.id, a.committer) for a in pull.get_commits()]).values()
         # Are there new committers?
         checked_committers = pull_info.seen_committers
