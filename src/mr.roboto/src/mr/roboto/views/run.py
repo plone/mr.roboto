@@ -119,15 +119,15 @@ def runFunctionPushTests(request):
         github = request.registry.settings['github']
         repository = github.get_repo(repo_name)
         pull = repository.get_pull(pull_number)
-        committers = dict([(a.committer.id, a.committer) for a in pull.get_commits()]).values()
+        committers = set([a.committer.login for a in pull.get_commits()])
         # Are there new committers?
-        checked_committers = pull_info.seen_committers
+        checked_committers = pull_info['seen_committers']
         for committer in committers:
-            if committer.login not in checked_committers:
-                logger.info("Checking contributor rights for %s." % committer.login)
+            if committer not in checked_committers:
+                logger.info("Checking contributor rights for %s." % committer)
                 # Check all new committers for Plone contributor rights
-                if not github.is_core_contributor(committer.login):
-                    msg = """@%s, it looks like you haven't signed \
+                if not github.is_core_contributor(committer):
+                    msg = """@%s, you've committed to this pull, but it looks like you haven't signed \
                             the Plone contributor agreement. You can find it at \
                             https://buildoutcoredev.readthedocs.org/en/latest/agreement.html\
                             . If you've already done so, let me know and I'll \
