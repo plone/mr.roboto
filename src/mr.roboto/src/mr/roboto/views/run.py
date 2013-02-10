@@ -21,6 +21,13 @@ runPushTests = Service(
     description="Run the core-dev buildout with a pull request"
 )
 
+createGithubPostCommitHooks = Service(
+    name='Create github post-commit hooks',
+    path='/run/githubcommithooks',
+    description="Creates github post-commit hooks."
+)
+
+
 
 jenkins_jobs = ['plone-4.3', 'plone-4.2']
 
@@ -136,6 +143,10 @@ def runFunctionPushTests(request):
             pulls_db.delete(pull_id)
 
 
+@createGithubPostCommitHooks.post()
+@validatetoken
+def createGithubPostCommitHooksView(request):
+    pass
 
 
 # Example payload Push
