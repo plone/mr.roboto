@@ -32,6 +32,8 @@ roboto_url = "http://jenkins2.plone.org:6543/"
 
 COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3']
 
+PYTHON_VERSIONS = ['2.6', '2.7']
+
 ACTUAL_HOOKS_INSTALL_ON = '4.3'
 
 def add_log(request, who, message):
@@ -59,7 +61,9 @@ def runFunctionCoreTests(request):
 
     for job in COREDEV_BRANCHES_TO_CHECK:
         name_jk_job = 'plone-' + job
-        jenkins_job(request, name_jk_job, url)
+        for python_ver in PYTHON_VERSIONS:
+            job_name = name_jk_job + '-python-' + python_ver
+            jenkins_job(request, job_name, url)
 
 
 @runPushTests.post()
