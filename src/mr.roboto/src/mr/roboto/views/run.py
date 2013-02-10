@@ -2,6 +2,8 @@
 from cornice import Service
 from mr.roboto.security import validatetoken
 from mr.roboto.jenkinsutil import jenkins_job
+from mr.roboto.jenkinsutil import jenkins_pull_job
+from mr.roboto.utils import add_log
 from mr.roboto.buildout import PloneCoreBuildout
 import logging
 
@@ -84,9 +86,9 @@ def runFunctionPushTests(request):
             for branch in COREDEV_BRANCHES_TO_CHECK:
                 core_buildout = PloneCoreBuildout(branch)
                 if core_buildout.get_package_branch(package_name) == target_branch:
-                    # TODO: Create job
-                    # jenkins_urls.append(job_url)
-                    pass
+                    # Create job
+                    job_url = jenkins_pull_job(request, pull_id, branch)
+                    jenkins_urls.append(job_url)
             if not jenkins_urls:
                 # Coredev doesn't use this package or branch. Ignore
                 return
