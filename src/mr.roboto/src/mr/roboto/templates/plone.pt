@@ -83,7 +83,7 @@
         <hudson.plugins.emailext.plugins.trigger.RegressionTrigger>
           <email>
             <recipientList>${email_notification_recipients}</recipientList>
-            <subject>$PROJECT_NAME – Build # $BUILD_NUMBER – Regression! – ${dollar}{TEST_COUNTS, var=&quot;fail&quot;} failure(s)</subject>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Regression! - ${dollar}{TEST_COUNTS, var=&quot;fail&quot;} failure(s)</subject>
             <body>$PROJECT_DEFAULT_CONTENT</body>
             <sendToDevelopers>false</sendToDevelopers>
             <sendToRequester>false</sendToRequester>
@@ -94,7 +94,7 @@
         <hudson.plugins.emailext.plugins.trigger.ImprovementTrigger>
           <email>
             <recipientList>${email_notification_recipients}</recipientList>
-            <subject>$PROJECT_NAME – Build # $BUILD_NUMBER – Improvement! – ${dollar}{TEST_COUNTS, var="fail"} failure(s)</subject>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Improvement! - ${dollar}{TEST_COUNTS, var="fail"} failure(s)</subject>
             <body>$PROJECT_DEFAULT_CONTENT</body>
             <sendToDevelopers>false</sendToDevelopers>
             <sendToRequester>false</sendToRequester>
@@ -105,7 +105,7 @@
         <hudson.plugins.emailext.plugins.trigger.FixedTrigger>
           <email>
             <recipientList>${email_notification_recipients}</recipientList>
-            <subject>$PROJECT_NAME – Build # $BUILD_NUMBER – Fixed! – 0 failure(s)</subject>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Fixed! - 0 failure(s)</subject>
             <body>$PROJECT_DEFAULT_CONTENT</body>
             <sendToDevelopers>false</sendToDevelopers>
             <sendToRequester>false</sendToRequester>
