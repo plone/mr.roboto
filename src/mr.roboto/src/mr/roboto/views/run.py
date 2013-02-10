@@ -110,7 +110,14 @@ def runFunctionPushTests(request):
                 # Coredev doesn't use this package or branch. Ignore
                 return
 
-            pull_request_message += "Thanks for your pull request!\n"
+            pull_request_message += "Hi @%s. Thanks for your pull request!\n\n" % payload['sender']['login']
+            branch_template = "\n* [Plone %s](%s)"
+            branch_str = ''.join([branch_template % (a, jenkins_get_job_url(request, b)) for a, b in matched_branches.iteritems()])
+            merge_test_str = "a merge test" if len(matched_branches) == 1 else "some merge tests"
+            link_str = "link" if len(matched_branches) == 1 else "links"
+            pull_request_message += "I've gone ahead and started %(merge_test_str)s for you: \n%(branch_str)s \n\nYou can check on the results at at the above %(link_str)s, or just wait a little while and I'll report them here.\n\n" % {'merge_test_str': merge_test_str, 'branch_str': branch_str, 'link_str': link_str}
+            pull_request_message += "I'll also keep track of any future changes made to this pull request or to the Plone core build. If you'd like to manually run the merge tests at any point, you can do so via the %(link_str)s above." % {'link_str': link_str}
+
             # Add entry to db
             pull_info = pulls_db.set(pull_id, jenkins_urls, [])
 
@@ -141,7 +148,8 @@ def runFunctionPushTests(request):
 
         # Add a comment to the pull request.
         print pull_request_message
-        pull.create_issue_comment(pull_request_message)
+        if pull_request_message:
+            pull.create_issue_comment(pull_request_message)
     else:
         if pull_info is not None:
             # Consider this a merged pull
