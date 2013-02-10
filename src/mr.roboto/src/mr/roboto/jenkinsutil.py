@@ -3,13 +3,12 @@ import StringIO
 from mr.roboto.jobs import create_jenkins_job_xml
 
 
-def jenkins_remove_job(request, pull_request):
+def jenkins_remove_job(request, identifier):
     """
     Remove the jenkins job from this pull request
     """
-    # look for the jenkins job and remove it
-    ident = 'pull-request-' + pull_request
-    request.jenkins.delete_job(ident)
+    jenkins = request.registry.settings['jenkins']
+    jenkins.delete_job(identifier)
     pass
 
 
@@ -48,14 +47,16 @@ def jenkins_job(request, job, url_to_callback, params=None):
     """
     Generic jenkins call job
     """
+    
+    jenkins = request.registry.settings['jenkins']
 
     # First we check if the job exists
-    if not request.jenkins.job_exists(job):
+    if not jenkins.job_exists(job):
         # we create the job
         pass
 
     # We are going to reconfigure the job
-    xml_config = request.jenkins.get_job_config(job)
+    xml_config = jenkins.get_job_config(job)
     f = StringIO(xml_config)
     xml_object = etree.parse(f)
     endpoint = xml_object.parse('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')
@@ -76,7 +77,7 @@ def jenkins_job(request, job, url_to_callback, params=None):
     # </properties>
 
     xml_reconfig = etree.tostring(xml_object)
-    request.jenkins.reconfig_job(job, xml_reconfig)
+    jenkins.reconfig_job(job, xml_reconfig)
 
-    request.jenkins.build_job(job, params)
+    jenkins.build_job(job, params)
 
