@@ -59,9 +59,23 @@ def jenkins_job(request, job, callback_url, params=None):
     xml_config = jenkins.get_job_config(job)
     f = StringIO(xml_config)
     xml_object = etree.parse(f)
-    endpoint = xml_object.parse('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')
-    if len(endpoint) == 1:
-        endpoint.text = callback_url
+    isthere = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty')
+    if len(isthere) == 0:
+        properties = xml_object.xpath('/project/properties/')
+        listener = """<com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.4">
+         <endpoints>
+          <com.tikal.hudson.plugins.notification.Endpoint>
+           <protocol>HTTP</protocol>
+           <url>%s</url>
+          </com.tikal.hudson.plugins.notification.Endpoint>
+         </endpoints>
+        </com.tikal.hudson.plugins.notification.HudsonNotificationProperty>
+        """ % callback_url
+        properties.append(etree.parse(listener))
+    else:
+        endpoint = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')
+        if len(endpoint) == 1:
+            endpoint.text = callback_url
 
     # We are going to add a publisher call to url
 
