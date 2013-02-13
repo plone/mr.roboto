@@ -46,15 +46,15 @@ def functionCallbackPloneCommit(request):
     full_url = answer['build']['full_url']
     if answer['build']['phase'] == 'STARTED':
         #we just started the build
-        add_log('jenkin', 'Commit to ' + repo + ' testing !')
+        add_log(request, 'jenkin', 'Commit to ' + repo + ' testing !')
         commit.create_comment('I\'m going to test this commit with ' + jk_job + ' you can check it at : ' + full_url + ', good luck!')
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
         # Great it worked
-        add_log('jenkin', 'Commit to ' + repo + ' OK !')
+        add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
         commit.create_comment('I tried your commit on the ' + jk_job + ' and the tests pass!! Congrats!! I own you a beer!! Share your achievment: ' + full_url + ' ![Alt text](' + roboto_url + '/static/roboto_si.png)')
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
-        add_log('jenkin', 'Commit to ' + repo + ' FAILED !')
+        add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
         commit.create_comment('I tried your commit on the ' + jk_job + ' and the tests does not pass!! Oups, maybe is not your fault and the tests where not passing before your commit!: ' + full_url + ' ![Alt text](' + roboto_url + '/static/roboto_no.png)')
 
 
