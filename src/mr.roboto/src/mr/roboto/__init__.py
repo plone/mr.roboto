@@ -17,7 +17,7 @@ def main(global_config, **settings):
     # adds cornice
     config.include("cornice")
     config.registry.settings['roboto_url'] = settings['roboto_url']
-    config.registry.settings['callback_url'] = settings['roboto_url'] + '/callback/'
+    config.registry.settings['callback_url'] = settings['callback_url'] + '/callback/'
     config.registry.settings['api_key'] = settings['api_key']
 
     config.registry.settings['jenkins'] = Jenkins(settings['jenkins_url'], settings['jenkins_username'], settings['jenkins_password'])
