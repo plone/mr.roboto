@@ -24,4 +24,3 @@ class PloneGithub(Github):
     def add_comment_to_pull_request(self, pull_id, comment):
         pull = self.get_pull_request(pull_id)
         pull.create_comment(comment)
-

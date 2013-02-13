@@ -6,6 +6,7 @@ from mr.roboto.jenkinsutil import jenkins_create_pull_job
 from mr.roboto.jenkinsutil import jenkins_get_job_url
 from mr.roboto.jenkinsutil import jenkins_build_job
 from mr.roboto.jenkinsutil import jenkins_remove_job
+from mr.roboto.jenkinsutil import jenkins_job_external
 from mr.roboto.buildout import PloneCoreBuildout
 import logging
 import json
@@ -16,6 +17,12 @@ runCoreTests = Service(
     name='Run core tests',
     path='/run/corecommit',
     description="Run the core-dev buildout"
+)
+
+runPloneTests = Service(
+    name='Run plone package tests',
+    path='/run/plonecommit',
+    description="Run the package buildout"
 )
 
 runPushTests = Service(
@@ -32,6 +39,14 @@ createGithubPostCommitHooks = Service(
 
 roboto_url = "http://jenkins2.plone.org:6543/"
 
+# PLONE PACKAGES VERSIONS
+
+PLONE_BRANCHES_TO_CHECK = ['4.3']
+
+PLONE_PYTHON_VERSIONS = ['2.7']
+
+# CORE-DEV VERSIONS
+
 COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3']
 
 PYTHON_VERSIONS = ['2.6', '2.7']
@@ -41,6 +56,38 @@ ACTUAL_HOOKS_INSTALL_ON = '4.3'
 
 def add_log(request, who, message):
     logger.info("Run Core Tests : " + who + " " + message)
+
+
+@runPloneTests.post()
+@validatetoken
+def runFunctionPloneTests(request):
+    """
+    When we are called by GH we want to run the jenkins plone build
+    """
+    payload = json.loads(request.POST['payload'])
+
+    # Going to run the core-dev tests
+    for commit in payload['commits']:
+        who = commit['committer']['name'] + ' <' + commit['committer']['email'] + '>'
+    repo = payload['repository']['url']
+    message = 'Commit trigger on ' + repo
+    add_log(request, who, message)
+    # We need to run the core-dev tests
+    # with a callback with the last commit hash
+    # we should store all of them but right now is ok
+    last_commit = payload['commits'][0]['id']
+    repo_name = repo.split('github.com/')[-1].split('.git')[0]
+
+    repo_base = repo_name.split('/')[0]
+    repo_module = repo_name.split('/')[1]
+
+    url = request.registry.settings['callback_url'] + 'plonecommit?commit_hash=' + last_commit + '&base=' + repo_base + '&module=' + repo_module
+
+    for job in PLONE_BRANCHES_TO_CHECK:
+        name_jk_job = 'plone-' + job + '-' + repo_module
+        for python_ver in PLONE_PYTHON_VERSIONS:
+            job_name = name_jk_job + '-python-' + python_ver
+            jenkins_job_external(request, job_name, url, repo)
 
 
 @runCoreTests.post()
@@ -54,13 +101,21 @@ def runFunctionCoreTests(request):
     # Going to run the core-dev tests
     for commit in payload['commits']:
         who = commit['committer']['name'] + '<' + commit['committer']['email'] + '>'
+
+    repo = payload['repository']['url']
     message = 'Commit trigger on core-dev'
     add_log(request, who, message)
     # We need to run the core-dev tests
     # with a callback with the last commit hash
     # we should store all of them but right now is ok
     last_commit = payload['commits'][0]['id']
-    url = request.registry.settings['callback_url'] + 'corecommit?commit_hash=' + last_commit
+
+    repo_name = repo.split('github.com/')[-1].split('.git')[0]
+
+    repo_base = repo_name.split('/')[0]
+    repo_module = repo_name.split('/')[1]
+
+    url = request.registry.settings['callback_url'] + 'corecommit?commit_hash=' + last_commit + '&base=' + repo_base + '&module=' + repo_module
 
     for job in COREDEV_BRANCHES_TO_CHECK:
         name_jk_job = 'plone-' + job

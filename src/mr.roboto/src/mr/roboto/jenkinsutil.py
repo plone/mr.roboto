@@ -49,11 +49,35 @@ def jenkins_create_pull_job(request, pull_request, branch=None, params=None):
     return ident
 
 
+def jenkins_job_external(request, job, callback_url, repo, branch=None, params=None):
+    """
+    Generic plone project job
+    """
+
+    jenkins = request.registry.settings['jenkins']
+
+    # First we check if the job exists
+    if not jenkins.job_exists(job):
+
+        # we create the job
+        job_xml = create_jenkins_job_xml(
+            'Test %s' % repo,
+            '2.7',
+            'no-reply@plone.org',
+            git_url=repo,
+            git_branch=branch if branch else 'master',
+            callback_url=callback_url)
+
+        jenkins.create_job(job, job_xml)
+
+    jenkins.build_job(job, params)
+
+
 def jenkins_job(request, job, callback_url, params=None):
     """
     Generic jenkins call job
     """
-    
+
     jenkins = request.registry.settings['jenkins']
 
     # First we check if the job exists
