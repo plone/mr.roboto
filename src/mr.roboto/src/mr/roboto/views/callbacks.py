@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
 from mr.roboto.security import validatejenkins
+from mr.roboto.views.run import add_log
 
 callbackCommit = Service(name='Callback for commits', path='/callback/corecommit',
                     description="Callback for commits jobs on jenkins")
@@ -13,6 +14,7 @@ callbackPlone = Service(name='Callback for commits on plone external repo', path
 
 
 @callbackPlone.post()
+@validatejenkins
 def functionCallbackPloneCommit(request):
     """
     For NON core-dev
@@ -44,12 +46,15 @@ def functionCallbackPloneCommit(request):
     full_url = answer['build']['full_url']
     if answer['build']['phase'] == 'STARTED':
         #we just started the build
+        add_log('jenkin', 'Commit to ' + repo + ' testing !')
         commit.create_comment('I\'m going to test this commit with ' + jk_job + ' you can check it at : ' + full_url + ', good luck!')
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
         # Great it worked
+        add_log('jenkin', 'Commit to ' + repo + ' OK !')
         commit.create_comment('I tried your commit on the ' + jk_job + ' and the tests pass!! Congrats!! I own you a beer!! Share your achievment: ' + full_url + ' ![Alt text](' + roboto_url + '/static/roboto_si.png)')
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
+        add_log('jenkin', 'Commit to ' + repo + ' FAILED !')
         commit.create_comment('I tried your commit on the ' + jk_job + ' and the tests does not pass!! Oups, maybe is not your fault and the tests where not passing before your commit!: ' + full_url + ' ![Alt text](' + roboto_url + '/static/roboto_no.png)')
 
 
