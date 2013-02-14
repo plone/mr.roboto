@@ -95,7 +95,6 @@ def functionCallbackPull(request):
 
 
 @callbackCommit.post()
-@validatejenkins
 def functionCallbackCommit(request):
     """
     For core-dev

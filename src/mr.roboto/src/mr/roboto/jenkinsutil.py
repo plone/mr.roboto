@@ -96,12 +96,14 @@ def jenkins_job(request, job, callback_url, params=None):
          <endpoints>
           <com.tikal.hudson.plugins.notification.Endpoint>
            <protocol>HTTP</protocol>
-           <url>%s</url>
+           <url></url>
           </com.tikal.hudson.plugins.notification.Endpoint>
          </endpoints>
         </com.tikal.hudson.plugins.notification.HudsonNotificationProperty>
-        """ % callback_url
-        properties.append(etree.XML(listener))
+        """
+        xml_list = etree.XML(listener)
+        xml_list.xpath('/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')[0].text = callback_url
+        properties.append(xml_list)
     else:
         endpoint = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')
         if len(endpoint) == 1:
