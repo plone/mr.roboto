@@ -103,7 +103,7 @@ def runFunctionCoreTests(request):
         who = commit['committer']['name'] + '<' + commit['committer']['email'] + '>'
 
     repo = payload['repository']['url']
-    message = 'Commit trigger on core-dev'
+    message = 'Commit trigger on core-dev on ' + repo
     add_log(request, who, message)
     # We need to run the core-dev tests
     # with a callback with the last commit hash

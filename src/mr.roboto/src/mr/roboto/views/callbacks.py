@@ -114,7 +114,6 @@ def functionCallbackCommit(request):
     We are going to write on the comment
 
     """
-    #import pdb; pdb.set_trace()
     answer = request.json_body
     commit_hash = request.GET['commit_hash']
     base = request.GET['base']
