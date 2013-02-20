@@ -37,8 +37,6 @@ createGithubPostCommitHooks = Service(
     description="Creates github post-commit hooks."
 )
 
-roboto_url = "http://jenkins2.plone.org:6543/"
-
 # PLONE PACKAGES VERSIONS
 
 PLONE_BRANCHES_TO_CHECK = ['4.3']
@@ -227,6 +225,7 @@ def runFunctionPushTests(request):
 def createGithubPostCommitHooksView(request):
     # We should remove all the actual hooks
     github = request.registry.settings['github']
+    roboto_url = request.registry.settings['roboto_url']
 
     buildout = PloneCoreBuildout(ACTUAL_HOOKS_INSTALL_ON)
     sources = buildout.sources
