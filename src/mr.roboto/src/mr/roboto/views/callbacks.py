@@ -52,6 +52,8 @@ def functionCallbackPloneCommit(request):
     jk_job = answer['name']
     full_url = answer['build']['full_url']
     message = ''
+    someThingDone = False
+
     if answer['build']['phase'] == 'STARTED':
         #we just started the build
         add_log(request, 'jenkin', 'Commit to ' + repo + ' testing !')
@@ -59,22 +61,25 @@ def functionCallbackPloneCommit(request):
             message = "* " + jk_job + " at : " + full_url
         else:
             message = old_message + '\n' + "* " + jk_job + " at : " + full_url
+        someThingDone = True
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
         # Great it worked
         add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
         temp = old_message.split(jk_job)
         message = temp[0] + ' Success ![Alt text](' + roboto_url + '/static/roboto_si.png)' + temp[1]
+        someThingDone = True
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
         add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
         temp = old_message.split(jk_job)
         message = temp[0] + ' Fail ![Alt text](' + roboto_url + '/static/roboto_no.png)' + temp[1]
-        
-    if comment_object:
+        someThingDone = True
+
+    if comment_object and someThingDone:
         comment_object.edit(message)
-    else:
+    elif someThingDone:
         commit.create_comment("Testing:\n" + message)
 
 
