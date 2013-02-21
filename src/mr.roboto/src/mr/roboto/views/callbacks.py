@@ -67,14 +67,14 @@ def functionCallbackPloneCommit(request):
         # Great it worked
         add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
         temp = old_message.split('[PENDING] ' + jk_job)
-        message = temp[0] + '[SUCCESS] ![Alt text](' + roboto_url + '/static/roboto_si.png)' + jk_job + temp[1]
+        message = temp[0] + '[SUCCESS] ![Alt text](' + roboto_url + 'static/roboto_si.png)' + jk_job + temp[1]
         someThingDone = True
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
         add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
         temp = old_message.split('[PENDING] ' + jk_job)
-        message = temp[0] + '[FAIL] ![Alt text](' + roboto_url + '/static/roboto_no.png)' + jk_job + temp[1]
+        message = temp[0] + '[FAIL] ![Alt text](' + roboto_url + 'static/roboto_no.png)' + jk_job + temp[1]
         someThingDone = True
 
     if comment_object and someThingDone:
@@ -172,14 +172,14 @@ def functionCallbackCommit(request):
         # Great it worked
         add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
         temp = old_message.split('[PENDING] ' + jk_job)
-        message = temp[0] + '[SUCCESS] ![Alt text](' + roboto_url + '/static/roboto_si.png)' + jk_job + temp[1]
+        message = temp[0] + '[SUCCESS] ![Alt text](' + roboto_url + 'static/roboto_si.png)' + jk_job + temp[1]
         someThingDone = True
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
         add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
         temp = old_message.split('[PENDING] ' + jk_job)
-        message = temp[0] + '[FAIL] ![Alt text](' + roboto_url + '/static/roboto_no.png)' + jk_job + temp[1]
+        message = temp[0] + '[FAIL] ![Alt text](' + roboto_url + 'static/roboto_no.png)' + jk_job + temp[1]
         someThingDone = True
 
     if comment_object and someThingDone:
