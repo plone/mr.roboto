@@ -44,7 +44,7 @@ def functionCallbackPloneCommit(request):
     comment_object = None
     old_message = ''
     for comment in commit.get_comments():
-        if comment.user == 'mister-roboto':
+        if comment.user.login == 'mister-roboto':
             comment_object = comment
             old_message = comment_object.body
 
