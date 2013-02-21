@@ -41,21 +41,41 @@ def functionCallbackPloneCommit(request):
     repo = base + '/' + module
     repo_object = request.registry.settings['github'].get_repo(repo)
     commit = repo_object.get_commit(commit_hash)
+    comment_object = None
+    old_message = ''
+    for comment in commit.get_comments():
+        if comment['user'] == 'mr.roboto@plone.org':
+            comment_object = comment
+            old_message = comment_object.body
+
     roboto_url = request.registry.settings['roboto_url']
     jk_job = answer['name']
     full_url = answer['build']['full_url']
+    message = ''
     if answer['build']['phase'] == 'STARTED':
         #we just started the build
         add_log(request, 'jenkin', 'Commit to ' + repo + ' testing !')
-        commit.create_comment('I\'m going to test this commit with ' + jk_job + ' you can check it at : ' + full_url + ', good luck!')
+        if old_message == '':
+            message = "* " + jk_job + " at : " + full_url
+        else:
+            message = old_message + '\n' + "* " + jk_job + " at : " + full_url
+
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
         # Great it worked
         add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
-        commit.create_comment('I tried your commit on the ' + jk_job + ' and the tests pass!! Congrats!! I own you a beer!! Share your achievment: ' + full_url + ' ![Alt text](' + roboto_url + '/static/roboto_si.png)')
+        temp = old_message.split(jk_job)
+        message = temp[0] + ' Success ![Alt text](' + roboto_url + '/static/roboto_si.png)' + temp[1]
+
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
         add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
-        commit.create_comment('I tried your commit on the ' + jk_job + ' and the tests does not pass!! Oups, maybe is not your fault and the tests where not passing before your commit!: ' + full_url + ' ![Alt text](' + roboto_url + '/static/roboto_no.png)')
+        temp = old_message.split(jk_job)
+        message = temp[0] + ' Fail ![Alt text](' + roboto_url + '/static/roboto_no.png)' + temp[1]
+        
+    if comment_object:
+        comment_object.edit(message)
+    else:
+        commit.create_comment("Testing:\n" + message)
 
 
 @callbackPull.post()
