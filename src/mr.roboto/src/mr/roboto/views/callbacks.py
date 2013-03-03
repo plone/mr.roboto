@@ -146,51 +146,26 @@ def functionCallbackCommit(request):
     repo = base + '/' + module
     repo_object = request.registry.settings['github'].get_repo(repo)
     commit = repo_object.get_commit(commit_hash)
-    comment_object = None
-    message = ''
-    for comment in commit.get_comments():
-        if comment.user.login == 'mister-roboto':
-            comment_object = comment
-            message = comment_object.body
 
-    roboto_url = request.registry.settings['roboto_url']
     jk_job = answer['name']
     full_url = answer['build']['full_url']
-    someThingDone = False
-
-    roboto_ok = "![Alt text](%sstatic/roboto_si.png)" % roboto_url
-    roboto_fail = "![Alt text](%sstatic/roboto_no.png)" % roboto_url
 
     if answer['build']['phase'] == 'STARTED':
         # We started the job so we are going to write on the GH commit 
         # A line with the status
         add_log(request, 'jenkin', 'Commit to ' + repo + ' start testing ' + jk_job + ' !')
-        message += "\n* %s [PENDING] " % full_url
         commit.create_status('pending', full_url, jk_job)
-        someThingDone = True
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
         # Great it worked
-        # We are going to look for the line on the comment and change the status
         add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
-        replace_from = "%s [PENDING]" % full_url
-        replace_to = "%s [SUCCESS] %s" % (full_url, roboto_ok)
-        message.replace(replace_from, replace_to)
         # We can change the status of the commit
         commit.create_status('success', full_url, jk_job)
-        someThingDone = True
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
         add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
-        replace_from = "%s [PENDING]" % full_url
-        replace_to = "%s [FAIL] %s" % (full_url, roboto_fail)
-        message.replace(replace_from, replace_to)
         # We can change the status of the commit
         commit.create_status('failure', full_url, jk_job)
         someThingDone = True
 
-    if comment_object and someThingDone:
-        comment_object.edit(message)
-    elif someThingDone:
-        commit.create_comment("Testing:\n" + message)

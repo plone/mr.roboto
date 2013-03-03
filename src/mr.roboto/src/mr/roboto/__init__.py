@@ -24,7 +24,6 @@ def main(global_config, **settings):
 
     config.registry.settings['github'] = PloneGithub(settings['github_user'], settings['github_password'])
 
-    config.registry.settings['core'] = ReposDB(settings['core_repos_db'])
     config.registry.settings['pulls'] = PullsDB(settings['core_pulls_db'])
 
     config.add_static_view('static', 'static', cache_max_age=3600)
