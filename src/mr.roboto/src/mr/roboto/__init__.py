@@ -2,7 +2,7 @@ from pyramid.config import Configurator
 
 from security import RequestWithAttributes
 
-from mr.roboto.db import ReposDB, PullsDB
+from mr.roboto.db import PullsDB
 
 from mr.roboto.plonegithub import PloneGithub
 from jenkins import Jenkins
