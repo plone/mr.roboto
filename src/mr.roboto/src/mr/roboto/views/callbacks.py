@@ -39,48 +39,33 @@ def functionCallbackPloneCommit(request):
     base = request.GET['base']
     module = request.GET['module']
     repo = base + '/' + module
-    repo_object = request.registry.settings['github'].get_repo(repo)
-    commit = repo_object.get_commit(commit_hash)
-    comment_object = None
-    old_message = ''
-    for comment in commit.get_comments():
-        if comment.user.login == 'mister-roboto':
-            comment_object = comment
-            old_message = comment_object.body
+    ghObject = request.registry.settings['github']
 
-    roboto_url = request.registry.settings['roboto_url']
     jk_job = answer['name']
     full_url = answer['build']['full_url']
-    message = ''
-    someThingDone = False
 
     if answer['build']['phase'] == 'STARTED':
-        #we just started the build
-        add_log(request, 'jenkin', 'Commit to ' + repo + ' testing !')
-        if old_message == '':
-            message = "* [PENDING] " + jk_job + " at : " + full_url
-        else:
-            message = old_message + '\n' + "* [PENDING] " + jk_job + " at : " + full_url
-        someThingDone = True
+        # We started the job so we are going to write on the GH commit 
+        # A line with the status
+        add_log(request, 'jenkin', 'Commit %s to %s start testing %s ' % (commit_hash, repo, jk_job))
+        message = "\n* %s - %s [PENDING] " % (jk_job, full_url)
+        ghObject.add_commit_message(repo, commit_hash, message)
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
         # Great it worked
-        add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
-        temp = old_message.split('[PENDING] ' + jk_job)
-        message = temp[0] + '[SUCCESS] ![Alt text](' + roboto_url + 'static/roboto_si.png)' + jk_job + temp[1]
-        someThingDone = True
+        add_log(request, 'jenkin', 'Commit %s to %s OK %s ' % (commit_hash, repo, jk_job))
+        # We can change the comment of the commit
+        oldMessage = "%s [PENDING] " % full_url
+        message = "%s [SUCCESS] " % full_url
+        ghObject.replace_commit_message(repo, commit_hash, oldMessage, message)
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
-        add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
-        temp = old_message.split('[PENDING] ' + jk_job)
-        message = temp[0] + '[FAIL] ![Alt text](' + roboto_url + 'static/roboto_no.png)' + jk_job + temp[1]
-        someThingDone = True
-
-    if comment_object and someThingDone:
-        comment_object.edit(message)
-    elif someThingDone:
-        commit.create_comment("Testing:\n" + message)
+        add_log(request, 'jenkin', 'Commit %s to %s FAIL %s ' % (commit_hash, repo, jk_job))
+        # We can change the comment of the commit
+        oldMessage = "%s [PENDING] " % full_url
+        message = "%s [FAIL] " % full_url
+        ghObject.replace_commit_message(repo, commit_hash, oldMessage, message)
 
 
 @callbackPull.post()
@@ -144,8 +129,7 @@ def functionCallbackCommit(request):
     base = request.GET['base']
     module = request.GET['module']
     repo = base + '/' + module
-    repo_object = request.registry.settings['github'].get_repo(repo)
-    commit = repo_object.get_commit(commit_hash)
+    ghObject = request.registry.settings['github']
 
     jk_job = answer['name']
     full_url = answer['build']['full_url']
@@ -153,19 +137,23 @@ def functionCallbackCommit(request):
     if answer['build']['phase'] == 'STARTED':
         # We started the job so we are going to write on the GH commit 
         # A line with the status
-        add_log(request, 'jenkin', 'Commit to ' + repo + ' start testing ' + jk_job + ' !')
-        commit.create_status('pending', full_url, jk_job)
+        add_log(request, 'jenkin', 'Commit %s to %s start testing %s ' % (commit_hash, repo, jk_job))
+        message = "\n* %s - %s [PENDING] " % (jk_job, full_url)
+        ghObject.add_commit_message(repo, commit_hash, message)
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
         # Great it worked
-        add_log(request, 'jenkin', 'Commit to ' + repo + ' OK !')
-        # We can change the status of the commit
-        commit.create_status('success', full_url, jk_job)
+        add_log(request, 'jenkin', 'Commit %s to %s OK %s ' % (commit_hash, repo, jk_job))
+        # We can change the comment of the commit
+        oldMessage = "%s [PENDING] " % full_url
+        message = "%s [SUCCESS] " % full_url
+        ghObject.replace_commit_message(repo, commit_hash, oldMessage, message)
 
     if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
-        add_log(request, 'jenkin', 'Commit to ' + repo + ' FAILED !')
-        # We can change the status of the commit
-        commit.create_status('failure', full_url, jk_job)
-        someThingDone = True
+        add_log(request, 'jenkin', 'Commit %s to %s FAIL %s ' % (commit_hash, repo, jk_job))
+        # We can change the comment of the commit
+        oldMessage = "%s [PENDING] " % full_url
+        message = "%s [FAIL] " % full_url
+        ghObject.replace_commit_message(repo, commit_hash, oldMessage, message)
 

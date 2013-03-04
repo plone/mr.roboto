@@ -11,4 +11,5 @@ production.ini
 include/
 lib/
 local/
-
+.installed.cfg
+.mr.developer.cfg

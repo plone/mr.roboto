@@ -68,20 +68,49 @@
     </hudson.tasks.Shell>
   </builders>
 
-  <!-- PUBLISHERS -->
   <publishers>
-    <!-- TEST REPORT -->
     <hudson.tasks.junit.JUnitResultArchiver>
       <testResults>**/parts/jenkins-test/testreports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.plugins.robot.RobotPublisher plugin="robot@1.2.3">
+      <outputPath>parts/jenkins-test</outputPath>
+      <reportFileName>robot_report.html</reportFileName>
+      <logFileName>robot_log.html</logFileName>
+      <outputFileName>robot_output.xml</outputFileName>
+      <passThreshold>100.0</passThreshold>
+      <unstableThreshold>80.0</unstableThreshold>
+      <logFileLink>robot_report.html#total_all</logFileLink>
+      <otherFiles>
+        <string>robot_*.png</string>
+      </otherFiles>
+      <onlyCritical>true</onlyCritical>
+    </hudson.plugins.robot.RobotPublisher>
   </publishers>
-
+  
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup>
-      <deleteDirs>false</deleteDirs>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.12">
+      <deleteDirs>true</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <org.jvnet.hudson.plugins.port__allocator.PortAllocator plugin="port-allocator@1.5">
+      <ports>
+        <org.jvnet.hudson.plugins.port__allocator.DefaultPortType>
+          <name>ZSERVER_PORT</name>
+        </org.jvnet.hudson.plugins.port__allocator.DefaultPortType>
+      </ports>
+    </org.jvnet.hudson.plugins.port__allocator.PortAllocator>
+    <org.jenkinsci.plugins.xvfb.XvfbBuildWrapper plugin="xvfb@1.0.7">
+      <installationName>default</installationName>
+      <screen>1024x768x24</screen>
+      <debug>false</debug>
+      <timeout>0</timeout>
+      <displayNameOffset>1</displayNameOffset>
+      <additionalOptions/>
+      <shutdownWithBuild>false</shutdownWithBuild>
+    </org.jenkinsci.plugins.xvfb.XvfbBuildWrapper>
   </buildWrappers>
+
+
 
 </project>
