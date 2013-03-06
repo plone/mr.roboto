@@ -45,7 +45,14 @@ PLONE_PYTHON_VERSIONS = ['2.7']
 
 # CORE-DEV VERSIONS
 
-COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3']
+
+COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3', '4.4']
+
+COREDEV_JOBS = ['plone-4.2-python-2.6', 
+                'plone-4.2-python-2.7', 
+                'plone-4.3-python-2.7', 
+                'plone-4.3-python-2.6', 
+                'plone-4.4-python-2.7']
 
 PYTHON_VERSIONS = ['2.6', '2.7']
 
@@ -115,11 +122,9 @@ def runFunctionCoreTests(request):
 
     url = request.registry.settings['callback_url'] + 'corecommit?commit_hash=' + last_commit + '&base=' + repo_base + '&module=' + repo_module
 
-    for job in COREDEV_BRANCHES_TO_CHECK:
-        name_jk_job = 'plone-' + job
-        for python_ver in PYTHON_VERSIONS:
-            job_name = name_jk_job + '-python-' + python_ver
-            jenkins_job(request, job_name, url)
+    for job in COREDEV_JOBS:
+        job_name = job
+        jenkins_job(request, job_name, url)
 
 
 @runPushTests.post()
