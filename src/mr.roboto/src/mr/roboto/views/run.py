@@ -115,7 +115,7 @@ def runFunctionCoreTests(request):
     # Run the core jobs related with this commit on jenkins
     for core_job in core_jobs:
         for python_version in PYTHON_VERSIONS:
-            job_name = 'python-' + python_version + '-plone-' + core_job['plone_version']
+            job_name = 'plone-' + core_job['plone_version'] + '-python-' + python_version
             message = 'Start ' + job_name + ' Jenkins Job'
 
             # We create the JK job
