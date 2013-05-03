@@ -50,4 +50,3 @@ def send_mail_on_push(event):
             )
 
             mailer.send(msg)
-    print(event.msg)
