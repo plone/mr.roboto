@@ -50,7 +50,8 @@ class JenkinsJob(persistent.Persistent):
             plone_version=None,
             who=None,
             ref=None,
-            jk_name=None):
+            jk_name=None,
+            jk_url=None):
         self.type = job_type
         self.repo = repo
         self.branch = branch
@@ -60,7 +61,7 @@ class JenkinsJob(persistent.Persistent):
         self.who = who
         self.jk_name = jk_name
         self.ref = ref
-        self.url = ""
+        self.jk_url = jk_url
 
 
 class JenkinsJobs(mapping.MongoCollectionMapping):
