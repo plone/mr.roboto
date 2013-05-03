@@ -81,7 +81,7 @@ def runFunctionCoreTests(request):
     payload = json.loads(request.POST['payload'])
 
     # Subscribers to a git push event
-    request.registry.notify(NewPush(payload))
+    request.registry.notify(NewPush(payload, request))
 
     # DB of jenkins jobs
     jenkins_jobs = JenkinsJobs(request.registry.settings['dm'])
