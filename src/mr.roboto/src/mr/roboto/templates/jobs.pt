@@ -36,7 +36,7 @@
                     <td tal:content="python:job['repo']">repo</td>
                     <td tal:content="python:job['date']">repo</td>
                     <td tal:content="python:job['jk_name']">repo</td>
-                    <td><a href="" tal:attributes="python:job['jk_url']">link</a></td>
+                    <td><a href="" tal:attributes="href python:job['jk_url']">link</a></td>
                 </tr>
             </table>
         </div>
