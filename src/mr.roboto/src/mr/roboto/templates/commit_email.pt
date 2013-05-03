@@ -1,0 +1,12 @@
+Repository: ${push.repository.name}
+Branch: ${push.ref}
+Date: ${commit.timestamp}
+Author: ${commit.author.name} (${commit.author.get('username')}) <${commit.author.email}>
+Commit: ${commit.url}
+
+${commit.message}
+
+Files changed:
+${files}
+
+${structure: diff}

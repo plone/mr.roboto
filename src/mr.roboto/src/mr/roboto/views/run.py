@@ -1,15 +1,28 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
 from mr.roboto.security import validatetoken
-from mr.roboto.jenkinsutil import jenkins_job
+from mr.roboto.security import validategithub
+from mr.roboto.jenkinsutil import jenkins_core_job
 from mr.roboto.jenkinsutil import jenkins_create_pull_job
 from mr.roboto.jenkinsutil import jenkins_get_job_url
 from mr.roboto.jenkinsutil import jenkins_build_job
 from mr.roboto.jenkinsutil import jenkins_remove_job
 from mr.roboto.jenkinsutil import jenkins_job_external
 from mr.roboto.buildout import PloneCoreBuildout
+
+from mr.roboto.db import CorePackages
+from mr.roboto.db import CorePackage
+from mr.roboto.db import JenkinsJob
+from mr.roboto.db import JenkinsJobs
+
+from mr.roboto.events import NewPush
+
+import transaction
+
 import logging
 import json
+import uuid
+
 
 logger = logging.getLogger('mr.roboto')
 
@@ -43,88 +56,95 @@ PLONE_BRANCHES_TO_CHECK = ['4.3']
 
 PLONE_PYTHON_VERSIONS = ['2.7']
 
-# CORE-DEV VERSIONS
-
-
-COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3', '4.4']
-
-COREDEV_JOBS = ['plone-4.2-python-2.6', 
-                'plone-4.2-python-2.7', 
-                'plone-4.3-python-2.7', 
-                'plone-4.3-python-2.6', 
-                'plone-4.4-python-2.7']
+# CORE-DEV PYTHON VERSIONS
 
 PYTHON_VERSIONS = ['2.6', '2.7']
-
-ACTUAL_HOOKS_INSTALL_ON = '4.3'
 
 
 def add_log(request, who, message):
     logger.info("Run Core Tests : " + who + " " + message)
 
 
-@runPloneTests.post()
-@validatetoken
-def runFunctionPloneTests(request):
-    """
-    When we are called by GH we want to run the jenkins plone build
-    """
-    payload = json.loads(request.POST['payload'])
-
-    # Going to run the core-dev tests
-    for commit in payload['commits']:
-        who = commit['committer']['name'] + ' <' + commit['committer']['email'] + '>'
-    repo = payload['repository']['url']
-    message = 'Commit trigger on ' + repo
-    add_log(request, who, message)
-    # We need to run the core-dev tests
-    # with a callback with the last commit hash
-    # we should store all of them but right now is ok
-    last_commit = payload['commits'][0]['id']
-    repo_name = repo.split('github.com/')[-1].split('.git')[0]
-
-    repo_base = repo_name.split('/')[0]
-    repo_module = repo_name.split('/')[1]
-
-    url = request.registry.settings['callback_url'] + 'plonecommit?commit_hash=' + last_commit + '&base=' + repo_base + '&module=' + repo_module
-
-    for job in PLONE_BRANCHES_TO_CHECK:
-        name_jk_job = 'plone-' + job + '-' + repo_module
-        for python_ver in PLONE_PYTHON_VERSIONS:
-            job_name = name_jk_job + '-python-' + python_ver
-            jenkins_job_external(request, job_name, url, repo)
-
-
 @runCoreTests.post()
-@validatetoken
+@validategithub
 def runFunctionCoreTests(request):
     """
-    When we are called by GH we want to run the jenkins core-dev builds
+    When we are called by GH we want to run the jenkins builds
+
+    It's called for each push on the plone repo, so we look which tests needs to be runned for this repo:
+
+    * Core Dev : it's on sources
+    * PLIP : it's added as specific PLIP
+    * Package : it's added as specific package
+
     """
     payload = json.loads(request.POST['payload'])
 
-    # Going to run the core-dev tests
-    for commit in payload['commits']:
-        who = commit['committer']['name'] + '<' + commit['committer']['email'] + '>'
+    # Subscribers to a git push event
+    request.registry.notify(NewPush(payload))
 
-    repo = payload['repository']['url']
-    message = 'Commit trigger on core-dev on ' + repo
-    add_log(request, who, message)
-    # We need to run the core-dev tests
-    # with a callback with the last commit hash
-    # we should store all of them but right now is ok
+    # DB of jenkins jobs
+    jenkins_jobs = JenkinsJobs(request.registry.settings['dm'])
+
+    # We get the last commit id to have a reference
     last_commit = payload['commits'][0]['id']
 
-    repo_name = repo.split('github.com/')[-1].split('.git')[0]
+    # Create jk job uuid
+    jk_job_id = uuid.uuid4().hex
 
-    repo_base = repo_name.split('/')[0]
-    repo_module = repo_name.split('/')[1]
+    organization = payload['repository']['organization']
+    repo_name = payload['repository']['name']
 
-    url = request.registry.settings['callback_url'] + 'corecommit?commit_hash=' + last_commit + '&base=' + repo_base + '&module=' + repo_module
+    repo = organization + '/' + repo_name
+    branch = payload['ref'].split('/')[-1]
 
-    for job in COREDEV_JOBS:
-        job_name = job
-        jenkins_job(request, job_name, url)
+    # Going to run the core-dev tests
+    # Who is doing the push ??
+    who = ""
+    for commit in payload['commits']:
+        who = commit['committer']['name'] + '<' + commit['committer']['email'] + '>'
+        message = 'Commit trigger on ' + repo + ' ' + commit['id']
+        add_log(request, who, message)
+
+    # Look at DB which plone version needs to run tests
+    core_jobs = list(request.registry.settings['db']['core_package'].find({'repo': repo, 'branch': branch}))
+
+    # Define the callback url for jenkins
+    url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
+
+    # Run the core jobs related with this commit on jenkins
+    for core_job in core_jobs:
+        for python_version in PYTHON_VERSIONS:
+            job_name = 'python-' + python_version + '-plone-' + core_job['plone_version']
+            message = 'Start ' + job_name + ' Jenkins Job'
+
+            # We create the JK job
+            result = jenkins_core_job(request, job_name, url, payload=payload)
+
+            if result:
+                # We create the job on the mongo
+                add_log(request, who, message)
+                jenkins_jobs[jk_job_id] = JenkinsJob('core', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit, jk_url=result)
+                transaction.commit()
+
+    # Look at DB which PLIP jobs needs to run
+    # We need to look if there is any PLIP job that needs to run tests
+    plips = list(request.registry.settings['db']['plips'].find({'repo': repo, 'branch': branch}))
+
+    for plip in plips:
+        # Run the JK jobs for each plip
+        message = 'Start ' + job_name + ' Jenkins Job'
+
+        job_name = 'plip-' + plip['description']
+        # We create the JK job
+        result = jenkins_job_external(request, job_name, url, payload=payload)
+        if result:
+            add_log(request, who, message)
+            jenkins_jobs[jk_job_id] = JenkinsJob('plip', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit, jk_url=result)
+            transaction.commit()
+
+
+    # Look for standalone jobs on this package
 
 
 @runPushTests.post()
@@ -231,451 +251,55 @@ def createGithubPostCommitHooksView(request):
     # We should remove all the actual hooks
     github = request.registry.settings['github']
     roboto_url = request.registry.settings['roboto_url']
+    actual_plone_versions = request.registry.settings['plone_versions']
 
-    buildout = PloneCoreBuildout(ACTUAL_HOOKS_INSTALL_ON)
-    sources = buildout.sources
+    dm = request.registry.settings['dm']
+    core_packages = CorePackages(dm)
 
-    repos = [x.path for x in sources.values()]
+    # Remove all core_packages
+    request.registry.settings['db']['core_package'].remove({})
+    # actual_packages = core_packages.keys()
+    # for actual_package in actual_packages:
+    #     del core_packages[actual_package]
 
-    commit_url = roboto_url + 'run/corecommit?token=' + request.registry.settings['api_key']
-    pull_url = roboto_url + 'run/pullrequest?token=' + request.registry.settings['api_key']
+    transaction.commit()
 
-    repos.append('plone/buildout.coredev')
+    core_packages = CorePackages(dm)
+    # Clean Core Packages DB and sync to GH
+    for plone_version in actual_plone_versions:
 
-    for repo in repos:
-        if repo:
-            try:
-                add_log(request, 'github', 'Working on ' + repo)
-                gh_repo = github.get_repo(repo)
-                for hook in gh_repo.get_hooks():
-                    add_log(request, 'github', 'Removing hook ' + str(hook.config))
-                    hook.delete()
+        # Add the core package to mongo
+        buildout = PloneCoreBuildout(plone_version)
+        sources = buildout.sources.keys()
+        for source in sources:
+            source_obj = buildout.sources[source]
+            if source_obj.path is not None:
+                core_packages[source] = CorePackage(source, source_obj.path, source_obj.branch, plone_version)
 
-                # We are going to store the new hooks
-                add_log(request, 'github', 'Creating hook ' + commit_url + ' and ' + pull_url)
-                gh_repo.create_hook('web', {'url': commit_url}, 'push', True)
-                gh_repo.create_hook('web', {'url': pull_url}, 'pull_request', True)
-            except:
-                add_log(request, 'github', 'Problems on ' + repo)
+        transaction.commit()
 
-# Example payload Push
+    # hooks URL
+    commit_url = roboto_url + 'run/corecommit'
+    pull_url = roboto_url + 'run/pullrequest'
 
-# {
-#   "action": "synchronize",
-#   "number": 4,
-#   "pull_request": {
-#     "_links": {
-#       "comments": {
-#         "href": "https://api.github.com/repos/esteele/Products.Archetypes/issues/4/comments"
-#       },
-#       "html": {
-#         "href": "https://github.com/esteele/Products.Archetypes/pull/4"
-#       },
-#       "issue": {
-#         "href": "https://api.github.com/repos/esteele/Products.Archetypes/issues/4"
-#       },
-#       "review_comments": {
-#         "href": "https://api.github.com/repos/esteele/Products.Archetypes/pulls/4/comments"
-#       },
-#       "self": {
-#         "href": "https://api.github.com/repos/esteele/Products.Archetypes/pulls/4"
-#       }
-#     },
-#     "additions": 9,
-#     "assignee": null,
-#     "base": {
-#       "label": "esteele:master",
-#       "ref": "master",
-#       "repo": {
-#         "archive_url": "https://api.github.com/repos/esteele/Products.Archetypes/{archive_format}{/ref}",
-#         "assignees_url": "https://api.github.com/repos/esteele/Products.Archetypes/assignees{/user}",
-#         "blobs_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/blobs{/sha}",
-#         "branches_url": "https://api.github.com/repos/esteele/Products.Archetypes/branches{/branch}",
-#         "clone_url": "https://github.com/esteele/Products.Archetypes.git",
-#         "collaborators_url": "https://api.github.com/repos/esteele/Products.Archetypes/collaborators{/collaborator}",
-#         "comments_url": "https://api.github.com/repos/esteele/Products.Archetypes/comments{/number}",
-#         "commits_url": "https://api.github.com/repos/esteele/Products.Archetypes/commits{/sha}",
-#         "compare_url": "https://api.github.com/repos/esteele/Products.Archetypes/compare/{base}...{head}",
-#         "contents_url": "https://api.github.com/repos/esteele/Products.Archetypes/contents/{+path}",
-#         "contributors_url": "https://api.github.com/repos/esteele/Products.Archetypes/contributors",
-#         "created_at": "2013-02-08T10:59:48Z",
-#         "description": "None",
-#         "downloads_url": "https://api.github.com/repos/esteele/Products.Archetypes/downloads",
-#         "events_url": "https://api.github.com/repos/esteele/Products.Archetypes/events",
-#         "fork": true,
-#         "forks": 0,
-#         "forks_count": 0,
-#         "forks_url": "https://api.github.com/repos/esteele/Products.Archetypes/forks",
-#         "full_name": "esteele/Products.Archetypes",
-#         "git_commits_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/commits{/sha}",
-#         "git_refs_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/refs{/sha}",
-#         "git_tags_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/tags{/sha}",
-#         "git_url": "git://github.com/esteele/Products.Archetypes.git",
-#         "has_downloads": true,
-#         "has_issues": false,
-#         "has_wiki": false,
-#         "homepage": "None",
-#         "hooks_url": "https://api.github.com/repos/esteele/Products.Archetypes/hooks",
-#         "html_url": "https://github.com/esteele/Products.Archetypes",
-#         "id": 8092021,
-#         "issue_comment_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues/comments/{number}",
-#         "issue_events_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues/events{/number}",
-#         "issues_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues{/number}",
-#         "keys_url": "https://api.github.com/repos/esteele/Products.Archetypes/keys{/key_id}",
-#         "labels_url": "https://api.github.com/repos/esteele/Products.Archetypes/labels{/name}",
-#         "language": "Python",
-#         "languages_url": "https://api.github.com/repos/esteele/Products.Archetypes/languages",
-#         "merges_url": "https://api.github.com/repos/esteele/Products.Archetypes/merges",
-#         "milestones_url": "https://api.github.com/repos/esteele/Products.Archetypes/milestones{/number}",
-#         "mirror_url": null,
-#         "name": "Products.Archetypes",
-#         "notifications_url": "https://api.github.com/repos/esteele/Products.Archetypes/notifications{?since,all,participating}",
-#         "open_issues": 1,
-#         "open_issues_count": 1,
-#         "owner": {
-#           "avatar_url": "https://secure.gravatar.com/avatar/a25a9df6dcbd2c020989b6d479f4a00a?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-#           "events_url": "https://api.github.com/users/esteele/events{/privacy}",
-#           "followers_url": "https://api.github.com/users/esteele/followers",
-#           "following_url": "https://api.github.com/users/esteele/following",
-#           "gists_url": "https://api.github.com/users/esteele/gists{/gist_id}",
-#           "gravatar_id": "a25a9df6dcbd2c020989b6d479f4a00a",
-#           "id": 483999,
-#           "login": "esteele",
-#           "organizations_url": "https://api.github.com/users/esteele/orgs",
-#           "received_events_url": "https://api.github.com/users/esteele/received_events",
-#           "repos_url": "https://api.github.com/users/esteele/repos",
-#           "starred_url": "https://api.github.com/users/esteele/starred{/owner}{/repo}",
-#           "subscriptions_url": "https://api.github.com/users/esteele/subscriptions",
-#           "type": "User",
-#           "url": "https://api.github.com/users/esteele"
-#         },
-#         "private": false,
-#         "pulls_url": "https://api.github.com/repos/esteele/Products.Archetypes/pulls{/number}",
-#         "pushed_at": "2013-02-08T15:32:16Z",
-#         "size": 200,
-#         "ssh_url": "git@github.com:esteele/Products.Archetypes.git",
-#         "stargazers_url": "https://api.github.com/repos/esteele/Products.Archetypes/stargazers",
-#         "statuses_url": "https://api.github.com/repos/esteele/Products.Archetypes/statuses/{sha}",
-#         "subscribers_url": "https://api.github.com/repos/esteele/Products.Archetypes/subscribers",
-#         "subscription_url": "https://api.github.com/repos/esteele/Products.Archetypes/subscription",
-#         "svn_url": "https://github.com/esteele/Products.Archetypes",
-#         "tags_url": "https://api.github.com/repos/esteele/Products.Archetypes/tags{/tag}",
-#         "teams_url": "https://api.github.com/repos/esteele/Products.Archetypes/teams",
-#         "trees_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/trees{/sha}",
-#         "updated_at": "2013-02-08T15:32:16Z",
-#         "url": "https://api.github.com/repos/esteele/Products.Archetypes",
-#         "watchers": 0,
-#         "watchers_count": 0
-#       },
-#       "sha": "55de5f3e09315513d6c976f21ac634cf81ac1248",
-#       "user": {
-#         "avatar_url": "https://secure.gravatar.com/avatar/a25a9df6dcbd2c020989b6d479f4a00a?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-#         "events_url": "https://api.github.com/users/esteele/events{/privacy}",
-#         "followers_url": "https://api.github.com/users/esteele/followers",
-#         "following_url": "https://api.github.com/users/esteele/following",
-#         "gists_url": "https://api.github.com/users/esteele/gists{/gist_id}",
-#         "gravatar_id": "a25a9df6dcbd2c020989b6d479f4a00a",
-#         "id": 483999,
-#         "login": "esteele",
-#         "organizations_url": "https://api.github.com/users/esteele/orgs",
-#         "received_events_url": "https://api.github.com/users/esteele/received_events",
-#         "repos_url": "https://api.github.com/users/esteele/repos",
-#         "starred_url": "https://api.github.com/users/esteele/starred{/owner}{/repo}",
-#         "subscriptions_url": "https://api.github.com/users/esteele/subscriptions",
-#         "type": "User",
-#         "url": "https://api.github.com/users/esteele"
-#       }
-#     },
-#     "body": "",
-#     "changed_files": 1,
-#     "closed_at": null,
-#     "comments": 0,
-#     "comments_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues/4/comments",
-#     "commits": 3,
-#     "commits_url": "https://github.com/esteele/Products.Archetypes/pull/4/commits",
-#     "created_at": "2013-02-08T14:40:56Z",
-#     "deletions": 0,
-#     "diff_url": "https://github.com/esteele/Products.Archetypes/pull/4.diff",
-#     "head": {
-#       "label": "esteele:push-test",
-#       "ref": "push-test",
-#       "repo": {
-#         "archive_url": "https://api.github.com/repos/esteele/Products.Archetypes/{archive_format}{/ref}",
-#         "assignees_url": "https://api.github.com/repos/esteele/Products.Archetypes/assignees{/user}",
-#         "blobs_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/blobs{/sha}",
-#         "branches_url": "https://api.github.com/repos/esteele/Products.Archetypes/branches{/branch}",
-#         "clone_url": "https://github.com/esteele/Products.Archetypes.git",
-#         "collaborators_url": "https://api.github.com/repos/esteele/Products.Archetypes/collaborators{/collaborator}",
-#         "comments_url": "https://api.github.com/repos/esteele/Products.Archetypes/comments{/number}",
-#         "commits_url": "https://api.github.com/repos/esteele/Products.Archetypes/commits{/sha}",
-#         "compare_url": "https://api.github.com/repos/esteele/Products.Archetypes/compare/{base}...{head}",
-#         "contents_url": "https://api.github.com/repos/esteele/Products.Archetypes/contents/{+path}",
-#         "contributors_url": "https://api.github.com/repos/esteele/Products.Archetypes/contributors",
-#         "created_at": "2013-02-08T10:59:48Z",
-#         "description": "None",
-#         "downloads_url": "https://api.github.com/repos/esteele/Products.Archetypes/downloads",
-#         "events_url": "https://api.github.com/repos/esteele/Products.Archetypes/events",
-#         "fork": true,
-#         "forks": 0,
-#         "forks_count": 0,
-#         "forks_url": "https://api.github.com/repos/esteele/Products.Archetypes/forks",
-#         "full_name": "esteele/Products.Archetypes",
-#         "git_commits_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/commits{/sha}",
-#         "git_refs_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/refs{/sha}",
-#         "git_tags_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/tags{/sha}",
-#         "git_url": "git://github.com/esteele/Products.Archetypes.git",
-#         "has_downloads": true,
-#         "has_issues": false,
-#         "has_wiki": false,
-#         "homepage": "None",
-#         "hooks_url": "https://api.github.com/repos/esteele/Products.Archetypes/hooks",
-#         "html_url": "https://github.com/esteele/Products.Archetypes",
-#         "id": 8092021,
-#         "issue_comment_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues/comments/{number}",
-#         "issue_events_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues/events{/number}",
-#         "issues_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues{/number}",
-#         "keys_url": "https://api.github.com/repos/esteele/Products.Archetypes/keys{/key_id}",
-#         "labels_url": "https://api.github.com/repos/esteele/Products.Archetypes/labels{/name}",
-#         "language": "Python",
-#         "languages_url": "https://api.github.com/repos/esteele/Products.Archetypes/languages",
-#         "merges_url": "https://api.github.com/repos/esteele/Products.Archetypes/merges",
-#         "milestones_url": "https://api.github.com/repos/esteele/Products.Archetypes/milestones{/number}",
-#         "mirror_url": null,
-#         "name": "Products.Archetypes",
-#         "notifications_url": "https://api.github.com/repos/esteele/Products.Archetypes/notifications{?since,all,participating}",
-#         "open_issues": 1,
-#         "open_issues_count": 1,
-#         "owner": {
-#           "avatar_url": "https://secure.gravatar.com/avatar/a25a9df6dcbd2c020989b6d479f4a00a?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-#           "events_url": "https://api.github.com/users/esteele/events{/privacy}",
-#           "followers_url": "https://api.github.com/users/esteele/followers",
-#           "following_url": "https://api.github.com/users/esteele/following",
-#           "gists_url": "https://api.github.com/users/esteele/gists{/gist_id}",
-#           "gravatar_id": "a25a9df6dcbd2c020989b6d479f4a00a",
-#           "id": 483999,
-#           "login": "esteele",
-#           "organizations_url": "https://api.github.com/users/esteele/orgs",
-#           "received_events_url": "https://api.github.com/users/esteele/received_events",
-#           "repos_url": "https://api.github.com/users/esteele/repos",
-#           "starred_url": "https://api.github.com/users/esteele/starred{/owner}{/repo}",
-#           "subscriptions_url": "https://api.github.com/users/esteele/subscriptions",
-#           "type": "User",
-#           "url": "https://api.github.com/users/esteele"
-#         },
-#         "private": false,
-#         "pulls_url": "https://api.github.com/repos/esteele/Products.Archetypes/pulls{/number}",
-#         "pushed_at": "2013-02-08T15:32:16Z",
-#         "size": 200,
-#         "ssh_url": "git@github.com:esteele/Products.Archetypes.git",
-#         "stargazers_url": "https://api.github.com/repos/esteele/Products.Archetypes/stargazers",
-#         "statuses_url": "https://api.github.com/repos/esteele/Products.Archetypes/statuses/{sha}",
-#         "subscribers_url": "https://api.github.com/repos/esteele/Products.Archetypes/subscribers",
-#         "subscription_url": "https://api.github.com/repos/esteele/Products.Archetypes/subscription",
-#         "svn_url": "https://github.com/esteele/Products.Archetypes",
-#         "tags_url": "https://api.github.com/repos/esteele/Products.Archetypes/tags{/tag}",
-#         "teams_url": "https://api.github.com/repos/esteele/Products.Archetypes/teams",
-#         "trees_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/trees{/sha}",
-#         "updated_at": "2013-02-08T15:32:16Z",
-#         "url": "https://api.github.com/repos/esteele/Products.Archetypes",
-#         "watchers": 0,
-#         "watchers_count": 0
-#       },
-#       "sha": "c1e4b19df405c834c7532a098c16e89c23cebb97",
-#       "user": {
-#         "avatar_url": "https://secure.gravatar.com/avatar/a25a9df6dcbd2c020989b6d479f4a00a?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-#         "events_url": "https://api.github.com/users/esteele/events{/privacy}",
-#         "followers_url": "https://api.github.com/users/esteele/followers",
-#         "following_url": "https://api.github.com/users/esteele/following",
-#         "gists_url": "https://api.github.com/users/esteele/gists{/gist_id}",
-#         "gravatar_id": "a25a9df6dcbd2c020989b6d479f4a00a",
-#         "id": 483999,
-#         "login": "esteele",
-#         "organizations_url": "https://api.github.com/users/esteele/orgs",
-#         "received_events_url": "https://api.github.com/users/esteele/received_events",
-#         "repos_url": "https://api.github.com/users/esteele/repos",
-#         "starred_url": "https://api.github.com/users/esteele/starred{/owner}{/repo}",
-#         "subscriptions_url": "https://api.github.com/users/esteele/subscriptions",
-#         "type": "User",
-#         "url": "https://api.github.com/users/esteele"
-#       }
-#     },
-#     "html_url": "https://github.com/esteele/Products.Archetypes/pull/4",
-#     "id": 4056914,
-#     "issue_url": "https://github.com/esteele/Products.Archetypes/issues/4",
-#     "merge_commit_sha": "d4e5f736262659e7d41e97b2e8e9e08c09329023",
-#     "mergeable": null,
-#     "mergeable_state": "unknown",
-#     "merged": false,
-#     "merged_at": null,
-#     "merged_by": null,
-#     "milestone": null,
-#     "number": 4,
-#     "patch_url": "https://github.com/esteele/Products.Archetypes/pull/4.patch",
-#     "review_comment_url": "/repos/esteele/Products.Archetypes/pulls/comments/{number}",
-#     "review_comments": 0,
-#     "review_comments_url": "https://github.com/esteele/Products.Archetypes/pull/4/comments",
-#     "state": "open",
-#     "title": "Test, please ignore.",
-#     "updated_at": "2013-02-08T15:32:16Z",
-#     "url": "https://api.github.com/repos/esteele/Products.Archetypes/pulls/4",
-#     "user": {
-#       "avatar_url": "https://secure.gravatar.com/avatar/a25a9df6dcbd2c020989b6d479f4a00a?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-#       "events_url": "https://api.github.com/users/esteele/events{/privacy}",
-#       "followers_url": "https://api.github.com/users/esteele/followers",
-#       "following_url": "https://api.github.com/users/esteele/following",
-#       "gists_url": "https://api.github.com/users/esteele/gists{/gist_id}",
-#       "gravatar_id": "a25a9df6dcbd2c020989b6d479f4a00a",
-#       "id": 483999,
-#       "login": "esteele",
-#       "organizations_url": "https://api.github.com/users/esteele/orgs",
-#       "received_events_url": "https://api.github.com/users/esteele/received_events",
-#       "repos_url": "https://api.github.com/users/esteele/repos",
-#       "starred_url": "https://api.github.com/users/esteele/starred{/owner}{/repo}",
-#       "subscriptions_url": "https://api.github.com/users/esteele/subscriptions",
-#       "type": "User",
-#       "url": "https://api.github.com/users/esteele"
-#     }
-#   },
-#   "repository": {
-#     "archive_url": "https://api.github.com/repos/esteele/Products.Archetypes/{archive_format}{/ref}",
-#     "assignees_url": "https://api.github.com/repos/esteele/Products.Archetypes/assignees{/user}",
-#     "blobs_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/blobs{/sha}",
-#     "branches_url": "https://api.github.com/repos/esteele/Products.Archetypes/branches{/branch}",
-#     "clone_url": "https://github.com/esteele/Products.Archetypes.git",
-#     "collaborators_url": "https://api.github.com/repos/esteele/Products.Archetypes/collaborators{/collaborator}",
-#     "comments_url": "https://api.github.com/repos/esteele/Products.Archetypes/comments{/number}",
-#     "commits_url": "https://api.github.com/repos/esteele/Products.Archetypes/commits{/sha}",
-#     "compare_url": "https://api.github.com/repos/esteele/Products.Archetypes/compare/{base}...{head}",
-#     "contents_url": "https://api.github.com/repos/esteele/Products.Archetypes/contents/{+path}",
-#     "contributors_url": "https://api.github.com/repos/esteele/Products.Archetypes/contributors",
-#     "created_at": "2013-02-08T10:59:48Z",
-#     "description": "None",
-#     "downloads_url": "https://api.github.com/repos/esteele/Products.Archetypes/downloads",
-#     "events_url": "https://api.github.com/repos/esteele/Products.Archetypes/events",
-#     "fork": true,
-#     "forks": 0,
-#     "forks_count": 0,
-#     "forks_url": "https://api.github.com/repos/esteele/Products.Archetypes/forks",
-#     "full_name": "esteele/Products.Archetypes",
-#     "git_commits_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/commits{/sha}",
-#     "git_refs_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/refs{/sha}",
-#     "git_tags_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/tags{/sha}",
-#     "git_url": "git://github.com/esteele/Products.Archetypes.git",
-#     "has_downloads": true,
-#     "has_issues": false,
-#     "has_wiki": false,
-#     "homepage": "None",
-#     "hooks_url": "https://api.github.com/repos/esteele/Products.Archetypes/hooks",
-#     "html_url": "https://github.com/esteele/Products.Archetypes",
-#     "id": 8092021,
-#     "issue_comment_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues/comments/{number}",
-#     "issue_events_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues/events{/number}",
-#     "issues_url": "https://api.github.com/repos/esteele/Products.Archetypes/issues{/number}",
-#     "keys_url": "https://api.github.com/repos/esteele/Products.Archetypes/keys{/key_id}",
-#     "labels_url": "https://api.github.com/repos/esteele/Products.Archetypes/labels{/name}",
-#     "language": "Python",
-#     "languages_url": "https://api.github.com/repos/esteele/Products.Archetypes/languages",
-#     "merges_url": "https://api.github.com/repos/esteele/Products.Archetypes/merges",
-#     "milestones_url": "https://api.github.com/repos/esteele/Products.Archetypes/milestones{/number}",
-#     "mirror_url": null,
-#     "name": "Products.Archetypes",
-#     "notifications_url": "https://api.github.com/repos/esteele/Products.Archetypes/notifications{?since,all,participating}",
-#     "open_issues": 1,
-#     "open_issues_count": 1,
-#     "owner": {
-#       "avatar_url": "https://secure.gravatar.com/avatar/a25a9df6dcbd2c020989b6d479f4a00a?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-#       "events_url": "https://api.github.com/users/esteele/events{/privacy}",
-#       "followers_url": "https://api.github.com/users/esteele/followers",
-#       "following_url": "https://api.github.com/users/esteele/following",
-#       "gists_url": "https://api.github.com/users/esteele/gists{/gist_id}",
-#       "gravatar_id": "a25a9df6dcbd2c020989b6d479f4a00a",
-#       "id": 483999,
-#       "login": "esteele",
-#       "organizations_url": "https://api.github.com/users/esteele/orgs",
-#       "received_events_url": "https://api.github.com/users/esteele/received_events",
-#       "repos_url": "https://api.github.com/users/esteele/repos",
-#       "starred_url": "https://api.github.com/users/esteele/starred{/owner}{/repo}",
-#       "subscriptions_url": "https://api.github.com/users/esteele/subscriptions",
-#       "type": "User",
-#       "url": "https://api.github.com/users/esteele"
-#     },
-#     "private": false,
-#     "pulls_url": "https://api.github.com/repos/esteele/Products.Archetypes/pulls{/number}",
-#     "pushed_at": "2013-02-08T15:32:16Z",
-#     "size": 200,
-#     "ssh_url": "git@github.com:esteele/Products.Archetypes.git",
-#     "stargazers_url": "https://api.github.com/repos/esteele/Products.Archetypes/stargazers",
-#     "statuses_url": "https://api.github.com/repos/esteele/Products.Archetypes/statuses/{sha}",
-#     "subscribers_url": "https://api.github.com/repos/esteele/Products.Archetypes/subscribers",
-#     "subscription_url": "https://api.github.com/repos/esteele/Products.Archetypes/subscription",
-#     "svn_url": "https://github.com/esteele/Products.Archetypes",
-#     "tags_url": "https://api.github.com/repos/esteele/Products.Archetypes/tags{/tag}",
-#     "teams_url": "https://api.github.com/repos/esteele/Products.Archetypes/teams",
-#     "trees_url": "https://api.github.com/repos/esteele/Products.Archetypes/git/trees{/sha}",
-#     "updated_at": "2013-02-08T15:32:16Z",
-#     "url": "https://api.github.com/repos/esteele/Products.Archetypes",
-#     "watchers": 0,
-#     "watchers_count": 0
-#   },
-#   "sender": {
-#     "avatar_url": "https://secure.gravatar.com/avatar/a25a9df6dcbd2c020989b6d479f4a00a?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-#     "events_url": "https://api.github.com/users/esteele/events{/privacy}",
-#     "followers_url": "https://api.github.com/users/esteele/followers",
-#     "following_url": "https://api.github.com/users/esteele/following",
-#     "gists_url": "https://api.github.com/users/esteele/gists{/gist_id}",
-#     "gravatar_id": "a25a9df6dcbd2c020989b6d479f4a00a",
-#     "id": 483999,
-#     "login": "esteele",
-#     "organizations_url": "https://api.github.com/users/esteele/orgs",
-#     "received_events_url": "https://api.github.com/users/esteele/received_events",
-#     "repos_url": "https://api.github.com/users/esteele/repos",
-#     "starred_url": "https://api.github.com/users/esteele/starred{/owner}{/repo}",
-#     "subscriptions_url": "https://api.github.com/users/esteele/subscriptions",
-#     "type": "User",
-#     "url": "https://api.github.com/users/esteele"
-#   }
-# }
+    # set hooks on github
+    for repo in github.get_organization('plone').get_repos():
+
+        hooks = repo.get_hooks()
+
+        # Remove the old hooks
+        for hook in hooks:
+
+            #if hook.name == 'web' and (hook.config['url'].find(roboto_url) or hook.config['url'].find('jenkins.plone.org')):
+            if hook.name == 'web' and hook.config['url'].find(roboto_url):
+                add_log(request, 'github', 'Removing hook ' + str(hook.config))
+                hook.delete()
+
+        # Add the new hooks
+        add_log(request, 'github', 'Creating hook ' + commit_url + ' and ' + pull_url)
+        repo.create_hook('web', {'url': commit_url, 'secret': request.registry.settings['api_key']}, 'push', True)
+        repo.create_hook('web', {'url': pull_url, 'secret': request.registry.settings['api_key']}, 'pull_request', True)
 
 
-# Example payload
 
-# {
-# "before": "5aef35982fb2d34e9d9d4502f6ede1072793222d",
-# "repository": {
-# "url": "http://github.com/defunkt/github",
-# "name": "github",
-# "description": "You're lookin' at it.",
-# "watchers": 5,
-# "forks": 2,
-# "private": 1,
-# "owner": {
-# "email": "chris@ozmm.org",
-# "name": "defunkt"
-# }
-# },
-# "commits": [
-# {
-# "id": "41a212ee83ca127e3c8cf465891ab7216a705f59",
-# "url": "http://github.com/defunkt/github/commit/41a212ee83ca127e3c8cf465891ab7216a705f59",
-# "author": {
-# "email": "chris@ozmm.org",
-# "name": "Chris Wanstrath"
-# },
-# "message": "okay i give in",
-# "timestamp": "2008-02-15T14:57:17-08:00",
-# "added": ["filepath.rb"]
-# },
-# {
-# "id": "de8251ff97ee194a289832576287d6f8ad74e3d0",
-# "url": "http://github.com/defunkt/github/commit/de8251ff97ee194a289832576287d6f8ad74e3d0",
-# "author": {
-# "email": "chris@ozmm.org",
-# "name": "Chris Wanstrath"
-# },
-# "message": "update pricing a tad",
-# "timestamp": "2008-02-15T14:36:34-08:00"
-# }
-# ],
-# "after": "de8251ff97ee194a289832576287d6f8ad74e3d0",
-# "ref": "refs/heads/master"
-# }
+

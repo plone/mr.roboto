@@ -3,6 +3,9 @@
 from pyramid.decorator import reify
 from pyramid.request import Request
 
+from hashlib import sha1
+import hmac
+
 
 def validatejenkins(fn):
     def wrapped(request):
@@ -12,6 +15,18 @@ def validatejenkins(fn):
             return fn(request)
         else:
             return {'success': False, 'message': 'Only for localhost'}
+    return wrapped
+
+
+def validategithub(fn):
+    def wrapped(request):
+        if 'X-Hub_Signature' in request.headers:
+            sha1_gh = request.headers['X-Hub_Signature']
+            sha1_compute = hmac.new(request.registry.settings['api_key'], request.body, sha1).hexdigest()
+            if sha1_gh == 'sha1=' + sha1_compute:
+                return fn(request)
+        else:
+            return {'success': False, 'message': 'Token not active'}
     return wrapped
 
 

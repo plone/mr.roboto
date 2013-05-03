@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>Mr. Roboto</title>
+        <link href='http://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'/>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+
+        <style>
+            body {
+                background-color: rgb(0,149,211);
+                font-family: 'Raleway', sans-serif;
+            }
+            h2 {
+
+            }
+            ul {
+                list-style-type: none
+            }
+        </style>
+    </head>
+    <body>
+        <div id="options">
+            <table class="table">
+                <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Repo</th>
+                      <th>Data</th>
+                      <th>JK NAME</th>
+                      <th>URL</th>
+                    </tr>
+                </thead>
+                <!-- XXX Would be great to have a sorted table -->
+                <tr tal:repeat="job jobs">
+                    <td tal:content="python:job['jk_uid']">description</td>
+                    <td tal:content="python:job['repo']">repo</td>
+                    <td tal:content="python:job['date']">repo</td>
+                    <td> <a href="" tal:attributes="href python:job['jk_name']">repo</a></td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

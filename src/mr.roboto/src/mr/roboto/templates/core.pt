@@ -1,26 +1,19 @@
 <html>
     <head>
         <title>Mr. Roboto</title>
-
         <link href='http://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'/>
-
         <style>
             body {
                 background-color: rgb(0,149,211);
                 font-family: 'Raleway', sans-serif;
             }
+            h2 {
+
+            }
             #logo {
                 width: 100%;
                 height: 100%;
                 background: url('/static/roboto.png') no-repeat 50% 50%;
-            }
-            #options {
-                position: absolute;
-                top: 10px;
-                left: 10px;
-            }
-            a {
-                text-decoration: none;
             }
             ul {
                 list-style-type: none
@@ -29,14 +22,12 @@
     </head>
     <body>
         <div id="options">
-            <ul>
-                <li><a href="repos"> Core packages </a></li>
-                <li><a href="plips"> PLIPS </a></li>
-                <li> Pulls Requests </li>
-                <li><a href="jobs"> Jobs </a></li>
+            <tal:packages repeat="version python:packages.keys()"> 
+            <h2 tal:content="version">Version</h2>
+            <ul tal:define="list_packages python:packages[version]">
+                <li tal:repeat="package list_packages"> <span tal:replace="python:package['name']">name</span> - <span tal:replace="python:package['repo']">repo</span> - <span tal:replace="python:package['branch']">branch</span></li>
             </ul>
-        </div>
-        <div id="logo">
+            </tal:packages>
         </div>
     </body>
 </html>

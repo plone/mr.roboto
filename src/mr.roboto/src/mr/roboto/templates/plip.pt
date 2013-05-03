@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>Mr. Roboto</title>
+        <link href='http://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'/>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+        <style>
+            body {
+                background-color: rgb(0,149,211);
+                font-family: 'Raleway', sans-serif;
+            }
+            h2 {
+
+            }
+            ul {
+                list-style-type: none
+            }
+            .field input{
+            }
+            textarea {
+                width: 300px;
+            }
+            form {
+                margin-left: 20px;
+            }
+            #crud-button {
+                margin-left: 20px;
+                margin-top: 20px;
+            }
+            a {
+                color: white;
+            }
+        </style>
+        <script>
+            $(document).ready(function(){
+                $('#crud-button').click(function(){
+                    $('#crud').toggle();
+                })
+                $('#crud').hide();
+            });
+        </script>
+    </head>
+    <body>
+        <button id="crud-button" class="btn">Admin</button>
+        <div id="crud" class="row">
+            <div class="span12">
+            <form id="form" action="plips" method="POST">
+                <h3>Add new plip to test</h3>
+                <div class="field">
+                <label>description - key</label>
+                <input type="text" name="description"/>
+                </div>
+
+                <div class="field">
+                    <label>repo to hook (plone/plone.app.multilingual)</label>
+                    <input type="text" name="repo"/>
+                </div>
+                <div class="field">
+                <label>branch to hook (master)</label>
+                <input type="text" name="branch"/>
+                </div>
+                <div class="field">
+                <label>git repo with buildout to test (http://github.com/plone/plone.app.multilingual.git)</label>
+                <input type="text" name="buildout"/>
+                </div>
+                <div class="field">
+                <label>git repo branch to test (master)</label>
+                <input type="text" name="buildout_branch"/>
+                </div>
+                <div class="field">
+                <label>jenkins buildout configuration on repo</label>
+                <textarea name="buildout_file"></textarea>
+                </div>
+                <div class="field">
+                <label>url of plip reference</label>
+                <input type="text" name="url"/>
+                </div>
+                <div class="field">
+                <label>contact mails (plone@plone.org, jenkins@plone.org)</label>
+                <input type="text" name="contact"/>
+                </div>
+                <div class="field">
+                <label>api key</label>
+                <input type="password" name="key"/>
+                </div>
+                <input type="hidden" name="action" value="add"/>
+                <input type="submit" value="send"/>
+            </form>
+            </div>
+        </div>
+        <div id="options">
+            <table class="table">
+                <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Repo</th>
+                      <th>Branch</th>
+                      <th>JK URL</th>
+                      <th>PLIP URL</th>
+                    </tr>
+                </thead>
+                <!-- XXX Would be great to have a sorted table -->
+                <tr tal:repeat="plip plips">
+                    <td tal:content="python:plip['description']">description</td>
+                    <td tal:content="python:plip['repo']">repo</td>
+                    <td tal:content="python:plip['branch']">repo</td>
+                    <td> <a href="" tal:attributes="href python:plip['jk_url']">repo</a></td>
+                    <td> <a href="" tal:attributes="href python:plip['url']">PLIP url</a></td>
+                    <td> <button class="btn">Edit</button></td>
+                    <td> <button class="btn">Remove</button></td>
+
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
