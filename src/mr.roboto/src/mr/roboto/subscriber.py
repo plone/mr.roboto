@@ -10,7 +10,7 @@ from pyramid.events import subscriber
 
 from mr.roboto.events import NewPush
 
-templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "../templates"))
+templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "templates"))
 
 
 @subscriber(NewPush)
