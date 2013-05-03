@@ -43,8 +43,8 @@ def send_mail_on_push(event):
                                        payload['ref'].split('/')[-1],
                                        short_commit_msg),
                 sender="%s <svn-changes@plone.org>" % commit['committer']['name'],
-                #recipients=["plone-cvs@lists.sourceforge.net"],
-                recipients=["ramon.nb@gmail.com", "contact@timostollenwerk.net", "david.glick@plone.org", "ericsteele47@gmail.com"],
+                recipients=["plone-cvs@lists.sourceforge.net"],
+                #recipients=["ramon.nb@gmail.com", "contact@timostollenwerk.net", "david.glick@plone.org", "ericsteele47@gmail.com"],
                 body=templates['commit_email.pt'](**data),
                 extra_headers={'Reply-To': reply_to}
             )
