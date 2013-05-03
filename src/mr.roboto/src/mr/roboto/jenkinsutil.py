@@ -96,6 +96,8 @@ def jenkins_core_job(request, job, callback_url, params=None, payload=None):
 
     # We are going to reconfigure the job to add the notification
     xml_config = jenkins.get_job_config(job)
+    if xml_config is None:
+        return
     f = StringIO(xml_config)
     xml_object = etree.parse(f)
     isthere = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty')
