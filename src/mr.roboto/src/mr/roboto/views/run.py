@@ -282,6 +282,7 @@ def createGithubPostCommitHooksView(request):
     commit_url = roboto_url + 'run/corecommit'
     pull_url = roboto_url + 'run/pullrequest'
 
+    messages = []
     # set hooks on github
     for repo in github.get_organization('plone').get_repos():
 
@@ -297,9 +298,13 @@ def createGithubPostCommitHooksView(request):
 
         # Add the new hooks
         add_log(request, 'github', 'Creating hook ' + commit_url + ' and ' + pull_url)
-        repo.create_hook('web', {'url': commit_url, 'secret': request.registry.settings['api_key']}, 'push', True)
-        repo.create_hook('web', {'url': pull_url, 'secret': request.registry.settings['api_key']}, 'pull_request', True)
-
+        messages.append('Creating hook ' + commit_url)
+        try:
+            repo.create_hook('web', {'url': commit_url, 'secret': request.registry.settings['api_key']}, 'push', True)
+            repo.create_hook('web', {'url': pull_url, 'secret': request.registry.settings['api_key']}, 'pull_request', True)
+        except:
+            pass
+    return json.dumps(messages)
 
 
 

@@ -49,6 +49,8 @@ setup(name='mr.roboto',
           'mongopersist',
           'WebTest',
           'pytest',
+          'python-jenkins',
+          'pyramid_debugtoolbar',
       ],
       entry_points="""\
       [paste.app_factory]
