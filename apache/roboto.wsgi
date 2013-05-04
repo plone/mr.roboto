@@ -1,6 +1,12 @@
 import os, sys
+#from paste.deploy importo loadapp
 
-from paste.deploy import loadapp
+#import site
+#site.addsitedir('/home/bitnami/mr.roboto/eggs/site-packages')
 
-application = loadapp('config:/home/bitnami/mr.roboto/production.ini')
+from pyramid.paster import get_app, setup_logging
+ini_path = '/home/bitnami/mr.roboto/production.ini'
+setup_logging(ini_path)
+application = get_app(ini_path, 'main')
+#application = loadapp('config:/home/bitnami/mr.roboto/production.ini')
 
