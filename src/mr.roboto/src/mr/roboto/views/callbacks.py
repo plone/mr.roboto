@@ -132,16 +132,15 @@ def functionCallbackCommit(request):
     commit_hash = ''
     for job in jobs:
         commit_hash = job['ref']
-    base = request.GET['base']
-    module = request.GET['module']
-    repo = base + '/' + module
+        repo = job['repo']
+
     ghObject = request.registry.settings['github']
 
     jk_job = answer['name']
     full_url = answer['build']['full_url']
 
     if answer['build']['phase'] == 'STARTED':
-        # We started the job so we are going to write on the GH commit 
+        # We started the job so we are going to write on the GH commit
         # A line with the status
         add_log(request, 'jenkin', 'Commit %s to %s start testing %s ' % (commit_hash, repo, jk_job))
         message = "\n* %s - %s [PENDING] " % (jk_job, full_url)
