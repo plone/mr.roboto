@@ -62,7 +62,7 @@ PYTHON_VERSIONS = ['2.6', '2.7']
 
 
 def add_log(request, who, message):
-    logger.info("Run Core Tests : " + who + " " + message)
+    logger.info(who + " " + message)
 
 
 @runCoreTests.post()
