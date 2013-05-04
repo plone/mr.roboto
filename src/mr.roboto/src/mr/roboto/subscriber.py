@@ -49,4 +49,4 @@ def send_mail_on_push(event):
                 extra_headers={'Reply-To': reply_to}
             )
 
-            mailer.send(msg)
+            mailer.send_immediately(msg, fail_silently=False)
