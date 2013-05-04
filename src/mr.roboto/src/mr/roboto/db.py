@@ -73,7 +73,12 @@ class CorePackage(persistent.Persistent):
     """ CORE Package representation """
     _p_mongo_collection = 'core_package'
 
-    def __init__(self, name, repo, branch, plone_version):
+    def __init__(
+            self,
+            name,
+            repo,
+            branch,
+            plone_version):
         self.name = name
         self.repo = repo
         self.branch = branch
