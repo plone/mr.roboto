@@ -2,6 +2,7 @@
 from cornice import Service
 from mr.roboto.security import validatejenkins
 from mr.roboto.views.run import add_log
+import transaction
 
 callbackCommit = Service(name='Callback for commits', path='/callback/corecommit',
                     description="Callback for commits jobs on jenkins")
@@ -125,7 +126,12 @@ def functionCallbackCommit(request):
 
     """
     answer = request.json_body
-    commit_hash = request.GET['commit_hash']
+    jk_job_id = request.GET['jk_job_id']
+    add_log(request, 'jenkin', 'Received job ' + jk_job_id)
+    jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_job_id': jk_job_id}))
+    commit_hash = ''
+    for job in jobs:
+        commit_hash = job['ref']
     base = request.GET['base']
     module = request.GET['module']
     repo = base + '/' + module
@@ -156,4 +162,6 @@ def functionCallbackCommit(request):
         oldMessage = "%s [PENDING] " % full_url
         message = "%s [FAIL] " % full_url
         ghObject.replace_commit_message(repo, commit_hash, oldMessage, message)
+
+    transaction.commit()
 
