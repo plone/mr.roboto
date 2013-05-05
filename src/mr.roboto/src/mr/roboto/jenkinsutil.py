@@ -111,7 +111,6 @@ def jenkins_job_external(request, job, callback_url, data, payload=None):
     sending_payload = {'payload': spayload}
 
     jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
-    return url
 
 
 def jenkins_core_job(request, job, callback_url, params=None, payload=None):
@@ -164,5 +163,4 @@ def jenkins_core_job(request, job, callback_url, params=None, payload=None):
     sending_payload = {'payload': spayload}
 
     jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
-    return url
 

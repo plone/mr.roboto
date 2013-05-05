@@ -32,12 +32,6 @@ runCoreTests = Service(
     description="Run the core-dev buildout"
 )
 
-runPloneTests = Service(
-    name='Run plone package tests',
-    path='/run/plonecommit',
-    description="Run the package buildout"
-)
-
 runPushTests = Service(
     name='Run push tests',
     path='/run/pullrequest',
@@ -49,12 +43,6 @@ createGithubPostCommitHooks = Service(
     path='/run/githubcommithooks',
     description="Creates github post-commit hooks."
 )
-
-# PLONE PACKAGES VERSIONS
-
-PLONE_BRANCHES_TO_CHECK = ['4.3']
-
-PLONE_PYTHON_VERSIONS = ['2.7']
 
 # CORE-DEV PYTHON VERSIONS
 
@@ -106,9 +94,6 @@ def runFunctionCoreTests(request):
         message = 'Commit trigger on ' + repo + ' ' + commit['id']
         add_log(request, who, message)
 
-    # Look at DB which plone version needs to run tests
-    core_jobs = list(request.registry.settings['db']['core_package'].find({'repo': repo, 'branch': branch}))
-
     # Define the callback url for jenkins
     url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
 
@@ -118,14 +103,15 @@ def runFunctionCoreTests(request):
             job_name = 'plone-' + branch + '-python-' + python_version
             message = 'Start ' + job_name + ' Jenkins Job'
 
-            # We create the JK job
-            result = jenkins_core_job(request, job_name, url, payload=payload)
+            jenkins_jobs[jk_job_id] = JenkinsJob('core', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit)
+            transaction.commit()
 
-            if result:
-                # We create the job on the mongo
-                add_log(request, who, message)
-                jenkins_jobs[jk_job_id] = JenkinsJob('core', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit, jk_url=result)
-                transaction.commit()
+            # We create the JK job
+            jenkins_core_job(request, job_name, url, payload=payload)
+            add_log(request, who, message)
+
+    # Look at DB which plone version needs to run tests
+    core_jobs = list(request.registry.settings['db']['core_package'].find({'repo': repo, 'branch': branch}))
 
     # Run the core jobs related with this commit on jenkins
     for core_job in core_jobs:
@@ -133,14 +119,12 @@ def runFunctionCoreTests(request):
             job_name = 'plone-' + core_job['plone_version'] + '-python-' + python_version
             message = 'Start ' + job_name + ' Jenkins Job'
 
-            # We create the JK job
-            result = jenkins_core_job(request, job_name, url, payload=payload)
+            jenkins_jobs[jk_job_id] = JenkinsJob('core', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit)
+            transaction.commit()
 
-            if result:
-                # We create the job on the mongo
-                add_log(request, who, message)
-                jenkins_jobs[jk_job_id] = JenkinsJob('core', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit, jk_url=result)
-                transaction.commit()
+            # We create the JK job
+            jenkins_core_job(request, job_name, url, payload=payload)
+            add_log(request, who, message)
 
     # Look at DB which PLIP jobs needs to run
     # We need to look if there is any PLIP job that needs to run tests
@@ -152,14 +136,12 @@ def runFunctionCoreTests(request):
 
         job_name = 'job-' + plip['description']
         # We create the JK job
-        result = jenkins_job_external(request, job_name, url, payload=payload, data=plip)
-        if result:
-            add_log(request, who, message)
-            jenkins_jobs[jk_job_id] = JenkinsJob('plip', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit, jk_url=result)
-            transaction.commit()
+        jenkins_jobs[jk_job_id] = JenkinsJob('plip', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit)
+        transaction.commit()
 
-
-    # Look for standalone jobs on this package
+        # We create the JK job
+        jenkins_job_external(request, job_name, url, payload=payload, data=plip)
+        add_log(request, who, message)
 
 
 @runPushTests.post()
@@ -194,7 +176,7 @@ def runFunctionPushTests(request):
             # branch.
             logger.info("Checking coredev branches.")
             matched_branches = {}
-            for branch in COREDEV_BRANCHES_TO_CHECK:
+            for branch in request.registry.settings('plone_versions'):
                 core_buildout = PloneCoreBuildout(branch)
                 if core_buildout.get_package_branch(package_name) == target_branch:
                     logger.info('Package branch is used by coredev %s' % branch)

@@ -1,9 +1,11 @@
 from github import Github
 import Queue
 import threading
+import logger
 
 
 DEV_TEAM_ID = 14533
+
 
 class MessageWriter(threading.Thread):
     """
@@ -30,17 +32,18 @@ class MessageWriter(threading.Thread):
         comment = self.gh.get_commit_comment(todo['repo'], todo['sha'])
         message = comment.body
         message += todo['message']
+        logger.info('Add to GH commit ' + todo['sha'] + ' message : ' + message)
         comment.edit(message)
 
     def replace_message(self, todo):
         comment = self.gh.get_commit_comment(todo['repo'], todo['sha'])
         message = comment.body
         message = message.replace(todo['oldmessage'], todo['message'])
+        logger.info('Replace to GH commit ' + todo['sha'] + ' message : ' + todo['message'])
         comment.edit(message)
 
 
 class PloneGithub(Github):
-
 
     def __init__(self, user, passwd):
         self.queue = Queue.Queue()

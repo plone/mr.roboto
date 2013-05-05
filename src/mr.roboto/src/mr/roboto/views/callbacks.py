@@ -10,64 +10,6 @@ callbackCommit = Service(name='Callback for commits', path='/callback/corecommit
 callbackPull = Service(name='Callback for pull requests', path='/callback/corepull',
                     description="Callback for pull request on jenkins")
 
-callbackPlone = Service(name='Callback for commits on plone external repo', path='/callback/plonecommit',
-                    description="Callback for pull request on jenkins")
-
-
-@callbackPlone.post()
-@validatejenkins
-def functionCallbackPloneCommit(request):
-    """
-    For NON core-dev
-
-    When jenkins is finished it calls this url
-    {"name":"JobName",
-     "url":"JobUrl",
-     "build":{"number":1,
-        "phase":"STARTED",
-        "status":"FAILED",
-        "url":"job/project/5",
-        "full_url":"http://ci.jenkins.org/job/project/5"
-        "parameters":{"branch":"master"}
-     }
-    }
-
-    We are going to write on the comment
-
-    """
-    answer = request.json_body
-    commit_hash = request.GET['commit_hash']
-    base = request.GET['base']
-    module = request.GET['module']
-    repo = base + '/' + module
-    ghObject = request.registry.settings['github']
-
-    jk_job = answer['name']
-    full_url = answer['build']['full_url']
-
-    if answer['build']['phase'] == 'STARTED':
-        # We started the job so we are going to write on the GH commit 
-        # A line with the status
-        add_log(request, 'jenkin', 'Commit %s to %s start testing %s ' % (commit_hash, repo, jk_job))
-        message = "\n* %s - %s [PENDING] " % (jk_job, full_url)
-        ghObject.add_commit_message(repo, commit_hash, message)
-
-    if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'SUCCESS':
-        # Great it worked
-        add_log(request, 'jenkin', 'Commit %s to %s OK %s ' % (commit_hash, repo, jk_job))
-        # We can change the comment of the commit
-        oldMessage = "%s [PENDING] " % full_url
-        message = "%s [SUCCESS] " % full_url
-        ghObject.replace_commit_message(repo, commit_hash, oldMessage, message)
-
-    if answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
-        # Oooouu it failed
-        add_log(request, 'jenkin', 'Commit %s to %s FAIL %s ' % (commit_hash, repo, jk_job))
-        # We can change the comment of the commit
-        oldMessage = "%s [PENDING] " % full_url
-        message = "%s [FAIL] " % full_url
-        ghObject.replace_commit_message(repo, commit_hash, oldMessage, message)
-
 
 @callbackPull.post()
 @validatejenkins
@@ -130,7 +72,10 @@ def functionCallbackCommit(request):
     add_log(request, 'jenkin', 'Received job ' + jk_job_id)
     jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_job_id': jk_job_id}))
     commit_hash = ''
+    repo = ''
     for job in jobs:
+        # We set the job url
+        job['jk_url'] = answer['build']['full_url']
         commit_hash = job['ref']
         repo = job['repo']
 
