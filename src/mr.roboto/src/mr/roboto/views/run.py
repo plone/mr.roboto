@@ -147,8 +147,10 @@ def runFunctionCoreTests(request):
         transaction.commit()
 
         # We create the JK job
-        jenkins_job_external(request, job_name, url, plip, payload=payload, params=params)
+        url = jenkins_job_external(request, job_name, url, plip, payload=payload, params=params)
+        plip['jk_url'] = url
         add_log(request, who, message)
+        transaction.commit()
 
 
 @runPushTests.post()

@@ -112,6 +112,7 @@ def jenkins_job_external(request, job, callback_url, data, payload=None, params=
 
     jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
 
+    return jenkins.get_job_info(job)['url']
 
 def jenkins_core_job(request, job, callback_url, params=None, payload=None):
     """

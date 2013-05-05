@@ -43,7 +43,7 @@
                     $('#input-description').val(plip.find('.description').html());
                     var repo_to_edit = "";
                     plip.find('.repo').each(function(){ 
-                        repo_to_edit += $(this).html();
+                        repo_to_edit += $(this).html()+'\n';
                     })
 
                     $('#input-repo').val(repo_to_edit);
