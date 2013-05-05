@@ -112,6 +112,21 @@ def runFunctionCoreTests(request):
     # Define the callback url for jenkins
     url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
 
+    # In case is a push to buildout-coredev
+    if repo == 'plone/buildout-coredev':
+        for python_version in PYTHON_VERSIONS:
+            job_name = 'plone-' + branch + '-python-' + python_version
+            message = 'Start ' + job_name + ' Jenkins Job'
+
+            # We create the JK job
+            result = jenkins_core_job(request, job_name, url, payload=payload)
+
+            if result:
+                # We create the job on the mongo
+                add_log(request, who, message)
+                jenkins_jobs[jk_job_id] = JenkinsJob('core', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit, jk_url=result)
+                transaction.commit()
+
     # Run the core jobs related with this commit on jenkins
     for core_job in core_jobs:
         for python_version in PYTHON_VERSIONS:
@@ -137,7 +152,7 @@ def runFunctionCoreTests(request):
 
         job_name = 'job-' + plip['description']
         # We create the JK job
-        result = jenkins_job_external(request, job_name, url, payload=payload)
+        result = jenkins_job_external(request, job_name, url, payload=payload, data=plip)
         if result:
             add_log(request, who, message)
             jenkins_jobs[jk_job_id] = JenkinsJob('plip', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit, jk_url=result)

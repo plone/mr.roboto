@@ -11,16 +11,18 @@ def create_jenkins_job_xml(display_name,
                            git_branch=None,
                            git_url=CORE_DEV_GIT_URL,
                            callback_url=None,
-                           pull=None):
+                           pull=None,
+                           command=None):
 
-    command = "python%s bootstrap.py\n" % python_version
-    command += "bin/buildout -c %s\n" % buildout
-    # We need to do a checkout of the pull request
+    if not command:
+        command = "python%s bootstrap.py\n" % python_version
+        command += "bin/buildout -c %s\n" % buildout
+        # We need to do a checkout of the pull request
 
-    if git_url != CORE_DEV_GIT_URL:
-        command += "bin/jenkins-test"
-    else:      
-        command += "bin/jenkins-alltests -1"
+        if git_url != CORE_DEV_GIT_URL:
+            command += "bin/jenkins-test"
+        else:      
+            command += "bin/jenkins-alltests -1"
 
     result = render('mr.roboto:templates/plone.pt',
                     {'callback_url': callback_url,
