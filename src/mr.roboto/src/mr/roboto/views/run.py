@@ -113,7 +113,7 @@ def runFunctionCoreTests(request):
     url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
 
     # In case is a push to buildout-coredev
-    if repo == 'plone/buildout-coredev':
+    if repo == 'plone/buildout.coredev':
         for python_version in PYTHON_VERSIONS:
             job_name = 'plone-' + branch + '-python-' + python_version
             message = 'Start ' + job_name + ' Jenkins Job'

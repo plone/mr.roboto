@@ -3,6 +3,7 @@ from pyramid.renderers import render
 
 CORE_DEV_GIT_URL = 'git://github.com/plone/buildout.coredev.git'
 
+
 def create_jenkins_job_xml(display_name,
                            python_version,
                            email_notification_recipients,
@@ -21,7 +22,7 @@ def create_jenkins_job_xml(display_name,
 
         if git_url != CORE_DEV_GIT_URL:
             command += "bin/jenkins-test"
-        else:      
+        else:
             command += "bin/jenkins-alltests -1"
 
     result = render('mr.roboto:templates/plone.pt',
