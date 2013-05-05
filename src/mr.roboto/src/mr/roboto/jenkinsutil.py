@@ -52,7 +52,7 @@ def jenkins_create_pull_job(request, pull_request, branch=None, params=None):
     return ident
 
 
-def jenkins_job_external(request, job, callback_url, data, payload=None):
+def jenkins_job_external(request, job, callback_url, data, payload=None, params=None):
     """
     Generic plone project job
     """
@@ -67,7 +67,7 @@ def jenkins_job_external(request, job, callback_url, data, payload=None):
             '2.7',
             data['contact'],
             git_url=data['buildout'],
-            git_branch=data['buildout_branch'] if data['branch'] else 'master',
+            git_branch=data['buildout_branch'] if data['buildout_branch'] else 'master',
             callback_url=callback_url,
             command=data['buildout_file'])
 
@@ -105,7 +105,7 @@ def jenkins_job_external(request, job, callback_url, data, payload=None):
         xml_reconfig = etree.tostring(xml_object)
         jenkins.reconfig_job(job, xml_reconfig)
 
-    url = jenkins.build_job_url(job)
+    url = jenkins.build_job_url(job, params)
 
     spayload = json.dumps(payload)
     sending_payload = {'payload': spayload}

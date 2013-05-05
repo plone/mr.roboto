@@ -76,9 +76,10 @@ def reposPage(context, request):
         packages[plone_version] = version_packages
     return dict(packages=packages)
 
+
 @view_config(route_name='jobs', renderer='mr.roboto:templates/jobs.pt')
 def jobsPage(context, request):
     jobs = []
-    for job in list(request.registry.settings['db']['jenkins_job'].find()):
+    for job in list(request.registry.settings['db']['jenkins_job'].find().sort('date', -1).limit(100)):
         jobs.append(job)
     return dict(jobs=jobs)

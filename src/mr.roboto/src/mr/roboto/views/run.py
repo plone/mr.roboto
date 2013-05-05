@@ -88,11 +88,18 @@ def runFunctionCoreTests(request):
 
     # Going to run the core-dev tests
     # Who is doing the push ??
+
+    changeset = ""
     who = ""
     for commit in payload['commits']:
         who = commit['committer']['name'] + '<' + commit['committer']['email'] + '>'
-        message = 'Commit trigger on ' + repo + ' ' + commit['id']
+        changeset += who + ' ' + commit['message'] + '\n'
+        changeset += ' ' + commit['url'] + '\n\n'
+        message = 'Commit trigger on ' + repo + ' ' + branch + ' ' + commit['id']
         add_log(request, who, message)
+
+    # Params to send changes to jk
+    params = {'plonechanges': changeset}
 
     # Define the callback url for jenkins
     url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
@@ -107,7 +114,7 @@ def runFunctionCoreTests(request):
             transaction.commit()
 
             # We create the JK job
-            jenkins_core_job(request, job_name, url, payload=payload)
+            jenkins_core_job(request, job_name, url, payload=payload, params=params)
             add_log(request, who, message)
 
     # Look at DB which plone version needs to run tests
@@ -123,7 +130,7 @@ def runFunctionCoreTests(request):
             transaction.commit()
 
             # We create the JK job
-            jenkins_core_job(request, job_name, url, payload=payload)
+            jenkins_core_job(request, job_name, url, payload=payload, params=params)
             add_log(request, who, message)
 
     # Look at DB which PLIP jobs needs to run
@@ -140,7 +147,7 @@ def runFunctionCoreTests(request):
         transaction.commit()
 
         # We create the JK job
-        jenkins_job_external(request, job_name, url, payload=payload, data=plip)
+        jenkins_job_external(request, job_name, url, plip, payload=payload, params=params)
         add_log(request, who, message)
 
 
