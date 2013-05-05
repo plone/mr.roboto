@@ -73,9 +73,10 @@ def functionCallbackCommit(request):
     jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_uid': jk_job_id}))
     commit_hash = ''
     repo = ''
+    # We update the jk_url
+    request.registry.settings['db']['jenkins_job'].update({'jk_uid': jk_job_id}, {'$set': {'jk_url': answer['build']['full_url']}})
     for job in jobs:
         # We set the job url
-        job['jk_url'] = answer['build']['full_url']
         commit_hash = job['ref']
         repo = job['repo']
 

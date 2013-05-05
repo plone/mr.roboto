@@ -59,51 +59,20 @@ def jenkins_job_external(request, job, callback_url, data, payload=None, params=
 
     jenkins = request.registry.settings['jenkins']
 
+    job_xml = create_jenkins_job_xml(
+        'Test %s' % data['description'],
+        '2.7',
+        data['contact'],
+        git_url=data['buildout'],
+        git_branch=data['buildout_branch'] if data['buildout_branch'] else 'master',
+        callback_url=callback_url,
+        command=data['buildout_file'])
+
     if not jenkins.job_exists(job):
         # If we have job information we apply
-
-        job_xml = create_jenkins_job_xml(
-            'Test %s' % data['description'],
-            '2.7',
-            data['contact'],
-            git_url=data['buildout'],
-            git_branch=data['buildout_branch'] if data['buildout_branch'] else 'master',
-            callback_url=callback_url,
-            command=data['buildout_file'])
-
         jenkins.create_job(job, job_xml)
-
     else:
-        # We reconfigure job
-        xml_config = jenkins.get_job_config(job)
-        if xml_config is None:
-            return
-        f = StringIO(xml_config)
-        xml_object = etree.parse(f)
-        isthere = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty')
-        # We are going to add a publisher call to url
-        if len(isthere) == 0:
-            properties = xml_object.xpath('/project/properties')
-            listener = """<com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.4">
-             <endpoints>
-              <com.tikal.hudson.plugins.notification.Endpoint>
-               <protocol>HTTP</protocol>
-               <url></url>
-              </com.tikal.hudson.plugins.notification.Endpoint>
-             </endpoints>
-            </com.tikal.hudson.plugins.notification.HudsonNotificationProperty>
-            """
-            xml_list = etree.XML(listener)
-            xml_list.xpath('/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')[0].text = callback_url
-            properties.append(xml_list)
-        else:
-            endpoint = xml_object.xpath('/project/properties/com.tikal.hudson.plugins.notification.HudsonNotificationProperty/endpoints/com.tikal.hudson.plugins.notification.Endpoint/url')
-            if len(endpoint) == 1:
-                endpoint[0].text = callback_url
-
-        # Reconfigure the job
-        xml_reconfig = etree.tostring(xml_object)
-        jenkins.reconfig_job(job, xml_reconfig)
+        jenkins.reconfig_job(job, job_xml)
 
     url = jenkins.build_job_url(job, parameters=params)
 
@@ -113,6 +82,7 @@ def jenkins_job_external(request, job, callback_url, data, payload=None, params=
     jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
 
     return jenkins.get_job_info(job)['url']
+
 
 def jenkins_core_job(request, job, callback_url, params=None, payload=None):
     """
