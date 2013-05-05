@@ -157,7 +157,7 @@
         <hudson.plugins.emailext.plugins.trigger.RegressionTrigger>
           <email>
             <recipientList>${email_notification_recipients}</recipientList>
-            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Regression! - ${TEST_COUNTS, var="fail"} failure(s)</subject>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Regression! -  failure(s)</subject>
             <body>$PROJECT_DEFAULT_CONTENT</body>
             <sendToDevelopers>false</sendToDevelopers>
             <sendToRequester>false</sendToRequester>
@@ -168,7 +168,7 @@
         <hudson.plugins.emailext.plugins.trigger.ImprovementTrigger>
           <email>
             <recipientList>${email_notification_recipients}</recipientList>
-            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Improvement! - ${TEST_COUNTS, var="fail"} failure(s)</subject>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Improvement! - failure(s)</subject>
             <body>$PROJECT_DEFAULT_CONTENT</body>
             <sendToDevelopers>false</sendToDevelopers>
             <sendToRequester>false</sendToRequester>
