@@ -128,13 +128,13 @@ def runFunctionCoreTests(request):
 
     # Look at DB which PLIP jobs needs to run
     # We need to look if there is any PLIP job that needs to run tests
-    plips = list(request.registry.settings['db']['plips'].find({'repo': [repo, branch]}))
+    plips = list(request.registry.settings['db']['plip'].find({'repo': [repo, branch]}))
 
     for plip in plips:
         # Run the JK jobs for each plip
+        job_name = 'job-' + plip['description']
         message = 'Start ' + job_name + ' Jenkins Job'
 
-        job_name = 'job-' + plip['description']
         # We create the JK job
         jenkins_jobs[jk_job_id] = JenkinsJob('plip', jk_job_id, repo=repo, branch=branch, who=who, jk_name=job_name, ref=last_commit)
         transaction.commit()
