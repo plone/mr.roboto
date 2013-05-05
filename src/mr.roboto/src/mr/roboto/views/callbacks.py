@@ -70,7 +70,7 @@ def functionCallbackCommit(request):
     answer = request.json_body
     jk_job_id = request.GET['jk_job_id']
     add_log(request, 'jenkin', 'Received job ' + jk_job_id)
-    jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_job_id': jk_job_id}))
+    jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_uid': jk_job_id}))
     commit_hash = ''
     repo = ''
     for job in jobs:

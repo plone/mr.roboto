@@ -1,8 +1,9 @@
 from github import Github
 import Queue
 import threading
-import logger
+import logging
 
+logger = logging.getLogger('mr.roboto')
 
 DEV_TEAM_ID = 14533
 
