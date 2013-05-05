@@ -31,7 +31,7 @@
         <div id="options">
             <ul>
                 <li><a href="repos"> Core packages </a></li>
-                <li><a href="plips"> PLIPS </a></li>
+                <li><a href="plips"> Configured jobs </a></li>
                 <li> Pulls Requests </li>
                 <li><a href="jobs"> Jobs </a></li>
             </ul>

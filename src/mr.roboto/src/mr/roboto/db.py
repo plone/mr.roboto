@@ -13,7 +13,6 @@ class PLIPPackage(persistent.Persistent):
     def __init__(
             self,
             repo=None,
-            branch=None,
             buildout=None,
             description=None,
             url=None,
@@ -22,7 +21,6 @@ class PLIPPackage(persistent.Persistent):
             jk_url="",
             contact=None):
         self.repo = repo
-        self.branch = branch
         self.buildout = buildout
         self.buildout_file = buildout_file
         self.buildout_branch = buildout_branch

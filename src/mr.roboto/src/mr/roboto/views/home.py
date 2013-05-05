@@ -28,20 +28,26 @@ def logPage(context, request):
 def plipPage(context, request):
     if 'action' in request.POST and request.POST['key'] == request.registry.settings['api_key']:
         if request.POST['action'] == 'add':
-            repo = request.POST['repo']
-            branch = request.POST['branch']
+            repos_to_check = []
+            repos = request.POST['repo']
+            for line in repos.split('\r\n'):
+                if len(line.split(' ')) > 1:
+                    (repo, branch) = line.split(' ')
+                    repos_to_check.append([repo, branch])
             buildout = request.POST['buildout']
             description = request.POST['description']
-            url = request.POST['url']
+            if 'url' in request.POST:
+                url = request.POST['url']
+            else:
+                url = ''
             buildout_branch = request.POST['buildout_branch']
             buildout_file = request.POST['buildout_file']
-            contact = request.POST['contact']
+            contact = request.POST['contact'] if 'contact' in request.POST else ''
             if request.registry.settings['db']['plip'].find({'description': description}).count() > 0:
                 request.registry.settings['db']['plip'].remove({'description': description})
             dm = request.registry.settings['dm']
             PLIPPackages(dm)[description] = PLIPPackage(
-                repo=repo,
-                branch=branch,
+                repo=repos_to_check,
                 buildout=buildout,
                 description=description,
                 url=url,
@@ -50,7 +56,8 @@ def plipPage(context, request):
                 contact=contact)
             transaction.commit()
         if request.POST['action'] == 'delete':
-            pass
+            request.registry.settings['db']['plip'].remove({'description': request.POST['description']})
+
     plips = []
     for plip in list(request.registry.settings['db']['plip'].find()):
         plips.append(plip)

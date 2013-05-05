@@ -36,8 +36,47 @@
             $(document).ready(function(){
                 $('#crud-button').click(function(){
                     $('#crud').toggle();
-                })
+                });
                 $('#crud').hide();
+                $('.editplip').click(function(event){
+                    var plip = $(this).parent().parent();
+                    $('#input-description').val(plip.find('.description').html());
+                    var repo_to_edit = "";
+                    plip.find('.repo').each(function(){ 
+                        repo_to_edit += $(this).html();
+                    })
+
+                    $('#input-repo').val(repo_to_edit);
+
+                    $('#input-buildout').val(plip.find('.buildout').val());
+                    $('#input-buildout_branch').val(plip.find('.buildout_branch').val());
+                    $('#shell').val(plip.find('.buildout_file').val());
+                    $('#input-url').val(plip.find('.url').val());
+                    $('#input-contact').val(plip.find('.contact').val());
+                    $('#crud').show();
+                })
+                $('.removeplip').click(function(event){
+                    apikey = prompt('API key?');
+                    description = $(this).parent().parent().find('.description').html();
+                    data = {'key': apikey, 'description': description, 'action': 'delete'};
+                    jQuery.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: 'plips',
+                        data: data, 
+                        success: function(data) {
+                            $('.'+description).remove();
+                        }
+                    })
+                })
+                $('#basic_buildout').click(function(event){
+                    event.preventDefault(); 
+                    $('#shell').html("$PYTHON27 bootstrap.py -c jenkins.cfg\n\
+bin/buildout -c jenkins.cfg\n\
+bin/jenkins-test\n\
+bin/jenkins-code-analysis\n\
+bin/jenkins-test-coverage");
+                });
             });
         </script>
     </head>
@@ -49,36 +88,34 @@
                 <h3>Add new plip to test</h3>
                 <div class="field">
                 <label>description - key</label>
-                <input type="text" name="description"/>
+                <input id="input-description" type="text" name="description"/>
                 </div>
 
                 <div class="field">
-                    <label>repo to hook (plone/plone.app.multilingual)</label>
-                    <input type="text" name="repo"/>
-                </div>
-                <div class="field">
-                <label>branch to hook (master)</label>
-                <input type="text" name="branch"/>
+                    <label>list of repo and branches to hook (plone/plone.app.multilingual master)</label>
+                    <textarea rows="4" cols="70" id="input-repo" name="repo"></textarea>
                 </div>
                 <div class="field">
                 <label>git repo with buildout to test (http://github.com/plone/plone.app.multilingual.git)</label>
-                <input type="text" name="buildout"/>
+                <input type="text" id="input-buildout" name="buildout"/>
                 </div>
                 <div class="field">
                 <label>git repo branch to test (master)</label>
-                <input type="text" name="buildout_branch"/>
+                <input type="text" id="input-buildout_branch" name="buildout_branch"/>
                 </div>
                 <div class="field">
                 <label>jenkins buildout configuration on repo</label>
-                <textarea name="buildout_file"></textarea>
+                <textarea id="shell" rows="4" cols="50" id="input-buildout_file" name="buildout_file"></textarea>
+                <button class="btn" id="basic_buildout">Basic</button>
+                <button class="btn" id="coverage">Coverage</button>
                 </div>
                 <div class="field">
                 <label>url of plip reference</label>
-                <input type="text" name="url"/>
+                <input type="text" id="input-url" name="url"/>
                 </div>
                 <div class="field">
                 <label>contact mails (plone@plone.org, jenkins@plone.org)</label>
-                <input type="text" name="contact"/>
+                <input type="text" id="input-contact" name="contact"/>
                 </div>
                 <div class="field">
                 <label>api key</label>
@@ -95,22 +132,34 @@
                     <tr>
                       <th>Description</th>
                       <th>Repo</th>
-                      <th>Branch</th>
                       <th>JK URL</th>
-                      <th>PLIP URL</th>
+                      <th>REF URL</th>
                     </tr>
                 </thead>
                 <!-- XXX Would be great to have a sorted table -->
-                <tr tal:repeat="plip plips">
-                    <td tal:content="python:plip['description']">description</td>
-                    <td tal:content="python:plip['repo']">repo</td>
-                    <td tal:content="python:plip['branch']">repo</td>
+                <tal:block repeat="plip plips">
+                <tr tal:attributes="class python:plip['description']">
+                    <td tal:content="python:plip['description']" class='description'>description</td>
+                    <td> 
+                        <ul>
+                            <li tal:repeat="repo python:plip['repo']" class='repo'><span tal:replace="python:repo[0]">repo</span> <span tal:replace="python:repo[1]">repo</span></li>
+                        </ul>
+                    </td>
+
+                    <input type="hidden" class="buildout" value="" tal:attributes="value plip['buildout']"/>
+                    <input type="hidden" class="buildout_branch" value="" tal:attributes="value plip['buildout_branch']"/>
+                    <input type="hidden" class="buildout_file" value="" tal:attributes="value plip['buildout_file']"/>
+                    <input type="hidden" class="url" value="" tal:attributes="value plip['url']"/>
+                    <input type="hidden" class="contact" value="" tal:attributes="value plip['contact']"/>
+
                     <td> <a href="" tal:attributes="href python:plip['jk_url']">repo</a></td>
                     <td> <a href="" tal:attributes="href python:plip['url']">PLIP url</a></td>
-                    <td> <button class="btn">Edit</button></td>
-                    <td> <button class="btn">Remove</button></td>
+
+                    <td> <button class="btn editplip">Edit</button></td>
+                    <td> <button class="btn removeplip">Remove</button></td>
 
                 </tr>
+                </tal:block>
             </table>
         </div>
     </body>
