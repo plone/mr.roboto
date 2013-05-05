@@ -105,7 +105,7 @@ def jenkins_job_external(request, job, callback_url, data, payload=None, params=
         xml_reconfig = etree.tostring(xml_object)
         jenkins.reconfig_job(job, xml_reconfig)
 
-    url = jenkins.build_job_url(job, params)
+    url = jenkins.build_job_url(job, parameters=params)
 
     spayload = json.dumps(payload)
     sending_payload = {'payload': spayload}
@@ -157,7 +157,7 @@ def jenkins_core_job(request, job, callback_url, params=None, payload=None):
     jenkins.reconfig_job(job, xml_reconfig)
 
     #jenkins.build_job(job, params)
-    url = jenkins.build_job_url(job, params)
+    url = jenkins.build_job_url(job, parameters=params)
 
     spayload = json.dumps(payload)
     sending_payload = {'payload': spayload}
