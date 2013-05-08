@@ -90,16 +90,35 @@ class PloneGithub(Github):
         return comment_object
 
     def add_commit_message(self, repo, sha, message):
-        self.queue.put({'type': 'add',
-                        'repo': repo, 
-                        'sha': sha,
-                        'message': message
-        })
+        if not self.thread.is_alive():
+            logger.info('thread is dead!')
+            self.thread = MessageWriter(self.queue, self)
+            self.thread.setDaemon(True)
+            self.thread.start()
+
+        if sha != "":
+            self.queue.put({'type': 'add',
+                            'repo': repo,
+                            'sha': sha,
+                            'message': message
+                            })
+        else:
+            logger.info('Push without sha repo: ' + repo)
 
     def replace_commit_message(self, repo, sha, old_message, message):
-        self.queue.put({'type': 'replace',
-                        'repo': repo,
-                        'sha': sha,
-                        'message': message,
-                        'oldmessage': old_message
-        })
+        if not self.thread.is_alive():
+            logger.info('thread is dead!')
+            self.thread = MessageWriter(self.queue, self)
+            self.thread.setDaemon(True)
+            self.thread.start()
+
+        if sha != "":
+            self.queue.put({'type': 'replace',
+                            'repo': repo,
+                            'sha': sha,
+                            'message': message,
+                            'oldmessage': old_message
+                            })
+        else:
+            logger.info('Push without sha repo: ' + repo)
+

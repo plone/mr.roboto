@@ -74,8 +74,12 @@ def runFunctionCoreTests(request):
     # DB of jenkins jobs
     jenkins_jobs = JenkinsJobs(request.registry.settings['dm'])
 
+    # In case there is no commit on push
+    last_commit = ""
+
     # We get the last commit id to have a reference
-    last_commit = payload['commits'][0]['id']
+    if len(payload['commits']) > 0:
+        last_commit = payload['commits'][0]['id']
 
     # Create jk job uuid
     jk_job_id = uuid.uuid4().hex
