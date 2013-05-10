@@ -53,6 +53,8 @@
                     $('#shell').val(plip.find('.buildout_file').val());
                     $('#input-url').val(plip.find('.url').val());
                     $('#input-contact').val(plip.find('.contact').val());
+                    $('#input-robot_tests').val(plip.find('.robot_tests').val());
+
                     $('#crud').show();
                 })
                 $('.removeplip').click(function(event){
@@ -110,6 +112,10 @@ bin/jenkins-test-coverage");
                 <button class="btn" id="coverage">Coverage</button>
                 </div>
                 <div class="field">
+                <label>Robot test results ?</label>
+                <input id="input-robot_tests" type="checkbox" name="robot_test"/>
+                </div>
+                <div class="field">
                 <label>url of plip reference</label>
                 <input type="text" id="input-url" name="url"/>
                 </div>
@@ -151,6 +157,7 @@ bin/jenkins-test-coverage");
                     <input type="hidden" class="buildout_file" value="" tal:attributes="value plip['buildout_file']"/>
                     <input type="hidden" class="url" value="" tal:attributes="value plip['url']"/>
                     <input type="hidden" class="contact" value="" tal:attributes="value plip['contact']"/>
+                    <input type="hidden" class="robot_tests" value="" tal:attributes="value plip['robot_tests']"/>
 
                     <td> <a href="" tal:attributes="href python:plip['jk_url']">repo</a></td>
                     <td> <a href="" tal:attributes="href python:plip['url']">PLIP url</a></td>

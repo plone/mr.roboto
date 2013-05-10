@@ -66,7 +66,8 @@ def jenkins_job_external(request, job, callback_url, data, payload=None, params=
         git_url=data['buildout'],
         git_branch=data['buildout_branch'] if data['buildout_branch'] else 'master',
         callback_url=callback_url,
-        command=data['buildout_file'])
+        command=data['buildout_file'], 
+        robot_tests=data['robot_tests'])
 
     if not jenkins.job_exists(job):
         # If we have job information we apply

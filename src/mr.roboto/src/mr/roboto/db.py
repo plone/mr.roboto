@@ -19,7 +19,8 @@ class PLIPPackage(persistent.Persistent):
             buildout_branch=None,
             buildout_file=None,
             jk_url="",
-            contact=None):
+            contact=None,
+            robot_tests=None):
         self.repo = repo
         self.buildout = buildout
         self.buildout_file = buildout_file
@@ -28,6 +29,7 @@ class PLIPPackage(persistent.Persistent):
         self.url = url
         self.contact = contact
         self.jk_url = jk_url
+        self.robot_tests = robot_tests
 
 
 class PLIPPackages(mapping.MongoCollectionMapping):

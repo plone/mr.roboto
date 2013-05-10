@@ -13,7 +13,8 @@ def create_jenkins_job_xml(display_name,
                            git_url=CORE_DEV_GIT_URL,
                            callback_url=None,
                            pull=None,
-                           command=None):
+                           command=None,
+                           robot_tests=None):
 
     if not command:
         command = "python%s bootstrap.py\n" % python_version
@@ -33,6 +34,7 @@ def create_jenkins_job_xml(display_name,
                      'git_branch': git_branch,
                      'node': node,
                      'command': command,
-                     'dollar': '$'})
+                     'dollar': '$',
+                     'robot_tests': robot_tests})
 
     return result
