@@ -60,6 +60,8 @@ def plipPage(context, request):
 
     plips = []
     for plip in list(request.registry.settings['db']['plip'].find()):
+        if 'robot_tests' not in plip:
+            plip['robot_tests'] = None
         plips.append(plip)
 
     return dict(plips=plips)
