@@ -53,7 +53,11 @@
                     $('#shell').val(plip.find('.buildout_file').val());
                     $('#input-url').val(plip.find('.url').val());
                     $('#input-contact').val(plip.find('.contact').val());
-                    $('#input-robot_tests').val(plip.find('.robot_tests').val());
+                    if (plip.find('.robot_tests').val() == "True") {
+                        $('#input-robot_tests').attr('checked', true);
+                    } else {
+                        $('#input-robot_tests').attr('checked', false);
+                    }
 
                     $('#crud').show();
                 })
