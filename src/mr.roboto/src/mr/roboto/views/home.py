@@ -42,7 +42,7 @@ def plipPage(context, request):
                 url = ''
             buildout_branch = request.POST['buildout_branch']
             buildout_file = request.POST['buildout_file']
-            robot_tests = True if 'robot_tests' in request.POST else False
+            robot_tests = True if 'robot_test' in request.POST else False
             contact = request.POST['contact'] if 'contact' in request.POST else ''
             if request.registry.settings['db']['plip'].find({'description': description}).count() > 0:
                 request.registry.settings['db']['plip'].remove({'description': description})
