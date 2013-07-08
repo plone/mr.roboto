@@ -4,7 +4,9 @@ from mr.roboto.jobs import create_jenkins_job_xml
 import urllib2
 import urllib
 import json
+import logging
 
+logger = logging.getLogger('mr.roboto')
 
 def jenkins_remove_job(request, identifier):
     """
@@ -80,6 +82,7 @@ def jenkins_job_external(request, job, callback_url, data, payload=None, params=
     spayload = json.dumps(payload)
     sending_payload = {'payload': spayload}
 
+    logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
     jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
 
     return jenkins.get_job_info(job)['url']
@@ -134,5 +137,6 @@ def jenkins_core_job(request, job, callback_url, params=None, payload=None):
     spayload = json.dumps(payload)
     sending_payload = {'payload': spayload}
 
+    logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
     jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
 
