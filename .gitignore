@@ -13,3 +13,5 @@ lib/
 local/
 .installed.cfg
 .mr.developer.cfg
+
+development.ini
