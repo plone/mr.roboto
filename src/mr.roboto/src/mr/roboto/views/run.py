@@ -46,7 +46,8 @@ createGithubPostCommitHooks = Service(
 
 # CORE-DEV PYTHON VERSIONS
 
-PYTHON_VERSIONS = ['2.6', '2.7']
+OLD_PYTHON_VERSIONS = ['2.6', '2.7']
+PYTHON_VERSIONS = ['2.7']
 
 
 def add_log(request, who, message):
@@ -110,7 +111,12 @@ def runFunctionCoreTests(request):
 
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':
-        for python_version in PYTHON_VERSIONS:
+        # Temporal hack to get correct versions
+        if branch in ['4.2' or '4.3']:
+            pyversions = OLD_PYTHON_VERSIONS
+        else:
+            pyversions = PYTHON_VERSIONS
+        for python_version in pyversions:
             job_name = 'plone-' + branch + '-python-' + python_version
             message = 'Start ' + job_name + ' Jenkins Job'
 
@@ -126,7 +132,12 @@ def runFunctionCoreTests(request):
 
     # Run the core jobs related with this commit on jenkins
     for core_job in core_jobs:
-        for python_version in PYTHON_VERSIONS:
+        # Temporal hack to get correct versions
+        if branch in ['4.2' or '4.3']:
+            pyversions = OLD_PYTHON_VERSIONS
+        else:
+            pyversions = PYTHON_VERSIONS
+        for python_version in pyversions:
             job_name = 'plone-' + core_job['plone_version'] + '-python-' + python_version
             message = 'Start ' + job_name + ' Jenkins Job'
 
