@@ -154,7 +154,7 @@ def runFunctionCoreTests(request):
 
     for plip in plips:
         # Run the JK jobs for each plip
-        job_name = 'job-' + plip['description']
+        job_name = 'plip-' + plip['description']
         message = 'Start ' + job_name + ' Jenkins Job'
 
         # We create the JK job
