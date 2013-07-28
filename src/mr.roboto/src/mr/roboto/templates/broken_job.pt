@@ -1,0 +1,9 @@
+Repository: ${repo}
+Branch: ${branch}
+Commit-hash: ${hash}
+Author: ${name}
+
+Jenkins Information:
+
+Job: ${jk_job}
+Url: ${full_url}
