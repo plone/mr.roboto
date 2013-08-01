@@ -6,6 +6,7 @@ import transaction
 from pyramid_mailer import get_mailer
 from chameleon import PageTemplateLoader
 from pyramid_mailer.message import Message
+import os
 
 
 callbackCommit = Service(name='Callback for commits', path='/callback/corecommit',
