@@ -126,7 +126,7 @@ def functionCallbackCommit(request):
         mailer = get_mailer(request)
         msg = Message(
             subject='%s %s: %s' % (job, repo, "Broken tests results"),
-            sender="Jenkins Job FAIL <jenkins@plone.org>" 
+            sender="Jenkins Job FAIL <jenkins@plone.org>",
             recipients=["plone-testbot@lists.plone.org"],
             body=templates['broken_job.pt'](**data),
             extra_headers={'Reply-To': who}
