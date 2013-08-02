@@ -15,7 +15,7 @@ callbackCommit = Service(name='Callback for commits', path='/callback/corecommit
 callbackPull = Service(name='Callback for pull requests', path='/callback/corepull',
                     description="Callback for pull request on jenkins")
 
-templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "templates"))
+templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "../templates"))
 
 @callbackPull.post()
 @validatejenkins
