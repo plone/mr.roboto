@@ -1,7 +1,7 @@
 Repository: ${repo}
 Branch: ${branch}
 Commit-hash: ${hash}
-Author: ${name}
+Author: ${structure: name}
 
 Jenkins Information:
 
