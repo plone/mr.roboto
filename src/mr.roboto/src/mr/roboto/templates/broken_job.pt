@@ -6,4 +6,4 @@ Author: ${name}
 Jenkins Information:
 
 Job: ${jk_job}
-Url: ${full_url}
+Url: ${jk_url}

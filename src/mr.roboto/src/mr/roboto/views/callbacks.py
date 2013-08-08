@@ -120,8 +120,8 @@ def functionCallbackCommit(request):
             'hash': commit_hash,
             'branch': branch,
             'name': who,
-            'jk-job': jk_job,
-            'jk-url': full_url
+            'jk_job': jk_job,
+            'jk_url': full_url
         }
 
         mailer = get_mailer(request)
