@@ -1,6 +1,7 @@
 Repository: ${repo}
 Branch: ${branch}
 Commit-hash: ${hash}
+Commit-url: https://github.com/${repo}/commit/${hash}
 Author: ${structure: name}
 
 Jenkins Information:
