@@ -133,7 +133,7 @@ def runFunctionCoreTests(request):
     # Run the core jobs related with this commit on jenkins
     for core_job in core_jobs:
         # Temporal hack to get correct versions
-        if branch in ['4.2', '4.3']:
+        if core_job['plone_version'] in ['4.2', '4.3']:
             pyversions = OLD_PYTHON_VERSIONS
         else:
             pyversions = PYTHON_VERSIONS
