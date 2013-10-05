@@ -59,7 +59,7 @@ def create_jenkins_package_xml(
     )
 
     result = render(
-        'mr.roboto:templates/plone.pt',
+        'mr.roboto:templates/core_packages_jk_config.pt',
         {
             'callback_url': callback_url,
             'display_name': display_name,
