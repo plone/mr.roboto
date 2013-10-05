@@ -6,10 +6,17 @@ from mr.roboto.db import PullsDB
 
 from mr.roboto.plonegithub import PloneGithub
 from jenkins import Jenkins
+from jenkinsapi.jenkins import Jenkins as APIJenkins
 import pymongo
 import ast
 
 from mongopersist import datamanager
+from chameleon import PageTemplateLoader
+import os
+
+
+templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "templates"))
+dir_for_kgs = os.path.join(os.path.dirname(__file__), "kgs")
 
 
 def main(global_config, **settings):
@@ -38,7 +45,7 @@ def main(global_config, **settings):
 
     # jenkins object
     config.registry.settings['jenkins'] = Jenkins(settings['jenkins_url'], settings['jenkins_username'], settings['jenkins_password'])
-
+    config.registry.settings['jenkinsapi'] = APIJenkins(settings['jenkins_url'], settings['jenkins_username'], settings['jenkins_password'])
     # github object
     config.registry.settings['github'] = PloneGithub(settings['github_user'], settings['github_password'])
 
@@ -57,6 +64,8 @@ def main(global_config, **settings):
 
     config.add_route('home', '/')
     # config.add_route('log', '/log')
+    config.add_route('view_info', '/get_info')
+    config.add_route('kgs', '/kgs')
     config.add_route('repos', '/repos')
     config.add_route('jobs', '/jobs')
     config.add_route('plips', '/plips')

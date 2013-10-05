@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description></description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>20</daysToKeep>
     <numToKeep>30</numToKeep>
     <artifactDaysToKeep>3</artifactDaysToKeep>

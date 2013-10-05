@@ -4,6 +4,7 @@ import json
 import persistent
 import datetime
 from mongopersist import mapping
+from uuid import uuid4
 
 
 class PLIPPackage(persistent.Persistent):
@@ -37,31 +38,81 @@ class PLIPPackages(mapping.MongoCollectionMapping):
     __mongo_mapping_key__ = 'description'
 
 
+class Push(persistent.Persistent):
+    """ 
+    Push to plone github 
+
+    repo : has the repository where we pushed
+    branch : branch where we did the push
+    internal_identifier : identifier of the push
+    data : list of all commits
+
+    data is a list of :
+    [
+        {
+            'diff': diff,
+            'files': files,
+            'short_commit_msg': commit_msg,
+            'reply_to': who,
+            'sha': sha
+        }
+    ]
+
+    """
+    _p_mongo_collection = 'push'
+
+    def __init__(
+            self,
+            internal_identifier,
+            data,
+            who=None,
+            repo=None,
+            branch=None,
+            payload=None):
+        self.payload = payload
+        self.data = data
+        self.who = who
+        self.repo = repo
+        self.branch = branch
+        self.date = str(datetime.datetime.now())
+        self.internal_identifier = internal_identifier
+
+
+class Pushes(mapping.MongoCollectionMapping):
+    __mongo_collection__ = 'push'
+    __mongo_mapping_key__ = 'internal_identifier'
+
+
 class JenkinsJob(persistent.Persistent):
-    """ Jenkins Job Testing representation """
+    """ 
+    Jenkins Job Testing representation 
+
+    job_type : ['core', 'plip', 'corepackage']
+    jk_uid : identifier of the job -> [push_id]_[jk_name] or [package]_[push_id]_[jk_name]
+    date : when we started
+    ref : reference to the push
+    jk_name : name of the jenkins job
+    jk_url : url of the build (added on callback)
+    result : [None, True, False] depending on the result of the job (added on callback)
+
+    """
     _p_mongo_collection = 'jenkins_job'
 
     def __init__(
             self,
             job_type,
             jk_uid,
-            repo=None,
-            branch=None,
-            plone_version=None,
-            who=None,
-            ref=None,
+            push=None,
             jk_name=None,
-            jk_url=None):
+            jk_url=None,
+            result=None):
         self.type = job_type
-        self.repo = repo
-        self.branch = branch
-        self.plone_version = plone_version
         self.date = str(datetime.datetime.now())
         self.jk_uid = jk_uid
-        self.who = who
         self.jk_name = jk_name
-        self.ref = ref
+        self.push = push
         self.jk_url = jk_url
+        self.result = result
 
 
 class JenkinsJobs(mapping.MongoCollectionMapping):

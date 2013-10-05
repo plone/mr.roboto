@@ -13,5 +13,5 @@ lib/
 local/
 .installed.cfg
 .mr.developer.cfg
-
+*.log
 development.ini

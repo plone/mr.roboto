@@ -1,6 +1,7 @@
 from lxml import etree
 from StringIO import StringIO
-from mr.roboto.jobs import create_jenkins_job_xml
+from mr.roboto.jobs import create_jenkins_plip_job_xml
+from mr.roboto.jobs import create_jenkins_package_xml
 import urllib2
 import urllib
 import json
@@ -54,14 +55,42 @@ def jenkins_create_pull_job(request, pull_request, branch=None, params=None):
     return ident
 
 
-def jenkins_job_external(request, job, callback_url, data, payload=None, params=None):
+def jenkins_core_package_job(request, job, callback_url, data, payload=None, params=None):
+    jenkins = request.registry.settings['jenkins']
+
+    job_xml = create_jenkins_package_xml(
+        data['description'],
+        data['python_version'],
+        data['contact'],
+        data['plone_version'],
+        data['package_name'],
+        callback_url,
+        data['sources'])
+
+    if not jenkins.job_exists(job):
+        # If we have job information we apply
+        jenkins.create_job(job, job_xml)
+    else:
+        jenkins.reconfig_job(job, job_xml)
+    url = jenkins.build_job_url(job, parameters=params)
+
+    spayload = json.dumps(payload)
+    sending_payload = {'payload': spayload}
+
+    logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
+    jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
+
+    return jenkins.get_job_info(job)['url']
+
+
+def jenkins_job_plip(request, job, callback_url, data, payload=None, params=None):
     """
     Generic plone project job
     """
 
     jenkins = request.registry.settings['jenkins']
 
-    job_xml = create_jenkins_job_xml(
+    job_xml = create_jenkins_plip_job_xml(
         'Test %s' % data['description'],
         '2.7',
         data['contact'],

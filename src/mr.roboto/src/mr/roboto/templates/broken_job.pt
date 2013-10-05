@@ -1,10 +1,14 @@
 Repository: ${repo}
 Branch: ${branch}
-Commit-hash: ${hash}
-Commit-url: https://github.com/${repo}/commit/${hash}
 Author: ${structure: name}
 
-Jenkins Information:
+Jenkins Information
+-------------------
 
-Job: ${jk_job}
-Url: ${jk_url}
+${result}
+
+
+Github Information
+------------------
+
+${commits}

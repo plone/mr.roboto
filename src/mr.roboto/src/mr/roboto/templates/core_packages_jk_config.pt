@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <actions/>
+  <description/>
+  <displayName>${display_name}</displayName>
+  <logRotator class="hudson.tasks.LogRotator">
+    <daysToKeep>20</daysToKeep>
+    <numToKeep>30</numToKeep>
+    <artifactDaysToKeep>3</artifactDaysToKeep>
+    <artifactNumToKeep>10</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <com.tikal.hudson.plugins.notification.HudsonNotificationProperty plugin="notification@1.5">
+      <endpoints>
+        <com.tikal.hudson.plugins.notification.Endpoint>
+          <protocol>HTTP</protocol>
+          <format>JSON</format>
+          <url>${callback_url}</url>
+        </com.tikal.hudson.plugins.notification.Endpoint>
+      </endpoints>
+    </com.tikal.hudson.plugins.notification.HudsonNotificationProperty>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.TextParameterDefinition>
+          <name>plonechanges</name>
+          <description/>
+          <defaultValue>No changes</defaultValue>
+        </hudson.model.TextParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty plugin="throttle-concurrents@1.8">
+      <maxConcurrentPerNode>0</maxConcurrentPerNode>
+      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@1.5.0">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+       <name/>
+        <refspec/>
+        <url>git://github.com/plone/buildout.coredev.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>${plone_version}</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <ignoreNotifyCommit>false</ignoreNotifyCommit>
+    <useShallowClone>false</useShallowClone>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir/>
+    <reference/>
+    <excludedRegions/>
+    <excludedUsers/>
+    <gitConfigName/>
+    <gitConfigEmail/>
+    <skipTag>false</skipTag>
+    <includedRegions/>
+    <scmName/>
+  </scm>
+  <assignedNode>Slave</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo "Save to CHANGES.log"
+echo $plonechanges &gt; CHANGES.log
+
+echo "${command}" &gt; onthefly.cfg
+
+$PYTHON${python_version} bootstrap.py -c onthefly.cfg
+bin/buildout -c onthefly.cfg
+bin/test -s ${package_name}
+bin/code-analysis
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <!-- EMAIL NOTIFICATION -->
+    <hudson.plugins.emailext.ExtendedEmailPublisher>
+      <recipientList>${email_notification_recipients}</recipientList>
+      <configuredTriggers>
+        <hudson.plugins.emailext.plugins.trigger.RegressionTrigger>
+          <email>
+            <recipientList>${email_notification_recipients}</recipientList>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Regression! -  failure(s)</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.RegressionTrigger>
+        <hudson.plugins.emailext.plugins.trigger.ImprovementTrigger>
+          <email>
+            <recipientList>${email_notification_recipients}</recipientList>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Improvement! - failure(s)</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.ImprovementTrigger>
+        <hudson.plugins.emailext.plugins.trigger.FixedTrigger>
+          <email>
+            <recipientList>${email_notification_recipients}</recipientList>
+            <subject>$PROJECT_NAME - Build # $BUILD_NUMBER - Fixed! - 0 failure(s)</subject>
+            <body>$PROJECT_DEFAULT_CONTENT</body>
+            <sendToDevelopers>false</sendToDevelopers>
+            <sendToRequester>false</sendToRequester>
+            <includeCulprits>false</includeCulprits>
+            <sendToRecipientList>true</sendToRecipientList>
+          </email>
+        </hudson.plugins.emailext.plugins.trigger.FixedTrigger>
+      </configuredTriggers>
+      <contentType>default</contentType>
+      <defaultSubject>$DEFAULT_SUBJECT</defaultSubject>
+      <defaultContent>$DEFAULT_CONTENT</defaultContent>
+      <attachmentsPattern/>
+      <presendScript/>
+    </hudson.plugins.emailext.ExtendedEmailPublisher>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>snapshoot.cfg</artifacts>
+      <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>**/parts/jenkins-test/testreports/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.plugins.robot.RobotPublisher plugin="robot@1.3.1">
+      <outputPath>parts/jenkins-test</outputPath>
+      <reportFileName>robot_report.html</reportFileName>
+      <logFileName>robot_log.html</logFileName>
+      <outputFileName>robot_output.xml</outputFileName>
+      <passThreshold>100.0</passThreshold>
+      <unstableThreshold>80.0</unstableThreshold>
+      <otherFiles>
+        <string>robot_*.png</string>
+      </otherFiles>
+      <onlyCritical>true</onlyCritical>
+    </hudson.plugins.robot.RobotPublisher>
+    <org.jenkinsci.plugins.custom__history.SaveHistory plugin="CustomHistory@1.6">
+      <fname>CHANGES.log</fname>
+      <exitOnFail>false</exitOnFail>
+    </org.jenkinsci.plugins.custom__history.SaveHistory>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.18">
+      <deleteDirs>true</deleteDirs>
+      <cleanupParameter/>
+      <externalDelete/>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <org.jvnet.hudson.plugins.port__allocator.PortAllocator plugin="port-allocator@1.8">
+      <ports>
+        <org.jvnet.hudson.plugins.port__allocator.DefaultPortType>
+          <name>ZSERVER_PORT</name>
+        </org.jvnet.hudson.plugins.port__allocator.DefaultPortType>
+      </ports>
+    </org.jvnet.hudson.plugins.port__allocator.PortAllocator>
+    <org.jenkinsci.plugins.xvfb.XvfbBuildWrapper plugin="xvfb@1.0.8">
+      <installationName>default</installationName>
+      <screen>1024x768x24</screen>
+      <debug>false</debug>
+      <timeout>0</timeout>
+      <displayNameOffset>1</displayNameOffset>
+      <additionalOptions/>
+      <shutdownWithBuild>false</shutdownWithBuild>
+    </org.jenkinsci.plugins.xvfb.XvfbBuildWrapper>
+  </buildWrappers>
+</project>

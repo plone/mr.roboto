@@ -2,6 +2,8 @@ from pyramid.view import view_config
 
 from mr.roboto.security import validatetoken
 from mr.roboto.db import CorePackages, PLIPPackages, PLIPPackage
+from mr.roboto.db import Push
+from mr.roboto.db import Pushes
 
 import logging
 import transaction
@@ -22,6 +24,17 @@ def logPage(context, request):
     log = f.read()
     f.close()
     return dict(log=log)
+
+
+@view_config(route_name='view_info', renderer='mr.roboto:templates/push_info.pt')
+def view_commit_info(context, request):
+    if 'push' in request.GET:
+        push_id = request.GET['push']
+        pushes = Pushes(request.registry.settings['dm'])
+        if push_id in pushes:
+            push = pushes[push_id]
+        jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push.internal_identifier}))
+        return dict(push=push, jobs=jobs)
 
 
 @view_config(route_name='plips', renderer='mr.roboto:templates/plip.pt')

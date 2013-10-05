@@ -122,3 +122,7 @@ class PloneGithub(Github):
         else:
             logger.info('Push without sha repo: ' + repo)
 
+    def set_status(self, repo, sha, status, message, url):
+        repo_object = self.get_repo(repo)
+        commit = repo_object.get_commit(sha)
+        commit.create_status(status, target_url=url, description=message)
