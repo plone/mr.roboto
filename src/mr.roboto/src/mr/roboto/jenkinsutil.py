@@ -72,15 +72,15 @@ def jenkins_core_package_job(request, job, callback_url, data, payload=None, par
         jenkins.create_job(job, job_xml)
     else:
         jenkins.reconfig_job(job, job_xml)
-    # url = jenkins.build_job_url(job, parameters=params)
+    url = jenkins.build_job_url(job, parameters=params)
 
-    jenkins.build_job(job, params)
+    # jenkins.build_job(job, params)
 
-    # spayload = json.dumps(payload)
-    # sending_payload = {'payload': spayload}
+    spayload = json.dumps(payload)
+    sending_payload = {'payload': spayload}
 
-    # logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
-    # jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
+    logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
+    jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
 
     return jenkins.get_job_info(job)['url']
 
@@ -108,14 +108,14 @@ def jenkins_job_plip(request, job, callback_url, data, payload=None, params=None
     else:
         jenkins.reconfig_job(job, job_xml)
 
-    jenkins.build_job(job, params)
-    # url = jenkins.build_job_url(job, parameters=params)
+    # jenkins.build_job(job, params)
+    url = jenkins.build_job_url(job, parameters=params)
 
-    # spayload = json.dumps(payload)
-    # sending_payload = {'payload': spayload}
+    spayload = json.dumps(payload)
+    sending_payload = {'payload': spayload}
 
-    # logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
-    # jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
+    logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
+    jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
 
     return jenkins.get_job_info(job)['url']
 
@@ -163,12 +163,12 @@ def jenkins_core_job(request, job, callback_url, params=None, payload=None):
     xml_reconfig = etree.tostring(xml_object)
     jenkins.reconfig_job(job, xml_reconfig)
 
-    jenkins.build_job(job, params)
-    # url = jenkins.build_job_url(job, parameters=params)
+    # jenkins.build_job(job, params)
+    url = jenkins.build_job_url(job, parameters=params)
 
-    # spayload = json.dumps(payload)
-    # sending_payload = {'payload': spayload}
+    spayload = json.dumps(payload)
+    sending_payload = {'payload': spayload}
 
-    # logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
-    # jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
+    logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
+    jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
 
