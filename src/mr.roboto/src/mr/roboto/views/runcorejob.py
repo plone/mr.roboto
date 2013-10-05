@@ -159,16 +159,16 @@ def runFunctionCoreTests(request):
 
                 # Coredev.buildout job
                 # Define the callback url for jenkins
-                url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
                 jk_job_id = push_id + '_' + job_name
+                url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
                 jenkins_jobs[jk_job_id] = JenkinsJob('core', jk_job_id, jk_name=job_name, push=push_id)
                 transaction.commit()
                 jenkins_core_job(request, job_name, url, payload=payload, params=params)
 
                 # Core package job
                 # Define the callback url for jenkins
-                url = request.registry.settings['callback_url'] + 'corecommitkgs?jk_job_id=' + jk_job_id
                 jk_job_id = repo + '_' + push_id + '_' + job_name
+                url = request.registry.settings['callback_url'] + 'corecommitkgs?jk_job_id=' + jk_job_id
                 job_kgs_name = 'kgs-' + repo + '-' + job_name
                 jenkins_jobs[jk_job_id] = JenkinsJob('corepackage', jk_job_id, jk_name=job_kgs_name, push=push_id)
                 transaction.commit()
