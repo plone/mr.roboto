@@ -92,7 +92,7 @@ def runFunctionCoreTests(request):
     for commit in payload['commits']:
         # get the commit data structure
         commit_data = get_info_from_commit(commit)
-        commits_info += commit_data
+        commits_info.append(commit_data)
 
         # prepare a changeset text message
         data = {
