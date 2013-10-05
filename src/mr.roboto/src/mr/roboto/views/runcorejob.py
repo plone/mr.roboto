@@ -82,7 +82,10 @@ def runFunctionCoreTests(request):
     # Going to run the core-dev tests
     # Who is doing the push ??
 
-    who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
+    if payload['pusher']['name'] == u'none':
+        who = "NoBody <nobody@plone.org>"
+    else:
+        who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
     changeset = ""
     commits_info = []
 
