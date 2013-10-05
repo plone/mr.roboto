@@ -169,7 +169,7 @@ def runFunctionCoreTests(request):
                 # Define the callback url for jenkins
                 jk_job_id = repo + '_' + push_id + '_' + job_name
                 url = request.registry.settings['callback_url'] + 'corecommitkgs?jk_job_id=' + jk_job_id
-                job_kgs_name = 'kgs-' + repo + '-' + job_name
+                job_kgs_name = 'kgs-' + repo_name + '-' + job_name
                 jenkins_jobs[jk_job_id] = JenkinsJob('corepackage', jk_job_id, jk_name=job_kgs_name, push=push_id)
                 transaction.commit()
 
