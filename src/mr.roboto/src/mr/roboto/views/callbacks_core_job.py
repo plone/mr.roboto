@@ -132,6 +132,10 @@ def functionCallbackCommit(request):
                     folder_to_store_kgs = dir_for_kgs + '/' + answer['name'] + '/'
                     if not os.access(folder_to_store_kgs, os.R_OK):
                         os.mkdir(folder_to_store_kgs)
+                    if os.access(folder_to_store_kgs + 'snapshoot.cfg', os.R_OK):
+                        os.remove(folder_to_store_kgs + 'snapshoot.cfg')
+                    if os.access(folder_to_store_kgs + 'versions.cfg', os.R_OK):
+                        os.remove(folder_to_store_kgs + 'versions.cfg')
                     jkapiObject_build.get_artifact_dict()['snapshoot.cfg'].save_to_dir(folder_to_store_kgs)
                     jkapiObject_build.get_artifact_dict()['versions.cfg'].save_to_dir(folder_to_store_kgs)
                 except:
