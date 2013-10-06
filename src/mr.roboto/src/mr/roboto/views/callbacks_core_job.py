@@ -46,6 +46,7 @@ def functionCallbackCommit(request):
     jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_uid': jk_job_id}))
     if len(jobs) == 0:
         add_log(request, 'jenkin', 'Invalid jenkins job  %s ' % (jk_job_id))
+        import pdb; pdb.set_trace()
         return
     job = jobs[0]
 
