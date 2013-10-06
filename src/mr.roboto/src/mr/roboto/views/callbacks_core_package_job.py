@@ -102,7 +102,6 @@ def functionCallbackCommit(request):
 
         if len(all_jobs) == 0:
             add_log(request, 'jenkin', 'ERROR on system')
-            import pdb; pdb.set_trace()
 
         completed = True
         all_green = True
@@ -164,7 +163,6 @@ def functionCallbackCommit(request):
 
         if len(all_jobs) == 0:
             add_log(request, 'jenkin', 'ERROR on system')
-            import pdb; pdb.set_trace()
 
         # look for if it's completed
         completed = True
