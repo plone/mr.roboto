@@ -31,20 +31,22 @@
                 <h3>Message</h3>
                 <p tal:content="python: commit['short_commit_msg']"></p>
                 <h3>Diff</h3>
-                <p tal:content="structure python: commit['diff']"></p>
+                <pre tal:content="structure python: commit['diff']"></pre>
                 <h3>Files</h3>
-                <p tal:content="structure python: commit['files']"></p>
+                <tal:files repeat="file python: commit['files']">
+                    <p tal:content="file"></p>
+                </tal:files>t
             </tal:commits>
 
             <h2>jenkins results</h2>
             <tal:jk repeat="job jobs">
-                <h3>Date</h3>
+                <h4>Date</h4>
                 <p tal:content="python: job['date']"></p>
-                <h3>Job</h3>
+                <h4>Job</h4>
                 <p tal:content="python: job['jk_name']"></p>
-                <h3>URL</h3>
-                <p tal:content="python: job['jk_name']"></p>
-                <h3>Result</h3>
+                <h4>URL</h4>
+                <a tal:attributes="href python: job['jk_url']" tal:content="python: job['jk_url']">url</a>
+                <h4>Result</h4>
                 <p tal:content="python: job['result']"></p>
             </tal:jk>
         </div>
