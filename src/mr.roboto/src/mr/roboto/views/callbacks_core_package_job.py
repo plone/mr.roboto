@@ -96,6 +96,10 @@ def functionCallbackCommit(request):
         # check if there is any other job working
         all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'corepackage'}))
 
+        if len(all_jobs) == 0:
+            add_log(request, 'jenkin', 'ERROR on system')
+            import pdb; pdb.set_trace()
+
         completed = True
         all_green = True
         message = ''
@@ -118,6 +122,7 @@ def functionCallbackCommit(request):
         if completed:
             # update commit GH
             if all_green:
+                add_log(request, 'jenkin', '[GOOD] All kgs tests pass on push %s' % (push_uuid))
                 status = 'success'
                 status_message = 'Mr. Roboto aproves this commit!'
                 comment_message = 'TESTS PASSED\n Mr.Roboto url : %s\n %s' % (url, message)
@@ -125,6 +130,8 @@ def functionCallbackCommit(request):
                 request.registry.notify(KGSJobSuccess(payload, request, message))
 
             else:
+                add_log(request, 'jenkin', '[BAD] Some kgs tests fail on push %s' % (push_uuid))
+                add_log(request, 'jenkin', message)
                 status = 'failure'
                 status_message = 'Mr. Roboto does NOT aprove this commit!'
                 comment_message = 'TESTS FAILED\n Mr.Roboto url : %s\n %s' % (url, message)
@@ -150,6 +157,10 @@ def functionCallbackCommit(request):
         # check if there is any other job working
         all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'corepackage'}))
 
+        if len(all_jobs) == 0:
+            add_log(request, 'jenkin', 'ERROR on system')
+            import pdb; pdb.set_trace()
+
         # look for if it's completed
         completed = True
         message = ''
@@ -170,6 +181,9 @@ def functionCallbackCommit(request):
         if completed:
             # update commits GH
             status = 'failure'
+            add_log(request, 'jenkin', '[BAD] Some kgs tests fail on push %s' % (push_uuid))
+            add_log(request, 'jenkin', message)
+
             status_message = 'Mr. Roboto does NOT aprove this commit!'
             comment_message = 'TESTS FAILED\n Mr.roboto url : %s\n %s' % (url, message)
             request.registry.notify(KGSJobFailure(payload, request, message))
