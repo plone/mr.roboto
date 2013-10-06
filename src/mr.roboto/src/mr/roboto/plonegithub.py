@@ -126,3 +126,14 @@ class PloneGithub(Github):
         repo_object = self.get_repo(repo)
         commit = repo_object.get_commit(sha)
         commit.create_status(status, target_url=url, description=message)
+
+    def set_direct_message(self, repo, sha, message):
+        repo_object = self.get_repo(repo)
+        commit = repo_object.get_commit(sha)
+        comment_object = None
+        for comment in commit.get_comments():
+            if comment.user.login == self.user:
+                comment_object = comment
+                comment_object.edit(message)
+        if comment_object is None:
+            comment_object = commit.create_comment(message)

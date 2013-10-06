@@ -66,6 +66,9 @@ def functionCallbackCommit(request):
         return
     push = pushs[0]
 
+    # get the payload
+    payload = push['payload']
+
     # get the repo
     repo = push['repo']
 
@@ -108,27 +111,34 @@ def functionCallbackCommit(request):
                 message += '[FAILURE] '
             message += j['jk_name'] + ' kgs\n'
 
+        # url for more information
+        url = request.registry.settings['roboto_url'] + 'get_info?push=' + push_uuid
+
         # We need to setup the status of the commit
         if completed:
             # update commit GH
             if all_green:
                 status = 'success'
+                status_message = 'Mr. Roboto aproves this commit!'
+                comment_message = 'TESTS PASSED\n Mr.Roboto url : %s\n %s' % (url, message)
                 # We need to check if job before this one was not working
                 request.registry.notify(KGSJobSuccess(payload, request, message))
 
             else:
                 status = 'failure'
+                status_message = 'Mr. Roboto does NOT aprove this commit!'
+                comment_message = 'TESTS FAILED\n Mr.Roboto url : %s\n %s' % (url, message)
                 # We need to check if the job before was good
                 request.registry.notify(KGSJobFailure(payload, request, message))
         else:
             status = 'pending'
-
-        # url for more information
-        url = request.registry.settings['roboto_url'] + 'get_info?push=' + push_uuid
+            status_message = 'Mr. Roboto is still working!'
 
         # set the status on all the commits
         for commit in push['data']:
-            ghObject.set_status(repo, commit['sha'], status, message, url)
+            ghObject.set_status(repo, commit['sha'], status, status_message, url)
+            if completed:
+                ghObject.set_direct_message(repo, commit['sha'], comment_message)
 
     elif answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
@@ -154,17 +164,21 @@ def functionCallbackCommit(request):
             elif j['result'] is False:
                 message += '[FAILURE]\n'
 
+        url = request.registry.settings['roboto_url'] + 'get_info?push=' + push_uuid
+
         # We need to setup the status of the commit
         if completed:
             # update commits GH
             status = 'failure'
+            status_message = 'Mr. Roboto does NOT aprove this commit!'
+            comment_message = 'TESTS FAILED\n Mr.roboto url : %s\n %s' % (url, message)
             request.registry.notify(KGSJobFailure(payload, request, message))
-
         else:
             status = 'pending'
+            status_message = 'Mr. Roboto is still working!'
 
-        url = request.registry.settings['roboto_url'] + 'get_info?push=' + push_uuid
 
         for commit in push['data']:
-            ghObject.set_status(repo, commit['sha'], status, message, url)
-
+            ghObject.set_status(repo, commit['sha'], status, status_message, url)
+            if completed:
+                ghObject.set_direct_message(repo, commit['sha'], comment_message)
