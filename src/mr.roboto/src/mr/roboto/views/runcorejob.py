@@ -215,6 +215,8 @@ def runFunctionCoreTests(request):
 
             # We create the JK job
             jk_job_id = push_id + '_' + job_name
+            url = request.registry.settings['callback_url'] + 'plipcommit?jk_job_id=' + jk_job_id
+
             jenkins_jobs[jk_job_id] = JenkinsJob('plip', jk_job_id, jk_name=job_name, push=push_id)
             transaction.commit()
 

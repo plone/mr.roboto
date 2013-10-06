@@ -91,6 +91,7 @@ def functionCallbackCommit(request):
 
         # Update the result of the job on DB
         request.registry.settings['db']['jenkins_job'].update({'jk_uid': jk_job_id}, {'$set': {'result': True}})
+        transaction.commit()
 
         # check if there is any other job working
         all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'core'}))
@@ -155,6 +156,7 @@ def functionCallbackCommit(request):
 
         # Update the result of the job on DB
         request.registry.settings['db']['jenkins_job'].update({'jk_uid': jk_job_id}, {'$set': {'result': False}})
+        transaction.commit()
 
         # check if there is any other job working
         all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'core'}))

@@ -2,19 +2,19 @@
 from cornice import Service
 from mr.roboto.security import validatejenkins
 from mr.roboto.views.run import add_log
+import transaction
+from pyramid_mailer import get_mailer
+from chameleon import PageTemplateLoader
+from pyramid_mailer.message import Message
 import os
-from mr.roboto import dir_for_kgs
-from mr.roboto.events import KGSJobSuccess
-from mr.roboto.events import KGSJobFailure
+from mr.roboto import templates, dir_for_kgs
 
 
-callbackCommitCorePackageJob = Service(
-    name='Callback for commits on core packages and core package jobs',
-    path='/callback/corecommitkgs',
-    description="Callback for commits package jobs on jenkins")
+callbackCommit = Service(name='Callback for plip commits', path='/callback/plipcommit',
+                    description="Callback for plip commits jobs on jenkins")
 
 
-@callbackCommitCorePackageJob.post()
+@callbackCommit.post()
 def functionCallbackCommit(request):
     """
     For core-dev
@@ -31,6 +31,8 @@ def functionCallbackCommit(request):
      }
     }
 
+    We are going to write on the comment
+    We are going to store a KGS if it passes the test
 
     """
     answer = request.json_body
@@ -43,7 +45,7 @@ def functionCallbackCommit(request):
     # get the job
     jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_uid': jk_job_id}))
     if len(jobs) == 0:
-        add_log(request, 'jenkin', 'Invalid kgs jenkins job  %s ' % (jk_job_id))
+        add_log(request, 'jenkin', 'Invalid plip jenkins job  %s ' % (jk_job_id))
         return
     job = jobs[0]
 
@@ -65,9 +67,6 @@ def functionCallbackCommit(request):
         add_log(request, 'jenkin', 'No push linked to  %s ' % (push_uuid))
         return
     push = pushs[0]
-
-    # get the payload
-    payload = push['payload']
 
     # get the repo
     repo = push['repo']
@@ -95,26 +94,22 @@ def functionCallbackCommit(request):
         transaction.commit()
 
         # check if there is any other job working
-        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'type': 'corepackage'}))
-
-        if len(all_jobs) == 0:
-            add_log(request, 'jenkin', 'ERROR on system')
-            import pdb; pdb.set_trace()
+        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'plip'}))
 
         completed = True
         all_green = True
         message = ''
         for j in all_jobs:
+            message += j['jk_name'] + ' '
             if j['result'] is None:
                 # We still miss some jobs
                 completed = False
-                message += '[PENDING] '
+                message += '[PENDING]\n'
             elif j['result'] is True:
-                message += '[SUCCESS] '
+                message += '[SUCCESS]\n'
             elif j['result'] is False:
                 all_green = False
-                message += '[FAILURE] '
-            message += j['jk_name'] + ' kgs\n'
+                message += '[FAILURE]\n'
 
         # url for more information
         url = request.registry.settings['roboto_url'] + 'get_info?push=' + push_uuid
@@ -123,30 +118,20 @@ def functionCallbackCommit(request):
         if completed:
             # update commit GH
             if all_green:
-                add_log(request, 'jenkin', '[GOOD] All kgs tests pass on push %s' % (push_uuid))
                 status = 'success'
+                # Store the new KGS
                 status_message = 'Mr. Roboto aproves this commit!'
                 comment_message = 'TESTS PASSED\n Mr.Roboto url : %s\n %s' % (url, message)
-                # We need to check if job before this one was not working
-                request.registry.notify(KGSJobSuccess(payload, request, message))
+
 
             else:
-                add_log(request, 'jenkin', '[BAD] Some kgs tests fail on push %s' % (push_uuid))
-                add_log(request, 'jenkin', message)
                 status = 'failure'
                 status_message = 'Mr. Roboto does NOT aprove this commit!'
                 comment_message = 'TESTS FAILED\n Mr.Roboto url : %s\n %s' % (url, message)
-                # We need to check if the job before was good
-                request.registry.notify(KGSJobFailure(payload, request, message))
         else:
             status = 'pending'
             status_message = 'Mr. Roboto is still working!'
 
-        # set the status on all the commits
-        for commit in push['data']:
-            ghObject.set_status(repo, commit['sha'], status, status_message, url)
-            if completed:
-                ghObject.set_direct_message(repo, commit['sha'], comment_message)
 
     elif answer['build']['phase'] == 'FINISHED' and answer['build']['status'] == 'FAILURE':
         # Oooouu it failed
@@ -157,17 +142,13 @@ def functionCallbackCommit(request):
         transaction.commit()
 
         # check if there is any other job working
-        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'type': 'corepackage'}))
-
-        if len(all_jobs) == 0:
-            add_log(request, 'jenkin', 'ERROR on system')
-            import pdb; pdb.set_trace()
+        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'plip'}))
 
         # look for if it's completed
         completed = True
         message = ''
         for j in all_jobs:
-            message += j['jk_name'] + ' kgs '
+            message += j['jk_name'] + ' '
             if j['result'] is None:
                 # We still miss some jobs
                 completed = False
@@ -183,18 +164,11 @@ def functionCallbackCommit(request):
         if completed:
             # update commits GH
             status = 'failure'
-            add_log(request, 'jenkin', '[BAD] Some kgs tests fail on push %s' % (push_uuid))
-            add_log(request, 'jenkin', message)
-
             status_message = 'Mr. Roboto does NOT aprove this commit!'
             comment_message = 'TESTS FAILED\n Mr.roboto url : %s\n %s' % (url, message)
-            request.registry.notify(KGSJobFailure(payload, request, message))
+
         else:
             status = 'pending'
             status_message = 'Mr. Roboto is still working!'
 
 
-        for commit in push['data']:
-            ghObject.set_status(repo, commit['sha'], status, status_message, url)
-            if completed:
-                ghObject.set_direct_message(repo, commit['sha'], comment_message)

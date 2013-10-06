@@ -42,6 +42,10 @@
             <tal:jk repeat="job jobs">
                 <h3 tal:content="python: job['jk_name']"></h3>
                 <div>
+                    <label>ID</label>
+                    <p tal:content="python: job['jk_uid']"></p>
+                </div>
+                <div>
                     <label>Date</label>
                     <p tal:content="python: job['date']"></p>
                 </div>
