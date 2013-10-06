@@ -8,6 +8,7 @@ from chameleon import PageTemplateLoader
 from pyramid_mailer.message import Message
 import os
 from mr.roboto import templates, dir_for_kgs
+from mr.roboto.db import JenkinsJobs
 
 
 callbackCommit = Service(name='Callback for commits', path='/callback/corecommit',
@@ -42,13 +43,13 @@ def functionCallbackCommit(request):
     jk_job_id = request.GET['jk_job_id']
     add_log(request, 'jenkin', 'Received job ' + jk_job_id)
 
+    jenkins_jobs = JenkinsJobs(request.registry.settings['dm'])
     # get the job
-    jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_uid': jk_job_id}))
-    if len(jobs) == 0:
-        add_log(request, 'jenkin', 'Invalid jenkins job  %s ' % (jk_job_id))
-        import pdb; pdb.set_trace()
-        return
-    job = jobs[0]
+    try:
+        job = jenkins_jobs[jk_job_id]
+    except KeyError:
+        add_log(request, 'jenkin', 'Invalid core jenkins job  %s ' % (jk_job_id))
+        return        
 
     # get the pushid
     push_uuid = job['push']

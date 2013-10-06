@@ -6,6 +6,7 @@ import os
 from mr.roboto import dir_for_kgs
 from mr.roboto.events import KGSJobSuccess
 from mr.roboto.events import KGSJobFailure
+from mr.roboto.db import JenkinsJobs
 
 
 callbackCommitCorePackageJob = Service(
@@ -40,12 +41,13 @@ def functionCallbackCommit(request):
     jk_job_id = request.GET['jk_job_id']
     add_log(request, 'jenkin', 'Received job ' + jk_job_id)
 
+    jenkins_jobs = JenkinsJobs(request.registry.settings['dm'])
     # get the job
-    jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_uid': jk_job_id}))
-    if len(jobs) == 0:
+    try:
+        job = jenkins_jobs[jk_job_id]
+    except KeyError:
         add_log(request, 'jenkin', 'Invalid kgs jenkins job  %s ' % (jk_job_id))
-        return
-    job = jobs[0]
+        return        
 
     # get the pushid
     push_uuid = job['push']

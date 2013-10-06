@@ -8,6 +8,7 @@ from chameleon import PageTemplateLoader
 from pyramid_mailer.message import Message
 import os
 from mr.roboto import templates, dir_for_kgs
+from mr.roboto.db import JenkinsJobs
 
 
 callbackCommit = Service(name='Callback for plip commits', path='/callback/plipcommit',
@@ -43,11 +44,13 @@ def functionCallbackCommit(request):
     add_log(request, 'jenkin', 'Received job ' + jk_job_id)
 
     # get the job
-    jobs = list(request.registry.settings['db']['jenkins_job'].find({'jk_uid': jk_job_id}))
-    if len(jobs) == 0:
+    jenkins_jobs = JenkinsJobs(request.registry.settings['dm'])
+    # get the job
+    try:
+        job = jenkins_jobs[jk_job_id]
+    except KeyError:
         add_log(request, 'jenkin', 'Invalid plip jenkins job  %s ' % (jk_job_id))
         return
-    job = jobs[0]
 
     # get the pushid
     push_uuid = job['push']
