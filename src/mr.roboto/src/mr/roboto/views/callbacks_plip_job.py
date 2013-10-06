@@ -97,7 +97,7 @@ def functionCallbackCommit(request):
         transaction.commit()
 
         # check if there is any other job working
-        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'plip'}))
+        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'type': 'plip'}))
 
         completed = True
         all_green = True
@@ -145,7 +145,7 @@ def functionCallbackCommit(request):
         transaction.commit()
 
         # check if there is any other job working
-        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'plip'}))
+        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'type': 'plip'}))
 
         # look for if it's completed
         completed = True
