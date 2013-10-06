@@ -94,7 +94,7 @@ def functionCallbackCommit(request):
         request.registry.settings['db']['jenkins_job'].update({'jk_uid': jk_job_id}, {'$set': {'result': True}})
 
         # check if there is any other job working
-        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'corepackage'}))
+        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'type': 'corepackage'}))
 
         if len(all_jobs) == 0:
             add_log(request, 'jenkin', 'ERROR on system')
@@ -155,7 +155,7 @@ def functionCallbackCommit(request):
         request.registry.settings['db']['jenkins_job'].update({'jk_uid': jk_job_id}, {'$set': {'result': False}})
 
         # check if there is any other job working
-        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'job_type': 'corepackage'}))
+        all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'type': 'corepackage'}))
 
         if len(all_jobs) == 0:
             add_log(request, 'jenkin', 'ERROR on system')
