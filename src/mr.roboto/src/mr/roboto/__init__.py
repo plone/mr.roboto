@@ -17,6 +17,7 @@ import os
 
 templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "templates"))
 dir_for_kgs = os.path.join(os.path.dirname(__file__), "kgs")
+static_dir = os.path.join(os.path.dirname(__file__), "static", "changeset")
 
 
 def main(global_config, **settings):

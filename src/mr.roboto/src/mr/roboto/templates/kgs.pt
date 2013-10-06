@@ -13,5 +13,7 @@ flake8 = True
 jshint = True
 csslint = True
 
+[versions]
+zc.buildout = 1.7.1
 
 ${structure: sources}

@@ -83,7 +83,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>echo "Save to CHANGES.log"
-echo $plonechanges &gt; CHANGES.log
+curl $plonechanges -o CHANGES.log
 
 echo "${command}" &gt; onthefly.cfg
 

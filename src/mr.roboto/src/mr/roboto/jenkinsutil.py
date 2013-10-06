@@ -41,7 +41,7 @@ def jenkins_create_pull_job(request, pull_request, branch=None, params=None):
         ident = '%s-%s' % (ident, branch)
     if not jenkins.job_exists(ident):
         callback_url = request.registry.settings['callback_url'] + 'corepull?pull=' + ident
-        job_xml = create_jenkins_job_xml(
+        job_xml = create_jenkins_plip_job_xml(
             'Pull Request %s' % pull_request,
             '2.7',
             'no-reply@plone.org',
@@ -99,7 +99,7 @@ def jenkins_job_plip(request, job, callback_url, data, payload=None, params=None
         git_url=data['buildout'],
         git_branch=data['buildout_branch'] if data['buildout_branch'] else 'master',
         callback_url=callback_url,
-        command=data['buildout_file'], 
+        command=data['buildout_file'],
         robot_tests=data['robot_tests'])
 
     if not jenkins.job_exists(job):
@@ -163,7 +163,6 @@ def jenkins_core_job(request, job, callback_url, params=None, payload=None):
     xml_reconfig = etree.tostring(xml_object)
     jenkins.reconfig_job(job, xml_reconfig)
 
-    # jenkins.build_job(job, params)
     url = jenkins.build_job_url(job, parameters=params)
 
     spayload = json.dumps(payload)
@@ -171,4 +170,3 @@ def jenkins_core_job(request, job, callback_url, params=None, payload=None):
 
     logger.warn('Jenkins call: ' + url + ' payload: ' + spayload)
     jenkins.jenkins_open(urllib2.Request(url, urllib.urlencode(sending_payload)))
-

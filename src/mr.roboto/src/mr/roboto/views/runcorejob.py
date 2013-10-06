@@ -21,7 +21,7 @@ from mr.roboto.db import Pushes
 
 from mr.roboto.events import NewCoreDevBuildoutPush
 
-from mr.roboto import templates, dir_for_kgs
+from mr.roboto import templates, dir_for_kgs, static_dir
 
 import transaction
 
@@ -109,8 +109,13 @@ def runFunctionCoreTests(request):
 
     pushes[push_id] = Push(push_id, commits_info, repo=repo, branch=branch, who=who, payload=payload)
 
-    params = {'plonechanges': changeset, 'repo': repo}
-    params_package = {'plonechanges': changeset}
+    changeset_file = open(static_dir + '/' + push_id, 'w')
+    changeset_file.write(changeset)
+    changeset_file.close()
+    file_to_download = request.registry.settings['roboto_url'] + 'static/changeset/' + push_id
+
+    params = {'plonechanges': file_to_download, 'repo': repo}
+    params_package = {'plonechanges': file_to_download}
 
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':

@@ -9,3 +9,5 @@ ${commit.message}
 Files changed:
 ${files}
 
+${structure: diff}
+
