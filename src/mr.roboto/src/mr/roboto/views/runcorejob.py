@@ -184,7 +184,7 @@ def runFunctionCoreTests(request):
 
                 # get sources for kgs
                 folder_to_store_kgs = dir_for_kgs + '/' + job_name + '/'
-                if os.access(folder_to_store_kgs, os.R_OK):
+                if os.access(folder_to_store_kgs + 'snapshoot.cfg', os.R_OK):
                     f = open(folder_to_store_kgs + 'snapshoot.cfg', 'r')
                     sources = f.read()
                     f.close()
