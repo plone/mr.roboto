@@ -40,14 +40,34 @@
 
             <h2>jenkins results</h2>
             <tal:jk repeat="job jobs">
-                <h4>Date</h4>
-                <p tal:content="python: job['date']"></p>
-                <h4>Job</h4>
-                <p tal:content="python: job['jk_name']"></p>
-                <h4>URL</h4>
-                <a tal:attributes="href python: job['jk_url']" tal:content="python: job['jk_url']">url</a>
-                <h4>Result</h4>
-                <p tal:content="python: job['result']"></p>
+                <div>
+                    <label>Type</label>
+                    <p tal:content="python: job['date']"></p>
+                </div>
+                <div>
+                    <label>Date</label>
+                    <p tal:content="python: job['date']"></p>
+                </div>
+                <div>
+                    <label>Job</label>
+                    <p tal:content="python: job['jk_name']"></p>
+                </div>
+                <div>
+                    <label>Url</label>
+                    <a tal:attributes="href python: job['jk_url']" tal:content="python: job['jk_url']">url</a>
+                </div>
+                <div>
+                    <label>Result</label>
+                    <tal:passes condition="python: job['result']==None">
+                        <p>No result</p>
+                    </tal:passes>
+                    <tal:passes condition="python: job['result'] is True">
+                        <p>Passes</p>
+                    </tal:passes>
+                    <tal:passes condition="python: job['result'] is False">
+                        <p>No result</p>
+                    </tal:passes>
+                </div>
             </tal:jk>
         </div>
     </body>
