@@ -7,6 +7,7 @@ from mr.roboto import dir_for_kgs
 from mr.roboto.events import KGSJobSuccess
 from mr.roboto.events import KGSJobFailure
 from mr.roboto.db import JenkinsJobs
+import transaction
 
 
 callbackCommitCorePackageJob = Service(
