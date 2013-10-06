@@ -101,7 +101,7 @@ def runFunctionCoreTests(request):
             'files': '\n'.join(commit_data['files']),
             'diff': commit_data['diff'],
         }
-        changeset += templates['commit_email.pt'](**data)
+        changeset += templates['jenkins_changeset.pt'](**data)
 
         # For logging
         message = 'Commit on ' + repo + ' ' + branch + ' ' + commit['id']
