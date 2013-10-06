@@ -53,7 +53,7 @@ def functionCallbackCommit(request):
         return
 
     # get the pushid
-    push_uuid = job['push']
+    push_uuid = job.push
 
     # get the job name
     jk_job = answer['name']
