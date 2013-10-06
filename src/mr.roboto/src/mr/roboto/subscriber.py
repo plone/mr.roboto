@@ -35,7 +35,11 @@ def get_info_from_commit(commit):
 def send_to_testbot(payload, mailer, result=""):
 
     repo = payload['repository']['name']
-    who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
+
+    if payload['pusher']['name'] == u'none':
+        who = "NoBody <nobody@plone.org>"
+    else:
+        who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
 
     list_of_commits = ""
     for commit in payload['commits']:
