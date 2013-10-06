@@ -134,7 +134,7 @@ def functionCallbackCommit(request):
             status = 'pending'
 
         # url for more information
-        url = request.registry.settings['callback_url'] + 'get_info?push=' + push_uuid
+        url = request.registry.settings['roboto_url'] + 'get_info?push=' + push_uuid
 
         # set the status on all the commits
         for commit in push['data']:
@@ -171,7 +171,7 @@ def functionCallbackCommit(request):
         else:
             status = 'pending'
 
-        url = request.registry.settings['callback_url'] + 'get_info?push=' + push_uuid
+        url = request.registry.settings['roboto_url'] + 'get_info?push=' + push_uuid
 
         for commit in push['data']:
             ghObject.set_status(repo, commit['sha'], status, message, url)
