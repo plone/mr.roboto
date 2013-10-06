@@ -22,18 +22,18 @@
     </head>
     <body>
         <div id="options">
-            <h2 tal:content="push/repo"></h2>
-            <h2 tal:content="push/branch"></h2>
-            <h2 tal:content="push/who"></h2>
+            <h2 tal:content="python: push.repo"></h2>
+            <h2 tal:content="python: push.branch"></h2>
+            <h2 tal:content="python: push.who"></h2>
 
             <h2>Commits</h2>
-            <tal:commits repeat="commit push/data">
+            <tal:commits repeat="commit python: push.data">
                 <h3>Message</h3>
-                <p tal:content="commit/short_commit_msg"></p>
+                <p tal:content="python: commit['short_commit_msg']"></p>
                 <h3>Diff</h3>
-                <p tal:content="structure commit/diff"></p>
+                <p tal:content="structure python: commit['diff']"></p>
                 <h3>Files</h3>
-                <p tal:content="structure commit/files"></p>
+                <p tal:content="structure python: commit['files']"></p>
             </tal:commits>
 
             <h2>jenkins results</h2>
