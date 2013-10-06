@@ -40,17 +40,14 @@
 
             <h2>jenkins results</h2>
             <tal:jk repeat="job jobs">
+                <h3 tal:content="python: job['jk_name']"></h3>
                 <div>
                     <label>Type</label>
-                    <p tal:content="python: job['date']"></p>
+                    <p tal:content="python: job['job_type']"></p>
                 </div>
                 <div>
                     <label>Date</label>
                     <p tal:content="python: job['date']"></p>
-                </div>
-                <div>
-                    <label>Job</label>
-                    <p tal:content="python: job['jk_name']"></p>
                 </div>
                 <div>
                     <label>Url</label>
