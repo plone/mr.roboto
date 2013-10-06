@@ -125,6 +125,9 @@ def runFunctionCoreTests(request):
         else:
             pyversions = PYTHON_VERSIONS
 
+        # Subscribers to a git push event - so send mail
+        request.registry.notify(NewCoreDevBuildoutPush(payload, request))
+
         for python_version in pyversions:
             # Run the complete coredev
             job_name = 'plone-' + branch + '-python-' + python_version
@@ -137,8 +140,6 @@ def runFunctionCoreTests(request):
             # Define the callback url for jenkins
             url = request.registry.settings['callback_url'] + 'corecommit?jk_job_id=' + jk_job_id
 
-            # Subscribers to a git push event - so send mail
-            request.registry.notify(NewCoreDevBuildoutPush(payload, request))
 
             # We run the JK job
             jenkins_core_job(request, job_name, url, payload=payload, params=params)

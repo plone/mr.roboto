@@ -11,6 +11,9 @@ from mr.roboto.events import KGSJobSuccess
 from mr.roboto.events import KGSJobFailure
 
 from mr.roboto import templates
+import logging
+
+logger = logging.getLogger('mr.roboto')
 
 
 def get_info_from_commit(commit):
@@ -102,6 +105,7 @@ def send_to_cvs(payload, mailer, result=""):
 def send_mail_on_push(event):
     mailer = get_mailer(event.request)
     payload = event.payload
+    logger.info("Sending mail because of push to coredevBuildout " + payload['repository']['name'])
     send_to_cvs(payload, mailer)
 
 
@@ -111,6 +115,7 @@ def kgs_job_success(event):
     mailer = get_mailer(event.request)
     payload = event.payload
     result = event.result
+    logger.info("Sending mail because of good kgs finish " + result)
     send_to_cvs(payload, mailer, result)
 
 
@@ -121,6 +126,7 @@ def kgs_job_failure(event):
     mailer = get_mailer(event.request)
     payload = event.payload
     result = event.result
+    logger.info("Sending mail because of bad kgs finish " + result)
     send_to_cvs(payload, mailer, result)
 
     # Send mail to test-bot
