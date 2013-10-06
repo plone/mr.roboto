@@ -33,7 +33,7 @@ def view_commit_info(context, request):
         pushes = Pushes(request.registry.settings['dm'])
         if push_id in pushes:
             push = pushes[push_id]
-        jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push.internal_identifier}))
+        jobs = [f for f in request.registry.settings['db']['jenkins_job'].find({'push': push.internal_identifier})]
         return dict(push=push, jobs=jobs)
 
 
