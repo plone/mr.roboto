@@ -91,7 +91,7 @@ grep ${package_name} sources.cfg &gt;&gt; onthefly.cfg
 
 $PYTHON${python_version} bootstrap.py -c onthefly.cfg
 bin/buildout -c onthefly.cfg
-bin/test -s ${package_name}
+bin/jenkins-test -s ${package_name}
 bin/code-analysis
 
 </command>
