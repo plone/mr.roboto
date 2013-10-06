@@ -140,11 +140,6 @@ bin/code-analysis
       <attachmentsPattern></attachmentsPattern>
       <presendScript></presendScript>
     </hudson.plugins.emailext.ExtendedEmailPublisher>
-    <hudson.tasks.ArtifactArchiver>
-      <artifacts>snapshoot.cfg</artifacts>
-      <latestOnly>false</latestOnly>
-      <allowEmptyArchive>false</allowEmptyArchive>
-    </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
       <testResults>**/parts/jenkins-test/testreports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
