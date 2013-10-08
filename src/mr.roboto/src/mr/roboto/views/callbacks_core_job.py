@@ -98,6 +98,23 @@ def functionCallbackCommit(request):
         # check if there is any other job working
         all_jobs = list(request.registry.settings['db']['jenkins_job'].find({'push': push_uuid, 'type': 'core'}))
 
+        try:
+            build_num = int(answer['build']['number'])
+            jkapiObject_job = jkapiObject.get_job(answer['name'])
+            jkapiObject_build = jkapiObject_job.get_build(build_num)
+            folder_to_store_kgs = dir_for_kgs + '/' + answer['name'] + '/'
+            if not os.access(folder_to_store_kgs, os.R_OK):
+                os.mkdir(folder_to_store_kgs)
+            if os.access(folder_to_store_kgs + 'snapshoot.cfg', os.R_OK):
+                os.remove(folder_to_store_kgs + 'snapshoot.cfg')
+            if os.access(folder_to_store_kgs + 'versions.cfg', os.R_OK):
+                os.remove(folder_to_store_kgs + 'versions.cfg')
+            jkapiObject_build.get_artifact_dict()['snapshoot.cfg'].save_to_dir(folder_to_store_kgs)
+            jkapiObject_build.get_artifact_dict()['versions.cfg'].save_to_dir(folder_to_store_kgs)
+        except:
+            pass
+
+
         completed = True
         all_green = True
         message = ''
@@ -125,21 +142,6 @@ def functionCallbackCommit(request):
                 status_message = 'Mr. Roboto aproves this commit!'
                 comment_message = 'TESTS PASSED\n Mr.Roboto url : %s\n %s' % (url, message)
 
-                try:
-                    build_num = int(answer['build']['number'])
-                    jkapiObject_job = jkapiObject.get_job(answer['name'])
-                    jkapiObject_build = jkapiObject_job.get_build(build_num)
-                    folder_to_store_kgs = dir_for_kgs + '/' + answer['name'] + '/'
-                    if not os.access(folder_to_store_kgs, os.R_OK):
-                        os.mkdir(folder_to_store_kgs)
-                    if os.access(folder_to_store_kgs + 'snapshoot.cfg', os.R_OK):
-                        os.remove(folder_to_store_kgs + 'snapshoot.cfg')
-                    if os.access(folder_to_store_kgs + 'versions.cfg', os.R_OK):
-                        os.remove(folder_to_store_kgs + 'versions.cfg')
-                    jkapiObject_build.get_artifact_dict()['snapshoot.cfg'].save_to_dir(folder_to_store_kgs)
-                    jkapiObject_build.get_artifact_dict()['versions.cfg'].save_to_dir(folder_to_store_kgs)
-                except:
-                    pass
 
             else:
                 status = 'failure'
