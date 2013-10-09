@@ -43,6 +43,17 @@
             <tal:jk repeat="job jobs">
                 <tr>
                     <td>
+                        <tal:passes condition="python: job['result']==None">
+                            <p style="background-color:yellow;">No result</p>
+                        </tal:passes>
+                        <tal:passes condition="python: job['result'] is True">
+                            <p style="background-color:green;">Success</p>
+                        </tal:passes>
+                        <tal:passes condition="python: job['result'] is False">
+                            <p style="background-color:red;">Failure</p>
+                        </tal:passes>
+                    </td>
+                    <td>
                         <p tal:content="python: job['jk_name']"></p>
                     </td>
 <!--                     <td>
@@ -53,17 +64,6 @@
                     </td>
  -->                    <td>
                         <a tal:attributes="href python: job['jk_url']">Go to</a>
-                    </td>
-                    <td>
-                        <tal:passes condition="python: job['result']==None">
-                            <p style="background-color:yellow;">No result</p>
-                        </tal:passes>
-                        <tal:passes condition="python: job['result'] is True">
-                            <p style="background-color:green;">Success</p>
-                        </tal:passes>
-                        <tal:passes condition="python: job['result'] is False">
-                            <p style="background-color:red;">Failure</p>
-                        </tal:passes>
                     </td>
                 </tr>
             </tal:jk>
