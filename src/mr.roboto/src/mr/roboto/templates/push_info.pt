@@ -39,31 +39,49 @@
             </tal:commits>
 
             <h2>jenkins results</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        JK name
+                    </tr>
+                    <tr>
+                        ID
+                    </tr>
+                    <tr>
+                        Date
+                    </tr>
+                    <tr>
+                        URL
+                    </tr>
+                    <tr>
+                        Result
+                    </tr>
+                </thead>
             <tal:jk repeat="job jobs">
-                <h3 tal:content="python: job['jk_name']"></h3>
-                <div>
-                    <label>ID</label>
-                    <p tal:content="python: job['jk_uid']"></p>
-                </div>
-                <div>
-                    <label>Date</label>
-                    <p tal:content="python: job['date']"></p>
-                </div>
-                <div>
-                    <label>Url</label>
-                    <a tal:attributes="href python: job['jk_url']" tal:content="python: job['jk_url']">url</a>
-                </div>
-                <div>
-                    <label>Result</label>
-                    <tal:passes condition="python: job['result']==None">
-                        <p>No result</p>
-                    </tal:passes>
-                    <tal:passes condition="python: job['result'] is True">
-                        <p>Passes</p>
-                    </tal:passes>
-                    <tal:passes condition="python: job['result'] is False">
-                        <p>No result</p>
-                    </tal:passes>
+                <tr>
+                    <td>
+                        <p tal:content="python: job['jk_name']"></p>
+                    </td>
+                    <td>
+                        <p tal:content="python: job['jk_uid']"></p>
+                    </td>
+                    <td>
+                        <p tal:content="python: job['date']"></p>
+                    </td>
+                    <td>
+                        <a tal:attributes="href python: job['jk_url']">Go to</a>
+                    </td>
+                    <td>
+                        <tal:passes condition="python: job['result']==None">
+                            <p style="background-color:yellow;">No result</p>
+                        </tal:passes>
+                        <tal:passes condition="python: job['result'] is True">
+                            <p style="background-color:green;">Success</p>
+                        </tal:passes>
+                        <tal:passes condition="python: job['result'] is False">
+                            <p style="background-color:red;">Failure</p>
+                        </tal:passes>
+                    </td>
                 </div>
             </tal:jk>
         </div>
