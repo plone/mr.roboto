@@ -62,13 +62,13 @@
                     <td>
                         <p tal:content="python: job['jk_name']"></p>
                     </td>
-                    <td>
+<!--                     <td>
                         <p tal:content="python: job['jk_uid']"></p>
                     </td>
                     <td>
                         <p tal:content="python: job['date']"></p>
                     </td>
-                    <td>
+ -->                    <td>
                         <a tal:attributes="href python: job['jk_url']">Go to</a>
                     </td>
                     <td>
