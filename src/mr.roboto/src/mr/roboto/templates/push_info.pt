@@ -40,23 +40,6 @@
 
             <h2>jenkins results</h2>
             <table class="table">
-                <thead>
-                    <tr>
-                        JK name
-                    </tr>
-                    <tr>
-                        ID
-                    </tr>
-                    <tr>
-                        Date
-                    </tr>
-                    <tr>
-                        URL
-                    </tr>
-                    <tr>
-                        Result
-                    </tr>
-                </thead>
             <tal:jk repeat="job jobs">
                 <tr>
                     <td>
