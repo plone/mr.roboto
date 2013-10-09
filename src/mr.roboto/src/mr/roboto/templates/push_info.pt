@@ -82,8 +82,9 @@
                             <p style="background-color:red;">Failure</p>
                         </tal:passes>
                     </td>
-                </div>
+                </tr>
             </tal:jk>
+            </table>
         </div>
     </body>
 </html>
