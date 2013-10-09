@@ -94,6 +94,21 @@ bin/buildout -c onthefly.cfg
 bin/jenkins-test -s ${package_name} --all
 bin/code-analysis
 
+
+if [ ! -f parts/jenkins-test/robot_output.xml ]; then
+    echo "&lt;robot&gt;&lt;/robot&gt;" > parts/jenkins-test/robot_output.xml
+fi
+
+if [ ! -f parts/jenkins-test/robot_report.html ]; then
+    echo "&lt;html&gt;&lt;/html&gt;" > parts/jenkins-test/robot_report.html
+fi
+
+if [ ! -f parts/jenkins-test/robot_log.html ]; then
+    echo "&lt;html&gt;&lt;/html&gt;" > parts/jenkins-test/robot_log.html
+fi
+
+
+
 </command>
     </hudson.tasks.Shell>
   </builders>
