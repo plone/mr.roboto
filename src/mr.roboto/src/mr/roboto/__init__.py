@@ -68,6 +68,7 @@ def main(global_config, **settings):
     config.add_route('repos', '/repos')
     config.add_route('jobs', '/jobs')
     config.add_route('plips', '/plips')
+    config.add_route('dashboard', '/dashboard')
     # config.add_route('status', '/status')
 
     # Automatic views
