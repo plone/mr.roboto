@@ -24,7 +24,6 @@
                 <thead>
                     <tr>
                       <th>ID</th>
-                      <th>Repo</th>
                       <th>Data</th>
                       <th>JK NAME</th>
                       <th>URL</th>
@@ -33,7 +32,6 @@
                 <!-- XXX Would be great to have a sorted table -->
                 <tr tal:repeat="job jobs">
                     <td tal:content="python:job['jk_uid']">description</td>
-                    <td tal:content="python:job['repo']">repo</td>
                     <td tal:content="python:job['date']">repo</td>
                     <td tal:content="python:job['jk_name']">repo</td>
                     <td><a href="" tal:attributes="href python:job['jk_url']">link</a></td>
