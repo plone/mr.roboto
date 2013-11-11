@@ -15,9 +15,16 @@
             }
             #options {
                 width: 50%;
+                float: left;
             }
             #jenkinsiframe {
                 border: 0;
+                width: 100%;
+                height: 100%;
+            }
+            #jenkins {
+                width: 50%;
+                float: left;
             }
         </style>
         <script>
