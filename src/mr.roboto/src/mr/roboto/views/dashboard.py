@@ -8,10 +8,8 @@ from mr.roboto.db import Pushes
 
 @view_config(route_name='dashboard', renderer='mr.roboto:templates/dashboard.pt')
 def dashboard(context, request):
-    jobs5 = list(request.registry.settings['db']['jenkins_job'].find({'jk_name': 'plone-5.0-python-2.7'}).sort({'date', -1}))
+    job = request.registry.settings['db']['jenkins_job'].find({'jk_name': 'plone-5.0-python-2.7'}).sort('date', -1).next()
 
-    # Run the core jobs related with this commit on jenkins
-    job = jobs5[0]
 
     push_id = job['push']
 
