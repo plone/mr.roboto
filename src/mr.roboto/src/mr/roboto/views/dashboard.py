@@ -24,14 +24,14 @@ def dashboard(context, request):
         if 'result' in job and (job['result'] is False or job['result'] is None):
             broken = True
             since = job['date']
-            push_obj = request.registry.settings['db']['push'].find({'push_id': job['push']}).next()
-            by = push_obj['who']
+            push_obj = pushes[job['push']]
+            by = push_obj.who
             broken_jobs = request.registry.settings['db']['jenkins_job'].find({'jk_name': 'plone-5.0-python-2.7'}).sort('date', -1)
             for broken_job in broken_jobs:
-                if broken_job['result'] is False:
+                if broken_job['result'] is False or broken_job['result'] is None:
                     since = broken_job['date']
-                    push_obj = request.registry.settings['db']['push'].find({'push_id': broken_job['push']}).next()
-                    by = push_obj['who']
+                    push_obj = pushes[broken_job['push']]
+                    by = push_obj.who
                 else:
                     break
     return dict(push=push, jobs=jobs, broken=broken, since=since, by=by)
