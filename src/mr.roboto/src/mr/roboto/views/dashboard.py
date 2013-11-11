@@ -21,7 +21,7 @@ def dashboard(context, request):
     since = ""
     by = ""
     for job in jobs:
-        if 'result' in job and job['result'] is False:
+        if 'result' in job and (job['result'] is False or job['result'] is None):
             broken = True
             since = job['date']
             push_obj = request.registry.settings['db']['push'].find({'push_id': job['push']}).next()
