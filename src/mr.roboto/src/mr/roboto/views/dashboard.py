@@ -19,7 +19,7 @@ def dashboard(context, request):
     jobs = [f for f in request.registry.settings['db']['jenkins_job'].find({'push': push.internal_identifier})]
     broken = False
     for job in jobs:
-        if job['result'] is False:
+        if 'result' in job and job['result'] is False:
             broken = True
-            since = push['date']
+            since = job['date']
     return dict(push=push, jobs=jobs, broken=broken, since=since)
