@@ -4,7 +4,34 @@ import json
 import persistent
 import datetime
 from mongopersist import mapping
-from uuid import uuid4
+
+
+class PullRequest(persistent.Persistent):
+    """ Pull request representation """
+    _p_mongo_collection = 'pull'
+
+    def __init__(
+            self,
+            ident=None,
+            data=None,
+            who=None,
+            repo=None,
+            branch=None,
+            payload=None,
+            seen_commiters=[]):
+        self.payload = payload
+        self.data = data
+        self.who = who
+        self.repo = repo
+        self.branch = branch
+        self.date = str(datetime.datetime.now())
+        self.id = ident
+        self.seen_commiters = seen_commiters
+
+
+class PullRequests(mapping.MongoCollectionMapping):
+    __mongo_collection__ = 'plip'
+    __mongo_mapping_key__ = 'id'
 
 
 class PLIPPackage(persistent.Persistent):
@@ -87,7 +114,7 @@ class JenkinsJob(persistent.Persistent):
     """ 
     Jenkins Job Testing representation 
 
-    job_type : ['core', 'plip', 'corepackage']
+    job_type : ['core', 'plip', 'corepackage', 'pull']
     jk_uid : identifier of the job -> [push_id]_[jk_name] or [package]_[push_id]_[jk_name]
     date : when we started
     ref : reference to the push
@@ -147,32 +174,3 @@ class CorePackages(mapping.MongoCollectionMapping):
     __mongo_collection__ = 'core_package'
     __mongo_mapping_key__ = 'ident'
 
-
-class PullsDB(object):
-
-    def __init__(self, filename):
-        self._filename = filename
-        f = open(filename, 'r')
-        content = f.read()
-        if content != '':
-            self._db = json.loads(content)
-        else:
-            self._db = {}
-        f.close()
-
-    def save(self):
-        f = open(self._filename, 'w+')
-        f.write(json.dumps(self._db))
-        f.close()
-
-    def get(self, pull_id):
-        return self._db.get(pull_id)
-
-    def set(self, pull_id, jenkins_jobs=[], seen_committers=[]):
-        self._db[pull_id] = {'jenkins_jobs': jenkins_jobs, 'seen_committers': seen_committers}
-        self.save()
-        return {'jenkins_jobs': jenkins_jobs, 'seen_committers': seen_committers}
-
-    def delete(self, pull_id):
-        del self._db[pull_id]
-        self.save()
