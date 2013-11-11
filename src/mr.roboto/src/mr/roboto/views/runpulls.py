@@ -137,14 +137,14 @@ def runFunctionPushTests(request):
                 pull_request_message += msg
             pulls[pull_id].seen_commiters.append(committer)
 
-    if run_tests:
+    # if run_tests:
 
-        core_jobs = list(request.registry.settings['db']['core_package'].find({'repo': package_name, 'branch': target_branch}))
+    #     core_jobs = list(request.registry.settings['db']['core_package'].find({'repo': package_name, 'branch': target_branch}))
 
-        # Run the core jobs related with this commit on jenkins
-        for core_job in core_jobs:
-        # Add entry to db
-        pull_info = pulls_db.set(pull_id, matched_branches.values(), [])
+    #     # Run the core jobs related with this commit on jenkins
+    #     for core_job in core_jobs:
+    #     # Add entry to db
+    #     # pull_info = pulls_db.set(pull_id, matched_branches.values(), [])
 
 
 
