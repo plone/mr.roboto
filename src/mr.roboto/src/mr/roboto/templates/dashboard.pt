@@ -60,6 +60,7 @@
             <tal:broken condition="broken">
                 <h1> Mr. Roboto says : DON'T COMMIT NEW CODE ON BROKEN BUILD, FIX THE BUILD</h1>
                 <h2> Broken since <span tal:content="since"></span></h2>
+                <h2> Broken by <span tal:content="by"></span></h2>
             </tal:broken>
 
             <h2>Commits</h2>
