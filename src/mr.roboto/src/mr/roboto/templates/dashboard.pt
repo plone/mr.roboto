@@ -29,6 +29,7 @@
         <div id="options">
             <h2><span tal:content="python: push.repo"></span><span tal:content="python: push.branch"></span></h2>
             <h2 tal:content="python: push.who"></h2>
+            <h3 tal:content="python: push.date"></h3>
 
             <table class="table resultsjk">
             <tal:jk repeat="job jobs">
@@ -59,6 +60,10 @@
                 </tr>
             </tal:jk>
             </table>
+            <tal:broken condition="broken">
+                <h1> Mr. Roboto says : DON'T COMMIT NEW CODE ON BROKEN BUILD, FIX THE BUILD</h1>
+                <h2> Broken since <span tal:content="since"></span></h2>
+            </tal:broken>
 
             <h2>Commits</h2>
             <tal:commits repeat="commit python: push.data">
