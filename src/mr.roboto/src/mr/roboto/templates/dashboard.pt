@@ -32,7 +32,7 @@
                  window.location.reload(true);
              }
 
-             setTimeout(refresh, 5000);
+             setTimeout(refresh, 15000);
         </script>
     </head>
     <body>
