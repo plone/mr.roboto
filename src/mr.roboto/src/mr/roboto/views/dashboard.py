@@ -16,7 +16,7 @@ def dashboard(context, request):
     pushes = Pushes(request.registry.settings['dm'])
     if push_id in pushes:
         push = pushes[push_id]
-    jobs = [f for f in request.registry.settings['db']['jenkins_job'].find({'push': push.internal_identifier})]
+    jobs = (job,)    
     broken = False
     for job in jobs:
         if 'result' in job and job['result'] is False:
