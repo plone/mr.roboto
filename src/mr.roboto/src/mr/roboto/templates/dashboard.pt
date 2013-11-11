@@ -66,12 +66,12 @@
             <tal:commits repeat="commit python: push.data">
                 <h3>Message</h3>
                 <p tal:content="python: commit['short_commit_msg']"></p>
-                <h3>Diff</h3>
+<!--                 <h3>Diff</h3>
                 <pre tal:content="structure python: commit['diff']"></pre>
-                <h3>Files</h3>
+ -->                <h3>Files</h3>
                 <tal:files repeat="file python: commit['files']">
                     <p tal:content="file"></p>
-                </tal:files>t
+                </tal:files>
             </tal:commits>
 
 
