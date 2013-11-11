@@ -123,7 +123,7 @@ def runFunctionPushTests(request):
     pull = repository.get_pull(pull_number)
     committers = set([a.committer.login for a in pull.get_commits()])
     # Are there new committers?
-    checked_committers = 
+    checked_committers = "nobody"
     for committer in committers:
         if committer not in checked_committers:
             logger.info("Checking contributor rights for %s." % committer)
