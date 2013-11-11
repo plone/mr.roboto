@@ -2,7 +2,6 @@ from pyramid.config import Configurator
 
 from security import RequestWithAttributes
 
-from mr.roboto.db import PullsDB
 
 from mr.roboto.plonegithub import PloneGithub
 from jenkins import Jenkins
@@ -59,7 +58,6 @@ def main(global_config, **settings):
         root_database=settings['db_name'])
     config.registry.settings['dm'] = dm
 
-    config.registry.settings['pulls'] = PullsDB(settings['core_pulls_db'])
 
     config.add_static_view('static', 'static', cache_max_age=3600)
 
