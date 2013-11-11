@@ -18,6 +18,7 @@ def dashboard(context, request):
         push = pushes[push_id]
     jobs = (job,)    
     broken = False
+    since = ""
     for job in jobs:
         if 'result' in job and job['result'] is False:
             broken = True
