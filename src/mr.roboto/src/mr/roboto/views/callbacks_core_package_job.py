@@ -198,4 +198,6 @@ def functionCallbackCommit(request):
         for commit in push['data']:
             ghObject.set_status(repo, commit['sha'], status, status_message, url)
             if completed:
-                ghObject.set_direct_message(repo, commit['sha'], comment_message)
+                pass
+                # removing temporaly
+                #ghObject.set_direct_message(repo, commit['sha'], comment_message)

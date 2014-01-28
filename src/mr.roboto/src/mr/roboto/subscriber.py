@@ -61,8 +61,8 @@ def send_to_testbot(payload, mailer, result=""):
     msg = Message(
         subject='[FAIL] %s by %s' % (repo, who),
         sender="Jenkins Job FAIL <jenkins@plone.org>",
-        recipients=["plone-testbot@lists.plone.org"],
-        # recipients=["ramon.nb@gmail.com", "tisto@plone.org", "esteele@plone.org", "david.glick@plone.org"],
+        #recipients=["plone-testbot@lists.plone.org"],
+        recipients=["ramon.nb@gmail.com", "tisto@plone.org"], #, "esteele@plone.org", "david.glick@plone.org"],
         body=templates['broken_job.pt'](**data),
         extra_headers={'Reply-To': who}
     )
