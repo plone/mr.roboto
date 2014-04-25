@@ -88,12 +88,14 @@ def runFunctionCoreTests(request):
         who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
     changeset = ""
     commits_info = []
+    ci_skip = False
 
     for commit in payload['commits']:
         # get the commit data structure
         commit_data = get_info_from_commit(commit)
         commits_info.append(commit_data)
-
+        if '[ci skip]' in commit['message']:
+            ci_skip = True
         # prepare a changeset text message
         data = {
             'push': payload,
@@ -116,6 +118,11 @@ def runFunctionCoreTests(request):
 
     params = {'plonechanges': file_to_download, 'repo': repo}
     params_package = {'plonechanges': file_to_download}
+
+    if ci_skip:
+        add_log(request, 'ci_skip', 'Skipping testing because there is a tag on commit')
+        request.registry.notify(NewCoreDevBuildoutPush(payload, request))
+        return
 
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':
