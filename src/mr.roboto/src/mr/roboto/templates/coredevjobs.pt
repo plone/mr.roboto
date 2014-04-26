@@ -13,6 +13,9 @@
             h2 {
 
             }
+            a, a:visited, a:link {
+                color: white;
+            }
             ul {
                 list-style-type: none
             }
@@ -22,12 +25,12 @@
         <div id="options">
             <ul>
                 <li tal:repeat="job jobs">
-                    <a href="" tal:attributes="href python:'#' + job['job']" tal:content="python:job['job']"></a>
+                    <h3 id="top"><a href="" tal:attributes="href python:'#' + job['job']" tal:content="python:job['job']"></a></h3>
                 </li>
             </ul>
             <ul>
                 <li id="" tal:repeat="job jobs" tal:attributes="id python:job['job']">
-                    <h3 tal:content="python:job['job']"></h3>
+                    <h3 tal:content="python:job['job']"></h3><a href="#top">top</a>
                     <ul>
                         <li tal:repeat="jk_job python:job['jobs']">
                             <table class="table">
