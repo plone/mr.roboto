@@ -13,6 +13,9 @@
             h2 {
 
             }
+            a, a:visited, a:link {
+                color: white;
+            }
             ul {
                 list-style-type: none
             }
@@ -37,6 +40,9 @@
                            tal:attributes="href string:get_info?push=${push['internal_identifier']}">
                        </a>
                     </span>
+                    <p tal:repeat="data python:push['data']">
+                        <span tal:replace="data['short_commit_msg']"></span>
+                    </p>
                     <ul>
                         <li tal:repeat="job python:push['jobs']">
                             <tal:passes condition="python: job['result']==None">
