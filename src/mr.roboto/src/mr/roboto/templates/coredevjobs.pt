@@ -33,25 +33,25 @@
                             <table class="table">
                                 <tr>
                                     <td>
-                                        <a href="" tal:attributes="href python:job['jk_url']">
+                                        <a href="" tal:attributes="href python:jk_job['jk_url']">
                                             JENKINS
                                         </a>
                                     </td>
                                     <td>
-                                        <tal:passes condition="python: job['result']==None">
+                                        <tal:passes condition="python: jk_job['result']==None">
                                             <span style="background-color:yellow;">No result</span>
                                         </tal:passes>
-                                        <tal:passes condition="python: job['result'] is True">
+                                        <tal:passes condition="python: jk_job['result'] is True">
                                             <span style="background-color:green;">Success</span>
                                         </tal:passes>
-                                        <tal:passes condition="python: job['result'] is False">
+                                        <tal:passes condition="python: jk_job['result'] is False">
                                             <span style="background-color:red;">Failure</span>
                                         </tal:passes>
                                     </td>
                                     <td>
                                     </td>
                                     <td>
-                                        <tal:pushes repeat="push python: job['push_info']">
+                                        <tal:pushes repeat="push python: jk_job['push_info']">
                                             <span>
                                                 <a href="" tal:attributes="href string:get_info?push=${push['internal_identifier']}">Changeset</a>
                                             </span>
