@@ -22,11 +22,11 @@
         <div id="options">
             <ul>
                 <li tal:repeat="job jobs">
-                    <a href="" tal:attributes="href string:#${job/job}" tal:content="job/job"></a>
+                    <a href="" tal:attributes="href python:'#' + job['job']" tal:content="python:job['job']"></a>
                 </li>
             </ul>
             <ul>
-                <li id="" tal:repeat="job jobs" tal:attributes="id job/job">
+                <li id="" tal:repeat="job jobs" tal:attributes="id python:job['job']">
                     <h3 tal:content="python:job['job']"></h3>
                     <ul>
                         <li tal:repeat="jk_job python:job['jobs']">
@@ -53,7 +53,7 @@
                                     <td>
                                         <tal:pushes repeat="push python: job['push_info']">
                                             <span>
-                                                <a href="" tal:attributes="href string:get_info?push=${push/internal_identifier}">Changeset</a>
+                                                <a href="" tal:attributes="href string:get_info?push=${push['internal_identifier']}">Changeset</a>
                                             </span>
                                             <span>
                                                 <span tal:replace="python:push['who']"></span> at
