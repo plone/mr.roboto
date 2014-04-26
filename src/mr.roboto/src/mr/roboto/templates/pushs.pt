@@ -34,7 +34,7 @@
                         which changeset:
                         <a href="" 
                            tal:content="python:push['internal_identifier']"
-                           tal:attributes="href string:get_info?push=${push/internal_identifier}">
+                           tal:attributes="href string:get_info?push=${push['internal_identifier']}">
                        </a>
                     </span>
                     <ul>
