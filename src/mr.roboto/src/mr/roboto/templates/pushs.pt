@@ -19,6 +19,9 @@
             ul {
                 list-style-type: none
             }
+            #messages {
+                padding-left: 40px;
+            }
         </style>
     </head>
     <body>
@@ -40,19 +43,16 @@
                            tal:attributes="href string:get_info?push=${push['internal_identifier']}">
                        </a>
                     </span>
-                    <p tal:repeat="data python:push['data']">
-                        <span tal:replace="data['short_commit_msg']"></span>
-                    </p>
                     <ul>
                         <li tal:repeat="job python:push['jobs']">
                             <tal:passes condition="python: job['result']==None">
-                                <p style="background-color:yellow;">No result</p>
+                                <p style="background-color:yellow; display: inline-block;">No result</p>
                             </tal:passes>
                             <tal:passes condition="python: job['result'] is True">
-                                <p style="background-color:green;">Success</p>
+                                <p style="background-color:green; display: inline-block;">Success</p>
                             </tal:passes>
                             <tal:passes condition="python: job['result'] is False">
-                                <p style="background-color:red;">Failure</p>
+                                <p style="background-color:red; display: inline-block;">Failure</p>
                             </tal:passes>
                             <p>
                                 Jenkins job [<span tal:replace="python: job['type']"></span>]: 
@@ -62,6 +62,12 @@
                             </p>
                         </li>
                     </ul>
+                    <ul id="messages">
+                        <li tal:repeat="data python:push['data']">
+                            <span tal:replace="data['short_commit_msg']"></span>
+                        </li>
+                    </ul>
+
                 </li>
             </ul>
         </div>
