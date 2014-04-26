@@ -44,6 +44,7 @@ runCoreTests = Service(
 
 OLD_PYTHON_VERSIONS = ['2.6', '2.7']
 PYTHON_VERSIONS = ['2.7']
+PLONE_VERSIONS_WITH_26 = ['4.2', '4.3']
 
 
 def add_log(request, who, message):
@@ -127,7 +128,7 @@ def runFunctionCoreTests(request):
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':
         # Temporal hack to get correct versions
-        if branch in ['4.2', '4.3']:
+        if branch in PLONE_VERSIONS_WITH_26:
             pyversions = OLD_PYTHON_VERSIONS
         else:
             pyversions = PYTHON_VERSIONS

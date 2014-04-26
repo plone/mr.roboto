@@ -32,8 +32,9 @@
             <ul>
                 <li><a href="repos"> Core packages </a></li>
                 <li><a href="plips"> Configured jobs </a></li>
-                <li> Pulls Requests </li>
-                <li><a href="jobs"> Jobs </a></li>
+                <li><a href="pushs"> Pulls </a></li>
+                <li><a href="coredevjobs"> Coredev jobs </a></li>
+                <li><a href="jobs"> Runned Jobs </a></li>
             </ul>
         </div>
         <div id="logo">

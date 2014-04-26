@@ -1,0 +1,73 @@
+<html>
+    <head>
+        <title>Mr. Roboto</title>
+        <link href='http://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'/>
+        <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+        <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+
+        <style>
+            body {
+                background-color: rgb(0,149,211);
+                font-family: 'Raleway', sans-serif;
+            }
+            h2 {
+
+            }
+            ul {
+                list-style-type: none
+            }
+        </style>
+    </head>
+    <body>
+        <div id="options">
+            <ul>
+                <li tal:repeat="job jobs">
+                    <a href="" tal:attributes="href string:#${job/job}" tal:content="job/job"></a>
+                </li>
+            </ul>
+            <ul>
+                <li id="" tal:repeat="job jobs" tal:attributes="id job/job">
+                    <h3 tal:content="python:job['job']"></h3>
+                    <ul>
+                        <li tal:repeat="jk_job python:job['jobs']">
+                            <table class="table">
+                                <tr>
+                                    <td>
+                                        <a href="" tal:attributes="href python:job['jk_url']">
+                                            JENKINS
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <tal:passes condition="python: job['result']==None">
+                                            <span style="background-color:yellow;">No result</span>
+                                        </tal:passes>
+                                        <tal:passes condition="python: job['result'] is True">
+                                            <span style="background-color:green;">Success</span>
+                                        </tal:passes>
+                                        <tal:passes condition="python: job['result'] is False">
+                                            <span style="background-color:red;">Failure</span>
+                                        </tal:passes>
+                                    </td>
+                                    <td>
+                                    </td>
+                                    <td>
+                                        <tal:pushes repeat="push python: job['push_info']">
+                                            <span>
+                                                <a href="" tal:attributes="href string:get_info?push=${push/internal_identifier}">Changeset</a>
+                                            </span>
+                                            <span>
+                                                <span tal:replace="python:push['who']"></span> at
+                                                <span tal:replace="python:push['repo']"></span>/<span tal:replace="python:push['branch']"></span> on
+                                                <span tal:replace="python:push['date']"></span>
+                                            </span>
+                                        </tal:pushes>
+                                    </td>
+                                </tr>
+                            </table>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </body>
+</html>
