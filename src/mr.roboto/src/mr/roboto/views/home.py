@@ -106,7 +106,7 @@ def jobsPage(context, request):
 @view_config(route_name='pushs', renderer='mr.roboto:templates/pushs.pt')
 def pushsPage(context, request):
     pushs = []
-    for push in list(request.registry.settings['db']['push'].find().sort('data', -1).limit(100)):
+    for push in list(request.registry.settings['db']['push'].find().sort('data', 1).limit(100)):
         jobs_dict = []
         for job in list(request.registry.settings['db']['jenkins_job'].find({'push': push['internal_identifier']})):
             jobs_dict.append(job)
