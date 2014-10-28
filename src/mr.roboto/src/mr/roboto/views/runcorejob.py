@@ -184,7 +184,10 @@ def runFunctionCoreTests(request):
                 jk_job_id = repo_name + '_' + push_id + '_' + job_name
                 url = request.registry.settings['callback_url'] + 'corecommitkgs?jk_job_id=' + jk_job_id
                 job_kgs_name = 'kgs-' + repo_name + '-' + job_name
-                jenkins_jobs[jk_job_id] = JenkinsJob('corepackage', jk_job_id, jk_name=job_kgs_name, push=push_id)
+
+                # Timo asked to remove KGS
+                # jenkins_jobs[jk_job_id] = JenkinsJob('corepackage', jk_job_id, jk_name=job_kgs_name, push=push_id)
+                
                 transaction.commit()
 
                 # Convert 2.7 to 27 for python jenkins
@@ -208,7 +211,9 @@ def runFunctionCoreTests(request):
                     'sources': sources
 
                 }
-                jenkins_core_package_job(request, job_kgs_name, url, data, payload=payload, params=params_package)
+
+                # Timo asked to remove KGS
+                # jenkins_core_package_job(request, job_kgs_name, url, data, payload=payload, params=params_package)
 
                 add_log(request, who, message)
 
