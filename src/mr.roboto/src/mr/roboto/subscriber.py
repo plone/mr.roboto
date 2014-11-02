@@ -9,6 +9,7 @@ from pyramid.events import subscriber
 from mr.roboto.events import NewCoreDevBuildoutPush
 from mr.roboto.events import KGSJobSuccess
 from mr.roboto.events import KGSJobFailure
+from mr.roboto.events import NewCoreDevPush
 
 from mr.roboto import templates
 import logging
@@ -99,6 +100,13 @@ def send_to_cvs(payload, mailer, result=""):
             )
 
             mailer.send_immediately(msg, fail_silently=False)
+
+@subscriber(NewCoreDevPush)
+def send_main_on_coredev(event):
+    mailer = get_mailer(event.request)
+    payload = event.payload
+    logger.info("Sending mail because of push to coredev " + payload['repository']['name'])
+    send_to_cvs(payload, mailer)
 
 
 @subscriber(NewCoreDevBuildoutPush)

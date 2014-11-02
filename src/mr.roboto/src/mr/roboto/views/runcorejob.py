@@ -20,6 +20,7 @@ from mr.roboto.db import Push
 from mr.roboto.db import Pushes
 
 from mr.roboto.events import NewCoreDevBuildoutPush
+from mr.roboto.events import NewCoreDevPush
 
 from mr.roboto import templates, dir_for_kgs, static_dir
 
@@ -124,6 +125,8 @@ def runFunctionCoreTests(request):
         add_log(request, 'ci_skip', 'Skipping testing because there is a tag on commit')
         request.registry.notify(NewCoreDevBuildoutPush(payload, request))
         return
+
+    request.registry.notify(NewCoreDevPush(payload, request))
 
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':

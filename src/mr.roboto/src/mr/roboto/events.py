@@ -5,6 +5,12 @@ class NewCoreDevBuildoutPush(object):
         self.request = request
 
 
+class NewCoreDevPush(object):
+    def __init__(self, payload, request):
+        self.payload = payload
+        self.request = request
+
+
 class KGSJobSuccess(object):
     def __init__(self, payload, request, result):
         self.payload = payload
