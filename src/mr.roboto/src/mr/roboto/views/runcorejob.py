@@ -137,7 +137,7 @@ def runFunctionCoreTests(request):
             pyversions = PYTHON_VERSIONS
 
         # Subscribers to a git push event - so send mail
-        request.registry.notify(NewCoreDevBuildoutPush(payload, request))
+        # request.registry.notify(NewCoreDevBuildoutPush(payload, request))
 
         for python_version in pyversions:
             # Run the complete coredev
