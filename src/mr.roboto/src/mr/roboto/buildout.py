@@ -68,8 +68,11 @@ class PloneCoreBuildout(object):
         config.readfp(open(path))
         sources_dict = {}
         for name, value in config['sources'].items():
-            source = Source().create_from_string(value)
-            sources_dict[name] = source
+            try:
+                 source = Source().create_from_string(value)
+                 sources_dict[name] = source
+            except:
+                 logger.info('BAD CHECKOUT ' + value)
         return sources_dict
 
     def _get_versions(self):
