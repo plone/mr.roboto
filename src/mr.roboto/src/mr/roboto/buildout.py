@@ -18,8 +18,8 @@ class Source():
         self.branch = branch
 
     def create_from_string(self, source_string):
-        protocol, url, push_url, branch = \
-            (lambda a, b, c=None, d=None: (a, b, c, d))(*source_string.split())
+        protocol, url, push_url, branch, egg = \
+            (lambda a, b, c=None, d=None, e=None: (a, b, c, d, e))(*source_string.split())
         self.protocol = protocol
         self.url = url
         if push_url is not None:

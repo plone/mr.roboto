@@ -24,12 +24,17 @@ from mr.roboto.events import NewCoreDevPush
 
 from mr.roboto import templates, dir_for_kgs, static_dir
 
+from github import InputGitTreeElement
+from github import InputGitAuthor
+
+
 import transaction
 
 import logging
 import json
 import uuid
 import os
+import datetime
 
 
 logger = logging.getLogger('mr.roboto')
@@ -50,6 +55,17 @@ PLONE_VERSIONS_WITH_26 = ['4.2', '4.3']
 
 def add_log(request, who, message):
     logger.info(who + " " + message)
+
+
+class GMT1(datetime.tzinfo):
+    def utcoffset(self, dt):
+        return datetime.timedelta(hours=1)
+
+    def dst(self, dt):
+        return datetime.timedelta(0)
+
+    def tzname(self, dt):
+        return "Europe/Catalunya"
 
 
 @runCoreTests.post()
@@ -91,6 +107,7 @@ def runFunctionCoreTests(request):
     changeset = ""
     commits_info = []
     ci_skip = False
+    timestamp = datetime.datetime.now(GMT1()).isoformat()
 
     for commit in payload['commits']:
         # get the commit data structure
@@ -106,7 +123,7 @@ def runFunctionCoreTests(request):
             'diff': commit_data['diff'],
         }
         changeset += templates['jenkins_changeset.pt'](**data)
-
+        timestamp = commit['timestamp']
         # For logging
         message = 'Commit on ' + repo + ' ' + branch + ' ' + commit['id']
         add_log(request, commit_data['reply_to'], message)
@@ -162,8 +179,23 @@ def runFunctionCoreTests(request):
         # Look at DB which plone version needs to run tests
         core_jobs = list(request.registry.settings['db']['core_package'].find({'repo': repo, 'branch': branch}))
 
+
         # Run the core jobs related with this commit on jenkins
         for core_job in core_jobs:
+
+            # Hook to test commit on coredev
+            if core_job['plone_version'] in ['5.0']:
+                # commit to the branch
+                ghObject = request.registry.settings['github']
+                repo = ghObject.get_organization('plone').get_repo('buildout.coredev')
+                head_ref = repo.get_git_ref("heads/%s" % '5.0-all-commits')
+                latest_commit = repo.get_git_commit(head_ref.object.sha)
+                base_tree = latest_commit.tree
+                element = InputGitTreeElement(path="last_commit.txt",mode='100644', type='blob', content=changeset)
+                new_tree = repo.create_git_tree([element], base_tree)
+                new_user = InputGitAuthor(payload['pusher']['name'], payload['pusher']['email'], timestamp)
+                repo.create_git_commit(changeset, new_tree, [], new_user, new_user)
+
             # Temporal hack to get correct versions
             if core_job['plone_version'] in ['4.2', '4.3']:
                 pyversions = OLD_PYTHON_VERSIONS
