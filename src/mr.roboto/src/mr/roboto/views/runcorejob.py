@@ -186,6 +186,7 @@ def runFunctionCoreTests(request):
             # Hook to test commit on coredev
             if core_job['plone_version'] in ['5.0']:
                 # commit to the branch
+                add_log(request, "test on github commit", "LETS COMMIT ON COREDEV")
                 ghObject = request.registry.settings['github']
                 repo = ghObject.get_organization('plone').get_repo('buildout.coredev')
                 head_ref = repo.get_git_ref("heads/%s" % '5.0-all-commits')
