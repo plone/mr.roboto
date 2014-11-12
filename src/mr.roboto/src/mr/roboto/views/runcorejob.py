@@ -194,7 +194,8 @@ def runFunctionCoreTests(request):
                 element = InputGitTreeElement(path="last_commit.txt",mode='100644', type='blob', content=changeset)
                 new_tree = repo.create_git_tree([element], base_tree)
                 new_user = InputGitAuthor(payload['pusher']['name'], payload['pusher']['email'], timestamp)
-                repo.create_git_commit(changeset, new_tree, [], new_user, new_user)
+                new_commit = repo.create_git_commit(changeset, new_tree, [], new_user, new_user)
+                head_ref.edit(sha=new_commit.sha, force=False)
 
             # Temporal hack to get correct versions
             if core_job['plone_version'] in ['4.2', '4.3']:
