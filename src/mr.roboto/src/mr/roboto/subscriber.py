@@ -6,10 +6,9 @@ from pyramid_mailer import get_mailer
 
 from pyramid.events import subscriber
 
-from mr.roboto.events import NewCoreDevBuildoutPush
-from mr.roboto.events import KGSJobSuccess
-from mr.roboto.events import KGSJobFailure
 from mr.roboto.events import NewCoreDevPush
+from mr.roboto.events import CommitAndMissingCheckout
+
 
 from mr.roboto import templates
 import logging
@@ -36,38 +35,17 @@ def get_info_from_commit(commit):
     }
 
 
-def send_to_testbot(payload, mailer, result=""):
-
-    repo = payload['repository']['name']
-
-    if payload['pusher']['name'] == u'none':
-        who = "NoBody <nobody@plone.org>"
-    else:
-        who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
-
-    list_of_commits = ""
-    for commit in payload['commits']:
-        list_of_commits += commit['author']['name'] + '\n'
-        list_of_commits += commit['message'] + '\n'
-        list_of_commits += commit['url'] + '\n\n'
-
-    data = {
-        'repo': repo,
-        'branch': payload['ref'].split('/')[-1],
-        'name': who,
-        'result': result,
-        'commits': list_of_commits
-    }
-
+def send_to_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
-        subject='[FAIL] %s by %s' % (repo, who),
+        subject='CHECKOUT ERROR %s %s' % (repo, branch),
         sender="Jenkins Job FAIL <jenkins@plone.org>",
-        #recipients=["plone-testbot@lists.plone.org"],
-        recipients=["ramon.nb@gmail.com", "tisto@plone.org"], #, "esteele@plone.org", "david.glick@plone.org"],
-        body=templates['broken_job.pt'](**data),
-        extra_headers={'Reply-To': who}
-    )
-
+        recipients=["ramon.nb@gmail.com", "tisto@plone.org", email], # XXX also to testbot
+        body=templates['error_commit_checkout.pt'](
+            who=who,
+            repo=repo,
+            branch=branch,
+            pv=pv),
+        )
     mailer.send_immediately(msg, fail_silently=False)
 
 
@@ -94,12 +72,12 @@ def send_to_cvs(payload, mailer, result=""):
                                        commit_data['short_commit_msg']),
                 sender="%s <svn-changes@plone.org>" % commit['committer']['name'],
                 recipients=["plone-cvs@lists.sourceforge.net"],
-                #recipients=["ramon.nb@gmail.com", "contact@timostollenwerk.net", "david.glick@plone.org", "ericsteele47@gmail.com"],
                 body=templates['commit_email.pt'](**data),
                 extra_headers={'Reply-To': commit_data['reply_to']}
             )
 
             mailer.send_immediately(msg, fail_silently=False)
+
 
 @subscriber(NewCoreDevPush)
 def send_main_on_coredev(event):
@@ -109,36 +87,15 @@ def send_main_on_coredev(event):
     send_to_cvs(payload, mailer)
 
 
-@subscriber(NewCoreDevBuildoutPush)
-def send_mail_on_push(event):
+@subscriber(CommitAndMissingCheckout)
+def send_main_on_missing_checkout(event):
     mailer = get_mailer(event.request)
-    payload = event.payload
-    logger.info("Sending mail because of push to coredevBuildout " + payload['repository']['name'])
-    send_to_cvs(payload, mailer)
-
-
-@subscriber(KGSJobSuccess)
-def kgs_job_success(event):
-    # Send mail to plone-cvs with the results
-    mailer = get_mailer(event.request)
-    payload = event.payload
-    result = event.result
-    logger.info("Sending mail because of good kgs finish " + result)
-    send_to_cvs(payload, mailer, result)
-
-
-@subscriber(KGSJobFailure)
-def kgs_job_failure(event):
-    # Send mail to plone-cvs
-    # with diff
-    mailer = get_mailer(event.request)
-    payload = event.payload
-    result = event.result
-    logger.info("Sending mail because of bad kgs finish " + result)
-    send_to_cvs(payload, mailer, result)
-
-    # Send mail to test-bot
-    # subject job FAIL package commit
-    send_to_testbot(payload, mailer, result)
-
+    logger.info("Sending mail because of push to coredev without correct checkout " + event.repo + ' ' + event.who )
+    send_to_missing_checkout(
+        mailer,
+        event.who,
+        event.repo,
+        event.branch,
+        event.pv,
+        event.email)
 

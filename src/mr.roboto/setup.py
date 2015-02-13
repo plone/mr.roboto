@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.0'
+version = '2.0'
 
 long_description = (
     open('README.rst').read()
@@ -39,18 +39,12 @@ setup(name='mr.roboto',
           'cornice',
           'configparser',
           'gitpython',
-          'python-dateutil',
-          'jenkinsapi',
           'PyGithub',
-          'persistent',
-          'zope.schema',
           'requests',
-          'lxml',
           'pyramid_mailer',
-          'mongopersist',
           'WebTest',
           'pytest',
-          'python-jenkins',
+          'pyramid_chameleon',
           'pyramid_debugtoolbar',
       ],
       entry_points="""\

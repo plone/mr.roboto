@@ -7,17 +7,6 @@ from hashlib import sha1
 import hmac
 
 
-def validatejenkins(fn):
-    def wrapped(request):
-        # We check if the call is from jenkins server
-        # import pdb; pdb.set_trace()
-        if request.environ['REMOTE_ADDR'] == '127.0.0.1':
-            return fn(request)
-        else:
-            return {'success': False, 'message': 'Only for localhost'}
-    return wrapped
-
-
 def validategithub(fn):
     def wrapped(request):
         if 'X-Hub_Signature' in request.headers:
