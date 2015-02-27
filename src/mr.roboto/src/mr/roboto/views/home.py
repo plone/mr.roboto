@@ -32,7 +32,7 @@ def sources(context, request):
     for key, value in d.items():
         new_key = '%s/%s' % (key[0], key[1])
         output[new_key] = value
-    return d
+    return output
 
 
 @view_config(route_name='checkouts', renderer='json')
