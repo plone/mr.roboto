@@ -28,6 +28,10 @@ def sources(context, request):
     sources_file = request.registry.settings['sources_file']
     f = open(sources_file, 'r')
     d = pickle.load(f)
+    output = {}
+    for key, value in d.items():
+        new_key = '%s/%s' % (key[0], key[1])
+        output[new_key] = value
     return d
 
 
