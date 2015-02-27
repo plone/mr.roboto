@@ -34,15 +34,6 @@
         </style>
     </head>
     <body>
-        <div id="options">
-            <ul>
-                <li><a href="repos"> Core packages </a></li>
-                <li><a href="plips"> Configured jobs </a></li>
-                <li><a href="pushs"> Pushs </a></li>
-                <li><a href="coredevjobs"> Coredev jobs </a></li>
-                <li><a href="jobs"> Runned Jobs </a></li>
-            </ul>
-        </div>
         <div id="logo">
         </div>
     </body>
