@@ -80,11 +80,14 @@ def runFunctionCoreTests(request):
     changeset = ""
     commits_info = []
     timestamp = datetime.datetime.now(GMT1()).isoformat()
+    fake = False
 
     for commit in payload['commits']:
         # get the commit data structure
         commit_data = get_info_from_commit(commit)
         commits_info.append(commit_data)
+        if '[fc]' in commit_data['short_commit_msg']:
+            fake = True
         # prepare a changeset text message
         data = {
             'push': payload,
@@ -98,7 +101,8 @@ def runFunctionCoreTests(request):
         message = 'Commit on ' + repo + ' ' + branch + ' ' + commit['id']
         add_log(request, commit_data['reply_to'], message)
 
-    request.registry.notify(NewCoreDevPush(payload, request))
+    if not fake:
+        request.registry.notify(NewCoreDevPush(payload, request))
 
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':

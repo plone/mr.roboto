@@ -3,6 +3,7 @@ from pyramid.view import view_config
 from mr.roboto.security import validatetoken
 
 import logging
+import pickle
 
 log = logging.getLogger('HOME')
 
@@ -22,17 +23,17 @@ def logPage(context, request):
     return dict(log=log)
 
 
-# @view_config(route_name='sources')
-# def sources(context, request):
-#     sources_file = request.registry.settings['sources_file']
-#     info = {}
-#     return dict(info=info)
+@view_config(route_name='sources', renderer='json')
+def sources(context, request):
+    sources_file = request.registry.settings['sources_file']
+    f = open(sources_file, 'r')
+    d = pickle.load(f)
+    return d
 
 
-# @view_config(route_name='checkouts')
-# def checkout(context, request):
-#     checkouts_file = request.registry.settings['checkouts_file']
-#     f = open(checkouts_file, 'r')
-#     read = f
-#     info = {}
-#     return dict(info=info)
+@view_config(route_name='checkouts', renderer='json')
+def checkout(context, request):
+    checkouts_file = request.registry.settings['checkouts_file']
+    f = open(checkouts_file, 'r')
+    d = pickle.load(f)
+    return d
