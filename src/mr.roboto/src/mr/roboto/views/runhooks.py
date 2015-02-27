@@ -81,7 +81,7 @@ def createGithubPostCommitHooksView(request):
         for hook in hooks:
 
             #if hook.name == 'web' and (hook.config['url'].find(roboto_url) or hook.config['url'].find('jenkins.plone.org')):
-            if hook.name == 'web' and hook.config['url'].find(roboto_url):
+            if hook.name == 'web' and (hook.config['url'].find(roboto_url) or hook.config['url'].find('roboto')):
                 add_log(request, 'github', 'Removing hook ' + str(hook.config))
                 if debug:
                     print "Debug removing hook"
