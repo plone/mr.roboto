@@ -23,6 +23,7 @@ def main(global_config, **settings):
 
     # adds pyramid_mailer
     config.include('pyramid_mailer')
+    config.include('pyramid_chameleon')
 
     # plone versions
     config.registry.settings['plone_versions'] = ast.literal_eval(settings['plone_versions'])
