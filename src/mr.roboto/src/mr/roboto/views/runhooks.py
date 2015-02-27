@@ -29,7 +29,8 @@ def createGithubPostCommitHooksView(request):
     #
     # checkouts_dict
     # {'5.0': ['package', '...']}
-
+    debug = request.registry.settings['debug']
+    import pdb; pdb.set_trace()
     sources_dict = {}
     checkouts_dict = {}
     # We should remove all the actual hooks

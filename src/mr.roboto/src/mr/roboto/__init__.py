@@ -34,6 +34,12 @@ def main(global_config, **settings):
     # api_key to callback from gh
     config.registry.settings['api_key'] = settings['api_key']
 
+    # Debug
+    if 'debug' in settings:
+        config.registry.settings['debug'] = settings['debug']
+    else:
+        config.registry.settings['debug'] = False
+
     config.registry.settings['sources_file'] = settings['sources_file']
     config.registry.settings['checkouts_file'] = settings['checkouts_file']
 
