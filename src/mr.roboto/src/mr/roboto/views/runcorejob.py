@@ -59,13 +59,12 @@ def runFunctionCoreTests(request):
 
     sources_file = request.registry.settings['sources_file']
     checkouts_file = request.registry.settings['checkouts_file']
-    actual_plone_versions = request.registry.settings['plone_versions']
 
     sources = pickle.loads(open(sources_file, 'r').read())
     checkouts = pickle.loads(open(checkouts_file, 'r').read())
 
     # General Vars we need
-    organization = payload['repository']['organization']
+    organization = payload['repository']['full_name'].split('/')[0]
     repo_name = payload['repository']['name']
 
     repo = organization + '/' + repo_name
