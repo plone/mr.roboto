@@ -103,7 +103,7 @@ def runFunctionCoreTests(request):
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':
         # don't do anything
-        pass
+        add_log(request, commit_data['reply_to'], 'Commit to coredev - do nothing')
 
     else:
         # It's not a commit to coredev repo
@@ -116,11 +116,11 @@ def runFunctionCoreTests(request):
                     request.registry.notify(CommitAndMissingCheckout(who, request, repo, branch, pv, payload['pusher']['email']))
         else:
             # Error repo not sources
-            pass
+            add_log(request, commit_data['reply_to'], 'Commit not in sources - %s/%s do nothing' % (repo, branch))
 
         for pv in versions_to_commit:
             # commit to the branch
-            add_log(request, "test on github commit", "LETS COMMIT ON COREDEV")
+            add_log(request, "github commit", "LETS COMMIT ON COREDEV")
             ghObject = request.registry.settings['github']
             repo = ghObject.get_organization('plone').get_repo('buildout.coredev')
             head_ref = repo.get_git_ref("heads/%s" % pv)
