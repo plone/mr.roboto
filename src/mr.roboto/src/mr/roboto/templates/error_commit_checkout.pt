@@ -2,4 +2,10 @@ Repository: ${repo}
 Author: ${who}
 Plone Version: ${pv}
 
+This package is used by Plone coredev ${pv} branch, 
+but it’s not currently checked out so is not including
+your change for testing.
 
+You must add this package at 
+
+https://github.com/plone/buildout.coredev/blob/${pv}/checkouts.cfg”
