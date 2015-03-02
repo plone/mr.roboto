@@ -68,6 +68,9 @@ def runFunctionCoreTests(request):
     repo_name = payload['repository']['name']
 
     repo = organization + '/' + repo_name
+    if 'ref' not in payload:
+        # Its not a commit, just a github check
+        return
     branch = payload['ref'].split('/')[-1]
 
     # Going to run the core-dev tests
