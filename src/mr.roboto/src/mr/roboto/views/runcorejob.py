@@ -8,6 +8,7 @@ from mr.roboto.events import NewCoreDevPush
 from mr.roboto.events import CommitAndMissingCheckout
 
 from mr.roboto import templates
+from mr.roboto.views.runhooks import getSourcesAndCheckouts
 
 from github import InputGitTreeElement
 from github import InputGitAuthor
@@ -84,6 +85,7 @@ def runFunctionCoreTests(request):
     commits_info = []
     timestamp = datetime.datetime.now(GMT1()).isoformat()
     fake = False
+    source_or_checkout = False
 
     for commit in payload['commits']:
         # get the commit data structure
@@ -98,6 +100,8 @@ def runFunctionCoreTests(request):
             'files': '\n'.join(commit_data['files']),
             'diff': commit_data['diff'],
         }
+        if 'sources.cfg' in data['files'] or 'checkouts.cfg' in data['files']:
+            source_or_checkout = True
         changeset += templates['jenkins_changeset.pt'](**data)
         timestamp = commit['timestamp']
         # For logging
@@ -111,6 +115,8 @@ def runFunctionCoreTests(request):
     if repo == 'plone/buildout.coredev':
         # don't do anything
         add_log(request, commit_data['reply_to'], 'Commit to coredev - do nothing')
+        if source_or_checkout:
+            getSourcesAndCheckouts(request)
 
     else:
         # It's not a commit to coredev repo

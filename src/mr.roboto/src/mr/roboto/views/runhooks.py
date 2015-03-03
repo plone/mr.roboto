@@ -21,26 +21,17 @@ createGithubPostCommitHooks = Service(
 )
 
 
-@createGithubPostCommitHooks.get()
-@validatetoken
-def createGithubPostCommitHooksView(request):
-    # sources_dict
-    # {('package_path', 'branch'): ['5.0', '4.3']}
-    #
-    # checkouts_dict
-    # {'5.0': ['package', '...']}
-    debug = request.registry.settings['debug']
+def getSourcesAndCheckouts(request):
     sources_dict = {}
     checkouts_dict = {}
     # We should remove all the actual hooks
-    github = request.registry.settings['github']
-    roboto_url = request.registry.settings['roboto_url']
     sources_file = request.registry.settings['sources_file']
     checkouts_file = request.registry.settings['checkouts_file']
     actual_plone_versions = request.registry.settings['plone_versions']
 
     # Clean Core Packages DB and sync to GH
     for plone_version in actual_plone_versions:
+        add_log(request, 'roboto', 'Checking sources and checkouts from plone %s' % plone_version)
 
         # Add the core package to mongo
         buildout = PloneCoreBuildout(plone_version)
@@ -65,6 +56,22 @@ def createGithubPostCommitHooksView(request):
     sf = open(checkouts_file, 'w')
     sf.write(pickle.dumps(checkouts_dict))
     sf.close()
+
+
+@createGithubPostCommitHooks.get()
+@validatetoken
+def createGithubPostCommitHooksView(request):
+    # sources_dict
+    # {('package_path', 'branch'): ['5.0', '4.3']}
+    #
+    # checkouts_dict
+    # {'5.0': ['package', '...']}
+    debug = request.registry.settings['debug']
+    # We should remove all the actual hooks
+    github = request.registry.settings['github']
+    roboto_url = request.registry.settings['roboto_url']
+
+    getSourcesAndCheckouts(request)
 
     # hooks URL
     commit_url = roboto_url + 'run/corecommit'
