@@ -98,7 +98,7 @@ def runFunctionCoreTests(request):
             'push': payload,
             'commit': commit,
             'files': '\n'.join(commit_data['files']),
-            'diff': commit_data['diff'],
+            # 'diff': commit_data['diff'],
         }
         if 'sources.cfg' in data['files'] or 'checkouts.cfg' in data['files']:
             source_or_checkout = True
