@@ -82,6 +82,7 @@ def runFunctionCoreTests(request):
     else:
         who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
     changeset = ""
+    changeset_long = ""
     commits_info = []
     timestamp = datetime.datetime.now(GMT1()).isoformat()
     fake = False
@@ -98,11 +99,12 @@ def runFunctionCoreTests(request):
             'push': payload,
             'commit': commit,
             'files': '\n'.join(commit_data['files']),
-            # 'diff': commit_data['diff'],
+            'diff': commit_data['diff'],
         }
         if 'sources.cfg' in data['files'] or 'checkouts.cfg' in data['files']:
             source_or_checkout = True
-        changeset += templates['jenkins_changeset.pt'](**data)
+        changeset += templates['github_commit.pt'](**data)
+        changeset_long += templates['jenkins_changeset.pt'](**data)
         timestamp = commit['timestamp']
         # For logging
         message = 'Commit on ' + repo + ' ' + branch + ' ' + commit['id']
@@ -139,7 +141,7 @@ def runFunctionCoreTests(request):
             head_ref = repo.get_git_ref("heads/%s" % pv)
             latest_commit = repo.get_git_commit(head_ref.object.sha)
             base_tree = latest_commit.tree
-            element = InputGitTreeElement(path="last_commit.txt", mode='100644', type='blob', content=changeset)
+            element = InputGitTreeElement(path="last_commit.txt", mode='100644', type='blob', content=changeset_long)
             new_tree = repo.create_git_tree([element], base_tree)
             new_user = InputGitAuthor(payload['pusher']['name'], payload['pusher']['email'], timestamp)
             new_commit = repo.create_git_commit('[fc] ' + changeset, new_tree, [latest_commit], new_user, new_user)
