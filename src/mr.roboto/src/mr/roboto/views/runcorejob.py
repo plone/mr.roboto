@@ -131,7 +131,7 @@ def runFunctionCoreTests(request):
                     request.registry.notify(CommitAndMissingCheckout(who, request, repo, branch, pv, payload['pusher']['email']))
         else:
             # Error repo not sources
-            add_log(request, commit_data['reply_to'], 'Commit not in sources - %s/%s do nothing' % (repo, branch))
+            add_log(request, who, 'Commit not in sources - %s/%s do nothing' % (repo, branch))
 
         for pv in versions_to_commit:
             # commit to the branch
