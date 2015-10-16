@@ -39,4 +39,3 @@ class RequestWithAttributes(Request):
     @reify
     def core(self):
         return self.registry.settings['core']
-

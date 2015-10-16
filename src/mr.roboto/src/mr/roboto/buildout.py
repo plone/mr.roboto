@@ -12,7 +12,7 @@ import logging
 logger = logging.getLogger('mr.roboto')
 
 
-class Source():
+class Source(object):
 
     def __init__(self, protocol=None, url=None, push_url=None, branch=None):
         self.protocol = protocol
@@ -47,7 +47,7 @@ class Source():
         return None
 
 
-class VersionsFile():
+class VersionsFile(object):
 
     def __init__(self, file_location):
         self.file_location = file_location
@@ -184,4 +184,3 @@ class PloneCoreBuildout(object):
                             self.location,
                             branch=self.core_version,
                             depth=1)
-

@@ -98,4 +98,3 @@ def send_main_on_missing_checkout(event):
         event.branch,
         event.pv,
         event.email)
-

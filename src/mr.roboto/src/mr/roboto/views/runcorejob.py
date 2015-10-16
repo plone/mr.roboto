@@ -148,6 +148,3 @@ def runFunctionCoreTests(request):
             head_ref.edit(sha=new_commit.sha, force=False)
         
         add_log(request, who, message)
-
-
-
