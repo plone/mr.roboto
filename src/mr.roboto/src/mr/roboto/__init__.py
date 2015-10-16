@@ -1,13 +1,11 @@
-from pyramid.config import Configurator
-
-from security import RequestWithAttributes
-
-
-from github import Github
-import ast
-
 from chameleon import PageTemplateLoader
+from github import Github
+from pyramid.config import Configurator
+from mr.roboto.security import RequestWithAttributes
+
+import ast
 import os
+
 
 templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "templates"))
 

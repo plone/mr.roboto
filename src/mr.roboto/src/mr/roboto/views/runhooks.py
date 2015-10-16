@@ -1,11 +1,12 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
-from mr.roboto.security import validatetoken
 from mr.roboto.buildout import PloneCoreBuildout
+from mr.roboto.security import validatetoken
 
+import json
 import logging
 import pickle
-import json
+
 
 debug = False
 logger = logging.getLogger('mr.roboto')

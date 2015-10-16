@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
-from configparser import ConfigParser, ExtendedInterpolation
+from configparser import ConfigParser
+from configparser import ExtendedInterpolation
+from tempfile import mkdtemp
+from UserDict import UserDict
+
+import git
+import logging
 import os
 import re
-from UserDict import UserDict
-import git
-from shutil import rmtree
-from tempfile import mkdtemp
-import logging
+
 
 logger = logging.getLogger('mr.roboto')
 

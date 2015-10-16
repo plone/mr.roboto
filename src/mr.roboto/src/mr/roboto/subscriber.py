@@ -1,17 +1,14 @@
 # -*- encoding: utf-8 -*-
+from mr.roboto import templates
+from mr.roboto.events import CommitAndMissingCheckout
+from mr.roboto.events import NewCoreDevPush
+from pyramid.events import subscriber
+from pyramid_mailer import get_mailer
+from pyramid_mailer.message import Message
+
+import logging
 import requests
 
-from pyramid_mailer.message import Message
-from pyramid_mailer import get_mailer
-
-from pyramid.events import subscriber
-
-from mr.roboto.events import NewCoreDevPush
-from mr.roboto.events import CommitAndMissingCheckout
-
-
-from mr.roboto import templates
-import logging
 
 logger = logging.getLogger('mr.roboto')
 

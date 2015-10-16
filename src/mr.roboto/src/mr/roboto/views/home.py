@@ -1,9 +1,9 @@
-from pyramid.view import view_config
-
 from mr.roboto.security import validatetoken
+from pyramid.view import view_config
 
 import logging
 import pickle
+
 
 log = logging.getLogger('HOME')
 

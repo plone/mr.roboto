@@ -1,5 +1,6 @@
-import unittest
 from pyramid import testing
+
+import unittest
 
 
 class MyTest(unittest.TestCase):

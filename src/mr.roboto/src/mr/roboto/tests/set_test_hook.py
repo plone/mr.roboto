@@ -1,5 +1,7 @@
-import sys
 from github import Github
+
+import sys
+
 
 if __name__ == '__main__':
 

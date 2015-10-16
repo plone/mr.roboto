@@ -1,22 +1,18 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
-from mr.roboto.security import validategithub
-from mr.roboto.buildout import PloneCoreBuildout
-from mr.roboto.subscriber import get_info_from_commit
-
-from mr.roboto.events import NewCoreDevPush
-from mr.roboto.events import CommitAndMissingCheckout
-
+from github import InputGitAuthor
+from github import InputGitTreeElement
 from mr.roboto import templates
+from mr.roboto.events import CommitAndMissingCheckout
+from mr.roboto.events import NewCoreDevPush
+from mr.roboto.security import validategithub
+from mr.roboto.subscriber import get_info_from_commit
 from mr.roboto.views.runhooks import getSourcesAndCheckouts
 
-from github import InputGitTreeElement
-from github import InputGitAuthor
-
-import logging
-import json
-import pickle
 import datetime
+import json
+import logging
+import pickle
 
 
 logger = logging.getLogger('mr.roboto')
