@@ -8,24 +8,29 @@ import ast
 import os
 
 
-templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), "templates"))
+templates = PageTemplateLoader(
+    os.path.join(os.path.dirname(__file__), 'templates')
+)
 
 
 def main(global_config, **settings):
-    """ This function returns a Pyramid WSGI application.
-    """
-    config = Configurator(settings=settings,
-                          request_factory=RequestWithAttributes)
+    """This function returns a Pyramid WSGI application."""
+    config = Configurator(
+        settings=settings,
+        request_factory=RequestWithAttributes
+    )
 
     # adds cornice
-    config.include("cornice")
+    config.include('cornice')
 
     # adds pyramid_mailer
     config.include('pyramid_mailer')
     config.include('pyramid_chameleon')
 
     # plone versions
-    config.registry.settings['plone_versions'] = ast.literal_eval(settings['plone_versions'])
+    config.registry.settings['plone_versions'] = ast.literal_eval(
+        settings['plone_versions']
+    )
 
     # roboto public url
     config.registry.settings['roboto_url'] = settings['roboto_url']
@@ -43,7 +48,10 @@ def main(global_config, **settings):
     config.registry.settings['checkouts_file'] = settings['checkouts_file']
 
     # github object
-    config.registry.settings['github'] = Github(settings['github_user'], settings['github_password'])
+    config.registry.settings['github'] = Github(
+        settings['github_user'],
+        settings['github_password']
+    )
 
     config.add_static_view('static', 'static', cache_max_age=3600)
 
@@ -53,8 +61,8 @@ def main(global_config, **settings):
     config.add_route('checkouts', '/checkouts.json')
 
     # Automatic views
-    config.scan("mr.roboto.views")
-    config.scan("mr.roboto.subscriber")
+    config.scan('mr.roboto.views')
+    config.scan('mr.roboto.subscriber')
 
     config.end()
 

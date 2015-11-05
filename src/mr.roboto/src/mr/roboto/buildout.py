@@ -24,7 +24,8 @@ class Source(object):
 
     def create_from_string(self, source_string):
         protocol, url, extra_1, extra_2, extra_3 = (
-            lambda a, b, c=None, d=None, e=None: (a, b, c, d, e))(*source_string.split())
+            lambda a, b, c=None, d=None, e=None: (a, b, c, d, e)
+        )(*source_string.split())
         for param in [extra_1, extra_2, extra_3]:
             if param is not None:
                 key, value = param.split('=')
@@ -76,11 +77,14 @@ class VersionsFile(object):
             versionstxt = f.read()
 
         if package_name not in self:
-            newline = "{} = {}".format(package_name, new_version)
+            newline = '{0} = {1}'.format(package_name, new_version)
             versionstxt += newline
 
-        reg = re.compile("(^%s[\s\=]+)[0-9\.abrc]+" % package_name, re.MULTILINE)
-        newVersionsTxt = reg.sub(r"\g<1>%s" % new_version, versionstxt)
+        reg = re.compile(
+            '(^{0}[\s\=]+)[0-9\.abrc]+'.format(package_name),
+            re.MULTILINE
+        )
+        newVersionsTxt = reg.sub(r'\g<1>{0}'.format(new_version), versionstxt)
         with open(path, 'w') as f:
             f.write(newVersionsTxt)
 
@@ -138,12 +142,20 @@ class CheckoutsFile(UserDict):
             checkoutstxt = f.read()
         with open(path, 'w') as f:
             if enabled:
-                fixes_text = "# Test fixes only"
-                reg = re.compile("^[\s]*%s\n" % fixes_text, re.MULTILINE)
-                newCheckoutsTxt = reg.sub('    %s\n%s\n' %
-                                          (package_name, fixes_text), checkoutstxt)
+                fixes_text = '# Test fixes only'
+                reg = re.compile(
+                    '^[\s]*{0}\n'.format(fixes_text),
+                    re.MULTILINE
+                )
+                newCheckoutsTxt = reg.sub(
+                    '    {0}\n{1}\n'.format(package_name, fixes_text),
+                    checkoutstxt
+                )
             else:
-                reg = re.compile("^[\s]*%s\n" % package_name, re.MULTILINE)
+                reg = re.compile(
+                    '^[\s]*{0}\n'.format(package_name),
+                    re.MULTILINE
+                )
                 newCheckoutsTxt = reg.sub('', checkoutstxt)
             f.write(newCheckoutsTxt)
 
@@ -169,7 +181,7 @@ class CheckoutsFile(UserDict):
 
 
 class PloneCoreBuildout(object):
-    PLONE_COREDEV_LOCATION = "git://github.com/plone/buildout.coredev.git"
+    PLONE_COREDEV_LOCATION = 'git://github.com/plone/buildout.coredev.git'
 
     def __init__(self, core_version=None):
         self.core_version = core_version
@@ -180,9 +192,15 @@ class PloneCoreBuildout(object):
         self.checkouts = CheckoutsFile(self.location + '/checkouts.cfg')
 
     def _clone(self):
-        logger.info("Cloning github repository %s, branch=%s"\
-                        % (self.location, self.core_version))
-        git.Repo.clone_from(self.PLONE_COREDEV_LOCATION,
-                            self.location,
-                            branch=self.core_version,
-                            depth=1)
+        logger.info(
+            'Cloning github repository {0}, branch={1}'.format(
+                self.location,
+                self.core_version
+            )
+        )
+        git.Repo.clone_from(
+            self.PLONE_COREDEV_LOCATION,
+            self.location,
+            branch=self.core_version,
+            depth=1
+        )

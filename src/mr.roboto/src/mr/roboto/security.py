@@ -11,7 +11,11 @@ def validategithub(fn):
     def wrapped(request):
         if 'X-Hub_Signature' in request.headers:
             sha1_gh = request.headers['X-Hub_Signature']
-            sha1_compute = hmac.new(request.registry.settings['api_key'], request.body, sha1).hexdigest()
+            hmac_value = hmac.new(
+                request.registry.settings['api_key'],
+                request.body, sha1
+            )
+            sha1_compute = hmac_value.hexdigest()
             if sha1_gh == 'sha1=' + sha1_compute:
                 return fn(request)
         else:

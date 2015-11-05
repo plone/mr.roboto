@@ -31,7 +31,7 @@ def sources(context, request):
     d = pickle.load(f)
     output = {}
     for key, value in d.items():
-        new_key = '%s/%s' % (key[0], key[1])
+        new_key = '{0}/{1}'.format(key[0], key[1])
         output[new_key] = value
     return output
 
