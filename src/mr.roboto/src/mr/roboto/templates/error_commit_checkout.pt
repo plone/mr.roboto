@@ -8,4 +8,7 @@ your change for testing.
 
 You must add this package at 
 
-https://github.com/plone/buildout.coredev/blob/${pv}/checkouts.cfg”
+https://github.com/plone/buildout.coredev/blob/${pv}/checkouts.cfg
+
+Regards,
+mr.roboto
