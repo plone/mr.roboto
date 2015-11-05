@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from chameleon import PageTemplateLoader
 from github import Github
 from pyramid.config import Configurator

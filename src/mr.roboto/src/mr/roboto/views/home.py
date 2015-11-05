@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from mr.roboto.security import validatetoken
 from pyramid.view import view_config
 

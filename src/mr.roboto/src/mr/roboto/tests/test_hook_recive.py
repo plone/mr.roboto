@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from hashlib import sha1
 
 import hmac
