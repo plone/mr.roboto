@@ -13,6 +13,8 @@ import re
 
 logger = logging.getLogger('mr.roboto')
 
+PATH_RE = '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)'
+
 
 class Source(object):
 
@@ -43,8 +45,7 @@ class Source(object):
     @property
     def path(self):
         if self.url:
-            match = re.match(
-                '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)', self.url)
+            match = re.match(PATH_RE, self.url)
             if match:
                 return match.groupdict()['path']
         return None
