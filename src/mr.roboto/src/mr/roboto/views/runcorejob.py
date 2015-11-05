@@ -86,6 +86,9 @@ def runFunctionCoreTests(request):
     fake = False
     source_or_checkout = False
 
+    commit_data = None
+    message = ''
+
     for commit in payload['commits']:
         # get the commit data structure
         commit_data = get_info_from_commit(commit)
@@ -112,7 +115,7 @@ def runFunctionCoreTests(request):
         request.registry.notify(NewCoreDevPush(payload, request))
 
     # In case is a push to buildout-coredev
-    if repo == 'plone/buildout.coredev':
+    if repo == 'plone/buildout.coredev' and commit_data:
         # don't do anything
         add_log(
             request,
