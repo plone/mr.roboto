@@ -1,22 +1,18 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
-from mr.roboto.security import validategithub
-from mr.roboto.buildout import PloneCoreBuildout
-from mr.roboto.subscriber import get_info_from_commit
-
-from mr.roboto.events import NewCoreDevPush
-from mr.roboto.events import CommitAndMissingCheckout
-
+from github import InputGitAuthor
+from github import InputGitTreeElement
 from mr.roboto import templates
+from mr.roboto.events import CommitAndMissingCheckout
+from mr.roboto.events import NewCoreDevPush
+from mr.roboto.security import validategithub
+from mr.roboto.subscriber import get_info_from_commit
 from mr.roboto.views.runhooks import getSourcesAndCheckouts
 
-from github import InputGitTreeElement
-from github import InputGitAuthor
-
-import logging
-import json
-import pickle
 import datetime
+import json
+import logging
+import pickle
 
 
 logger = logging.getLogger('mr.roboto')
@@ -24,12 +20,12 @@ logger = logging.getLogger('mr.roboto')
 runCoreTests = Service(
     name='Run core tests',
     path='/run/corecommit',
-    description="Run the core-dev buildout"
+    description='Run the core-dev buildout'
 )
 
 
 def add_log(request, who, message):
-    logger.info(who + " " + message)
+    logger.info(who + ' ' + message)
 
 
 class GMT1(datetime.tzinfo):
@@ -40,21 +36,20 @@ class GMT1(datetime.tzinfo):
         return datetime.timedelta(0)
 
     def tzname(self, dt):
-        return "Europe/Catalunya"
+        return 'Europe/Catalunya'
 
 
 @runCoreTests.post()
 @validategithub
 def runFunctionCoreTests(request):
-    """
-    When we are called by GH we want to run the jenkins builds
+    """When we are called by GH we want to run the jenkins builds
 
-    It's called for each push on the plone repo, so we look which tests needs to be runned for this repo:
+    It's called for each push on the plone repo, so we look which tests needs
+    to be runned for this repo:
 
     * Core Dev : it's on sources
     * PLIP : it's added as specific PLIP
     * Package : it's added as specific package
-
     """
     payload = json.loads(request.POST['payload'])
 
@@ -78,11 +73,14 @@ def runFunctionCoreTests(request):
     # Who is doing the push ??
 
     if payload['pusher']['name'] == u'none':
-        who = "NoBody <nobody@plone.org>"
+        who = 'NoBody <nobody@plone.org>'
     else:
-        who = "%s <%s>" % (payload['pusher']['name'], payload['pusher']['email'])
-    changeset = ""
-    changeset_long = ""
+        who = '{0} <{1}>'.format(
+            payload['pusher']['name'],
+            payload['pusher']['email']
+        )
+    changeset = ''
+    changeset_long = ''
     commits_info = []
     timestamp = datetime.datetime.now(GMT1()).isoformat()
     fake = False
@@ -116,7 +114,11 @@ def runFunctionCoreTests(request):
     # In case is a push to buildout-coredev
     if repo == 'plone/buildout.coredev':
         # don't do anything
-        add_log(request, commit_data['reply_to'], 'Commit to coredev - do nothing')
+        add_log(
+            request,
+            commit_data['reply_to'],
+            'Commit to coredev - do nothing'
+        )
         if source_or_checkout:
             getSourcesAndCheckouts(request)
 
@@ -128,26 +130,42 @@ def runFunctionCoreTests(request):
             versions_to_commit = sources[(repo, branch)]
             for pv in versions_to_commit:
                 if repo_name not in checkouts[pv]:
-                    request.registry.notify(CommitAndMissingCheckout(who, request, repo, branch, pv, payload['pusher']['email']))
+                    request.registry.notify(
+                        CommitAndMissingCheckout(
+                            who,
+                            request,
+                            repo,
+                            branch,
+                            pv,
+                            payload['pusher']['email']
+                        )
+                    )
         else:
             # Error repo not sources
-            add_log(request, who, 'Commit not in sources - %s/%s do nothing' % (repo, branch))
+            msg = 'Commit not in sources - %s/%s do nothing'
+            add_log(request, who, msg.format(repo, branch))
 
         for pv in versions_to_commit:
             # commit to the branch
-            add_log(request, "github commit", "LETS COMMIT ON COREDEV")
+            add_log(request, 'github commit', 'LETS COMMIT ON COREDEV')
             ghObject = request.registry.settings['github']
-            repo = ghObject.get_organization('plone').get_repo('buildout.coredev')
-            head_ref = repo.get_git_ref("heads/%s" % pv)
+            org = ghObject.get_organization('plone')
+            repo = org.get_repo('buildout.coredev')
+            head_ref = repo.get_git_ref('heads/{0}'.format(pv))
             latest_commit = repo.get_git_commit(head_ref.object.sha)
             base_tree = latest_commit.tree
-            element = InputGitTreeElement(path="last_commit.txt", mode='100644', type='blob', content=changeset_long)
+            element = InputGitTreeElement(
+                path='last_commit.txt',
+                mode='100644',
+                type='blob',
+                content=changeset_long
+            )
             new_tree = repo.create_git_tree([element], base_tree)
-            new_user = InputGitAuthor(payload['pusher']['name'], payload['pusher']['email'], timestamp)
-            new_commit = repo.create_git_commit('[fc] ' + changeset, new_tree, [latest_commit], new_user, new_user)
+            new_user = InputGitAuthor(payload['pusher']['name'],
+                                      payload['pusher']['email'], timestamp)
+            new_commit = repo.create_git_commit('[fc] ' + changeset, new_tree,
+                                                [latest_commit], new_user,
+                                                new_user)
             head_ref.edit(sha=new_commit.sha, force=False)
-        
+
         add_log(request, who, message)
-
-
-

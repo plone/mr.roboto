@@ -1,14 +1,9 @@
+=========
 mr.roboto
 =========
 
 The main goal of mr.roboto is to maintain sync between jenkins and github, taking
 care of the specific user cases of plone architecture.
-
-Configuration
-=============
-
-
-
 
 Use Cases
 =========
@@ -16,9 +11,9 @@ Use Cases
 See log
 -------
 
-To see the log that's beeing proceessed
+To see the log that's being processed
 
-https://jenkins.plone.org:6543/log?token=XXXXX
+https://jenkins.plone.org/roboto/log?token=XXXXX
 
 
 Autoconfigure the github repositories that are on core-dev sources
@@ -29,27 +24,7 @@ webservices. It will clean all the hooks on plone core-dev packages.
 
 Who to call :
 
-https://jenkins.plone.org:6543/run/githubcommithooks?token=XXXXX
-
-They are installed on the branch set on 
-
-mr.roboto.views.run.ACTUAL_HOOKS_INSTALL_ON = '4.3'
-
-
-Create core-dev jenkins jobs and clean jenkins
-----------------------------------------------
-
-It removes all the jenkins jobs that not Packages or Core and reconfigure Core tests again
-
-Who to call :
-
-https://jenkins.plone.org:6543/run/resetjenkins?token=XXXXX
-
-Which jobs are reconfigured depends on :
-
-mr.roboto.views.run.COREDEV_BRANCHES_TO_CHECK = ['4.2', '4.3', '4.4']
-
-mr.roboto.views.run.PYTHON_VERSIONS = ['2.6', '2.7']
+https://jenkins.plone.org/roboto/run/githubcommithooks?token=XXXXX
 
 
 There is a commit to a package that's on the core-dev sources
@@ -59,15 +34,6 @@ There is a commit to a package that's on the core-dev sources
 
 There is a pull request to a package that's on the core-dev sources
 -------------------------------------------------------------------
-
-
-
-Jenkins Jobs
-============
-
-Jenkins jobs are automatic created based on templates on mr.roboto.templates
-
-* plone.pt - template to create plone package jobs
 
 
 WebServices
@@ -84,7 +50,3 @@ WebServices
   Creates github post-commit hooks to all plone repositories in
   buildout.coredev sources.cfg.
 
-/run/createjenkinsjobs
-
-  Security : parameter based ?token=XXXXX
-  Creates all Jenkins jobs for Plone.

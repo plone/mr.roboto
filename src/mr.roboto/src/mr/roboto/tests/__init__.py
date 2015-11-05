@@ -1,5 +1,7 @@
-import unittest
+# -*- coding: utf-8 -*-
 from pyramid import testing
+
+import unittest
 
 
 class MyTest(unittest.TestCase):
@@ -25,4 +27,4 @@ class MyTest(unittest.TestCase):
         request = testing.DummyRequest()
         request.context = testing.DummyResource()
         response = view_fn(request)
-        self.assertEqual(response, {'greeting':'hello'})
+        self.assertEqual(response, {'greeting': 'hello'})

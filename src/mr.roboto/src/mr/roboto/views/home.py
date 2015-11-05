@@ -1,9 +1,10 @@
-from pyramid.view import view_config
-
+# -*- coding: utf-8 -*-
 from mr.roboto.security import validatetoken
+from pyramid.view import view_config
 
 import logging
 import pickle
+
 
 log = logging.getLogger('HOME')
 
@@ -17,20 +18,19 @@ def homePage(context, request):
 @validatetoken
 @view_config(route_name='log', renderer='mr.roboto:templates/log.pt')
 def logPage(context, request):
-    f = open('roboto.log', 'r')
-    log = f.read()
-    f.close()
+    with open('roboto.log') as f:
+        log = f.read()
     return dict(log=log)
 
 
 @view_config(route_name='sources', renderer='json')
 def sources(context, request):
     sources_file = request.registry.settings['sources_file']
-    f = open(sources_file, 'r')
-    d = pickle.load(f)
+    with open(sources_file) as f:
+        d = pickle.load(f)
     output = {}
     for key, value in d.items():
-        new_key = '%s/%s' % (key[0], key[1])
+        new_key = '{0}/{1}'.format(key[0], key[1])
         output[new_key] = value
     return output
 
@@ -38,6 +38,6 @@ def sources(context, request):
 @view_config(route_name='checkouts', renderer='json')
 def checkout(context, request):
     checkouts_file = request.registry.settings['checkouts_file']
-    f = open(checkouts_file, 'r')
-    d = pickle.load(f)
+    with open(checkouts_file) as f:
+        d = pickle.load(f)
     return d

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import unittest
 
 
@@ -11,4 +12,4 @@ class FunctionalTests(unittest.TestCase):
 
     def test_run_corecommit(self):
         res = self.testapp.get('/run/corecommit', status=200)
-        self.failUnless('Pyramid' in res.body)
+        self.assertTrue('Pyramid' in res.body)

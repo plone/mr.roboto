@@ -46,8 +46,3 @@ WebServices
   Security : parameter based ?token=XXXXX
   Creates github post-commit hooks to all plone repositories in
   buildout.coredev sources.cfg.
-
-/run/createjenkinsjobs
-
-  Security : parameter based ?token=XXXXX
-  Creates all Jenkins jobs for Plone.

@@ -1,23 +1,25 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
-from mr.roboto.security import validatetoken
 from mr.roboto.buildout import PloneCoreBuildout
+from mr.roboto.security import validatetoken
 
+import json
 import logging
 import pickle
-import json
+
 
 debug = False
 logger = logging.getLogger('mr.roboto')
 
 
 def add_log(request, who, message):
-    logger.info(who + " " + message)
+    logger.info(who + ' ' + message)
+
 
 createGithubPostCommitHooks = Service(
     name='Create github post-commit hooks',
     path='/run/githubcommithooks',
-    description="Creates github post-commit hooks."
+    description='Creates github post-commit hooks.'
 )
 
 
@@ -31,7 +33,12 @@ def getSourcesAndCheckouts(request):
 
     # Clean Core Packages DB and sync to GH
     for plone_version in actual_plone_versions:
-        add_log(request, 'roboto', 'Checking sources and checkouts from plone %s' % plone_version)
+        msg = 'Checking sources and checkouts from plone {0}'
+        add_log(
+            request,
+            'roboto',
+            msg.format(plone_version)
+        )
 
         # Add the core package to mongo
         buildout = PloneCoreBuildout(plone_version)
@@ -39,10 +46,11 @@ def getSourcesAndCheckouts(request):
         for source in sources:
             source_obj = buildout.sources[source]
             if source_obj.path is not None:
-                if (source_obj.path, source_obj.branch) not in sources_dict:
-                    sources_dict[(source_obj.path, source_obj.branch)] = [plone_version]
+                key = (source_obj.path, source_obj.branch)
+                if key not in sources_dict:
+                    sources_dict[key] = [plone_version]
                 else:
-                    sources_dict[(source_obj.path, source_obj.branch)].append(plone_version)
+                    sources_dict[key].append(plone_version)
 
         checkouts_dict[plone_version] = []
         for checkout in buildout.checkouts.data:
@@ -86,23 +94,31 @@ def createGithubPostCommitHooksView(request):
         # Remove the old hooks
         for hook in hooks:
 
-            #if hook.name == 'web' and (hook.config['url'].find(roboto_url) or hook.config['url'].find('jenkins.plone.org')):
-            if hook.name == 'web' and hook.config['url'].find('roboto') and not hook.config['url'].find('github-webhook'):
+            # if hook.name == 'web' and (hook.config['url'].find(roboto_url)
+            #  or hook.config['url'].find('jenkins.plone.org')):
+            if hook.name == 'web' and \
+                    hook.config['url'].find('roboto') and \
+                    not hook.config['url'].find('github-webhook'):
                 add_log(request, 'github', 'Removing hook ' + str(hook.config))
                 if debug:
-                    print "Debug removing hook"
+                    print 'Debug removing hook'
                 else:
                     hook.delete()
 
         # Add the new hooks
-        add_log(request, 'github', 'Creating hook ' + commit_url + ' and ' + pull_url)
+        msg = 'Creating hook {0} and {1}'
+        add_log(request, 'github', msg.format(commit_url, pull_url))
         messages.append('Creating hook ' + commit_url)
         try:
             if debug:
-                print "Debug creating hook"
+                print 'Debug creating hook'
             else:
-                repo.create_hook('web', {'url': commit_url, 'secret': request.registry.settings['api_key']}, 'push', True)
-                repo.create_hook('web', {'url': pull_url, 'secret': request.registry.settings['api_key']}, 'pull_request', True)
-        except:
+                data = {
+                    'url': commit_url,
+                    'secret': request.registry.settings['api_key']
+                }
+                repo.create_hook('web', data, 'push', True)
+                repo.create_hook('web', data, 'pull_request', True)
+        except Exception:
             pass
     return json.dumps(messages)

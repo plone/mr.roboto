@@ -1,17 +1,14 @@
 # -*- encoding: utf-8 -*-
+from mr.roboto import templates
+from mr.roboto.events import CommitAndMissingCheckout
+from mr.roboto.events import NewCoreDevPush
+from pyramid.events import subscriber
+from pyramid_mailer import get_mailer
+from pyramid_mailer.message import Message
+
+import logging
 import requests
 
-from pyramid_mailer.message import Message
-from pyramid_mailer import get_mailer
-
-from pyramid.events import subscriber
-
-from mr.roboto.events import NewCoreDevPush
-from mr.roboto.events import CommitAndMissingCheckout
-
-
-from mr.roboto import templates
-import logging
 
 logger = logging.getLogger('mr.roboto')
 
@@ -19,12 +16,15 @@ logger = logging.getLogger('mr.roboto')
 def get_info_from_commit(commit):
     diff = requests.get(commit['url'] + '.diff').content
 
-    files = ['A %s' % f for f in commit['added']]
-    files.extend('M %s' % f for f in commit['modified'])
-    files.extend('D %s' % f for f in commit['removed'])
+    files = ['A {0}'.format(f) for f in commit['added']]
+    files.extend('M {0}'.format(f) for f in commit['modified'])
+    files.extend('D {0}'.format(f) for f in commit['removed'])
 
     short_commit_msg = commit['message'].split('\n')[0][:60]
-    reply_to = '%s <%s>' % (commit['committer']['name'], commit['committer']['email'])
+    reply_to = '{0} <{1}>'.format(
+        commit['committer']['name'],
+        commit['committer']['email']
+    )
 
     return {
         'diff': diff,
@@ -37,9 +37,13 @@ def get_info_from_commit(commit):
 
 def send_to_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
-        subject='CHECKOUT ERROR %s %s' % (repo, branch),
-        sender="Jenkins Job FAIL <jenkins@plone.org>",
-        recipients=["ramon.nb@gmail.com", "tisto@plone.org", email], # XXX also to testbot
+        subject='CHECKOUT ERROR {0} {1}'.format(repo, branch),
+        sender='Jenkins Job FAIL <jenkins@plone.org>',
+        recipients=[  # XXX also to testbot
+            'ramon.nb@gmail.com',
+            'tisto@plone.org',
+            email,
+        ],
         body=templates['error_commit_checkout.pt'](
             who=who,
             repo=repo,
@@ -49,11 +53,11 @@ def send_to_missing_checkout(mailer, who, repo, branch, pv, email):
     mailer.send_immediately(msg, fail_silently=False)
 
 
-def send_to_cvs(payload, mailer, result=""):
+def send_to_cvs(payload, mailer, result=''):
     # Send a mail
     if len(payload['commits']) < 40:
-        # safeguard against github getting confused and sending us the entire history
-
+        # safeguard against github getting confused and sending us the entire
+        # history
         for commit in payload['commits']:
 
             commit_data = get_info_from_commit(commit)
@@ -67,11 +71,14 @@ def send_to_cvs(payload, mailer, result=""):
             }
 
             msg = Message(
-                subject='%s/%s: %s' % (payload['repository']['name'],
-                                       payload['ref'].split('/')[-1],
-                                       commit_data['short_commit_msg']),
-                sender="%s <svn-changes@plone.org>" % commit['committer']['name'],
-                recipients=["plone-cvs@lists.sourceforge.net"],
+                subject='{0}/{1}: {2}'.format(
+                    payload['repository']['name'],
+                    payload['ref'].split('/')[-1],
+                    commit_data['short_commit_msg']),
+                sender='{0} <svn-changes@plone.org>'.format(
+                    commit['committer']['name']
+                ),
+                recipients=['plone-cvs@lists.sourceforge.net'],
                 body=templates['commit_email.pt'](**data),
                 extra_headers={'Reply-To': commit_data['reply_to']}
             )
@@ -83,14 +90,17 @@ def send_to_cvs(payload, mailer, result=""):
 def send_main_on_coredev(event):
     mailer = get_mailer(event.request)
     payload = event.payload
-    logger.info("Sending mail because of push to coredev " + payload['repository']['name'])
+    msg = 'Sending mail because of push to coredev {0}'
+    logger.info(msg.format(payload['repository']['name']))
     send_to_cvs(payload, mailer)
 
 
 @subscriber(CommitAndMissingCheckout)
 def send_main_on_missing_checkout(event):
     mailer = get_mailer(event.request)
-    logger.info("Sending mail because of push to coredev without correct checkout " + event.repo + ' ' + event.who )
+    msg = 'Sending mail because of push to coredev without correct checkout ' \
+          '{0} {1}'
+    logger.info(msg.format(event.repo, event.who))
     send_to_missing_checkout(
         mailer,
         event.who,
@@ -98,4 +108,3 @@ def send_main_on_missing_checkout(event):
         event.branch,
         event.pv,
         event.email)
-
