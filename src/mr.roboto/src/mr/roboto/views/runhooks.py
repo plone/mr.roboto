@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
 from mr.roboto.buildout import PloneCoreBuildout
-from mr.roboto.security import validatetoken
+from mr.roboto.security import validate_token
 
 import json
 import logging
@@ -23,7 +23,7 @@ createGithubPostCommitHooks = Service(
 )
 
 
-def getSourcesAndCheckouts(request):
+def get_sources_and_checkouts(request):
     sources_dict = {}
     checkouts_dict = {}
     # We should remove all the actual hooks
@@ -65,8 +65,8 @@ def getSourcesAndCheckouts(request):
 
 
 @createGithubPostCommitHooks.get()
-@validatetoken
-def createGithubPostCommitHooksView(request):
+@validate_token
+def create_github_post_commit_hooks_view(request):
     # sources_dict
     # {('package_path', 'branch'): ['5.0', '4.3']}
     #
@@ -77,7 +77,7 @@ def createGithubPostCommitHooksView(request):
     github = request.registry.settings['github']
     roboto_url = request.registry.settings['roboto_url']
 
-    getSourcesAndCheckouts(request)
+    get_sources_and_checkouts(request)
 
     # hooks URL
     commit_url = roboto_url + 'run/corecommit'

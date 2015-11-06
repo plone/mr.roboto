@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from mr.roboto.security import validatetoken
+from mr.roboto.security import validate_token
 from pyramid.view import view_config
 
 import logging
@@ -10,14 +10,14 @@ log = logging.getLogger('HOME')
 
 
 @view_config(route_name='home', renderer='mr.roboto:templates/home.pt')
-def homePage(context, request):
+def home_page(context, request):
     info = {}
     return dict(info=info)
 
 
-@validatetoken
+@validate_token
 @view_config(route_name='log', renderer='mr.roboto:templates/log.pt')
-def logPage(context, request):
+def log_page(context, request):
     with open('roboto.log') as f:
         log = f.read()
     return dict(log=log)

@@ -85,9 +85,12 @@ class VersionsFile(object):
             '(^{0}[\s\=]+)[0-9\.abrc]+'.format(package_name),
             re.MULTILINE
         )
-        newVersionsTxt = reg.sub(r'\g<1>{0}'.format(new_version), versionstxt)
+        new_versions_txt = reg.sub(
+            r'\g<1>{0}'.format(new_version),
+            versionstxt
+        )
         with open(path, 'w') as f:
-            f.write(newVersionsTxt)
+            f.write(new_versions_txt)
 
     def get(self, package_name):
         return self.__getitem__(package_name)
@@ -148,7 +151,7 @@ class CheckoutsFile(UserDict):
                     '^[\s]*{0}\n'.format(fixes_text),
                     re.MULTILINE
                 )
-                newCheckoutsTxt = reg.sub(
+                new_checkouts_txt = reg.sub(
                     '    {0}\n{1}\n'.format(package_name, fixes_text),
                     checkoutstxt
                 )
@@ -157,8 +160,8 @@ class CheckoutsFile(UserDict):
                     '^[\s]*{0}\n'.format(package_name),
                     re.MULTILINE
                 )
-                newCheckoutsTxt = reg.sub('', checkoutstxt)
-            f.write(newCheckoutsTxt)
+                new_checkouts_txt = reg.sub('', checkoutstxt)
+            f.write(new_checkouts_txt)
 
     def __delitem__(self, package_name):
         return self.__setitem__(package_name, False)

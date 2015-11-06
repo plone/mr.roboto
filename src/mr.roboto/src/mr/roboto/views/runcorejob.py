@@ -5,9 +5,9 @@ from github import InputGitTreeElement
 from mr.roboto import templates
 from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import NewCoreDevPush
-from mr.roboto.security import validategithub
+from mr.roboto.security import validate_github
 from mr.roboto.subscriber import get_info_from_commit
-from mr.roboto.views.runhooks import getSourcesAndCheckouts
+from mr.roboto.views.runhooks import get_sources_and_checkouts
 
 import datetime
 import json
@@ -40,8 +40,8 @@ class GMT1(datetime.tzinfo):
 
 
 @runCoreTests.post()
-@validategithub
-def runFunctionCoreTests(request):
+@validate_github
+def run_function_core_tests(request):
     """When we are called by GH we want to run the jenkins builds
 
     It's called for each push on the plone repo, so we look which tests needs
@@ -123,7 +123,7 @@ def runFunctionCoreTests(request):
             'Commit to coredev - do nothing'
         )
         if source_or_checkout:
-            getSourcesAndCheckouts(request)
+            get_sources_and_checkouts(request)
 
     else:
         # It's not a commit to coredev repo
@@ -151,8 +151,8 @@ def runFunctionCoreTests(request):
         for pv in versions_to_commit:
             # commit to the branch
             add_log(request, 'github commit', 'LETS COMMIT ON COREDEV')
-            ghObject = request.registry.settings['github']
-            org = ghObject.get_organization('plone')
+            gh = request.registry.settings['github']
+            org = gh.get_organization('plone')
             repo = org.get_repo('buildout.coredev')
             head_ref = repo.get_git_ref('heads/{0}'.format(pv))
             latest_commit = repo.get_git_commit(head_ref.object.sha)

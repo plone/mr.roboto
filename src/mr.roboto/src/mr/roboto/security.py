@@ -6,7 +6,7 @@ from pyramid.request import Request
 import hmac
 
 
-def validategithub(fn):
+def validate_github(fn):
     def wrapped(request):
         if 'X-Hub_Signature' in request.headers:
             sha1_gh = request.headers['X-Hub_Signature']
@@ -22,7 +22,7 @@ def validategithub(fn):
     return wrapped
 
 
-def validatetoken(fn):
+def validate_token(fn):
     def wrapped(request):
         token = request.token
         if token == request.registry.settings['api_key']:
