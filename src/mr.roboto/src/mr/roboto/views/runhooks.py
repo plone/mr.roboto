@@ -57,13 +57,11 @@ def getSourcesAndCheckouts(request):
             if checkout != '':
                 checkouts_dict[plone_version].append(checkout)
 
-    sf = open(sources_file, 'w')
-    sf.write(pickle.dumps(sources_dict))
-    sf.close()
+    with open(sources_file, 'w') as sf:
+        sf.write(pickle.dumps(sources_dict))
 
-    sf = open(checkouts_file, 'w')
-    sf.write(pickle.dumps(checkouts_dict))
-    sf.close()
+    with open(checkouts_file, 'w') as sf:
+        sf.write(pickle.dumps(checkouts_dict))
 
 
 @createGithubPostCommitHooks.get()
