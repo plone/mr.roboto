@@ -24,7 +24,7 @@ setup(
     keywords='',
     author='',
     author_email='',
-    url='http://svn.plone.org/svn/collective/',
+    url='https://github.com/plone/mr.roboto',
     license='gpl',
     packages=find_packages('src'),
     package_dir={'': 'src'},
