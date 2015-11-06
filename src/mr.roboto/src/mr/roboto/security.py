@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-
 from hashlib import sha1
 from pyramid.decorator import reify
 from pyramid.request import Request
