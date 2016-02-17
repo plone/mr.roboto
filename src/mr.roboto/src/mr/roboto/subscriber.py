@@ -30,6 +30,7 @@ def get_info_from_commit(commit):
         'diff': diff,
         'files': files,
         'short_commit_msg': short_commit_msg,
+        'full_commit_msg': commit['message'],
         'reply_to': reply_to,
         'sha': commit['id']
     }

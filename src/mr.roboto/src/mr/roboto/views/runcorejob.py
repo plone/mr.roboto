@@ -84,6 +84,7 @@ def run_function_core_tests(request):
     commits_info = []
     timestamp = datetime.datetime.now(GMT1()).isoformat()
     fake = False
+    skip = False
     source_or_checkout = False
 
     commit_data = None
@@ -95,6 +96,8 @@ def run_function_core_tests(request):
         commits_info.append(commit_data)
         if '[fc]' in commit_data['short_commit_msg']:
             fake = True
+        if '[ci skip]' in commit_data['full_commit_msg']:
+            skip = True
         # prepare a changeset text message
         data = {
             'push': payload,
@@ -111,7 +114,7 @@ def run_function_core_tests(request):
         message = 'Commit on ' + repo + ' ' + branch + ' ' + commit['id']
         add_log(request, commit_data['reply_to'], message)
 
-    if not fake:
+    if not fake and not skip:
         request.registry.notify(NewCoreDevPush(payload, request))
 
     # In case is a push to buildout-coredev
@@ -129,7 +132,7 @@ def run_function_core_tests(request):
         # It's not a commit to coredev repo
         # Look at DB which plone version needs to run tests
         versions_to_commit = []
-        if (repo, branch) in sources:
+        if not skip and (repo, branch) in sources:
             versions_to_commit = sources[(repo, branch)]
             for pv in versions_to_commit:
                 if repo_name not in checkouts[pv]:
@@ -143,6 +146,9 @@ def run_function_core_tests(request):
                             payload['pusher']['email']
                         )
                     )
+        elif skip:
+            msg = 'Commit skipping CI - %s/%s do nothing'
+            add_log(request, who, msg.format(repo, branch))
         else:
             # Error repo not sources
             msg = 'Commit not in sources - %s/%s do nothing'
