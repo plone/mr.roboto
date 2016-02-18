@@ -153,7 +153,7 @@ def run_function_core_tests(request):
                         )
                     )
         elif skip:
-            msg = 'Commit skipping CI - %s/%s do nothing'
+            msg = 'Commit skipping CI - {0}/{1} do nothing'
             add_log(request, who, msg.format(repo, branch))
         else:
             # Error repo not sources
