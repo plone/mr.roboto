@@ -157,7 +157,7 @@ def run_function_core_tests(request):
             add_log(request, who, msg.format(repo, branch))
         else:
             # Error repo not sources
-            msg = 'Commit not in sources - %s/%s do nothing'
+            msg = 'Commit not in sources - {0}/{1} do nothing'
             add_log(request, who, msg.format(repo, branch))
 
         for pv in versions_to_commit:
