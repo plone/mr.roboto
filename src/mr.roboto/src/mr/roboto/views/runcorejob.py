@@ -94,8 +94,6 @@ def run_function_core_tests(request):
         # get the commit data structure
         commit_data = get_info_from_commit(commit)
         commits_info.append(commit_data)
-        add_log(request, commit_data['reply_to'],
-                commit_data['full_commit_msg'])
         if '[fc]' in commit_data['short_commit_msg']:
             fake = True
         if '[ci skip]' in commit_data['full_commit_msg']:
@@ -114,10 +112,6 @@ def run_function_core_tests(request):
         timestamp = commit['timestamp']
         # For logging
         message = 'Commit on ' + repo + ' ' + branch + ' ' + commit['id']
-        if fake:
-            message += ' Fake.'
-        if skip:
-            message += ' Skip.'
         add_log(request, commit_data['reply_to'], message)
 
     if not fake and not skip:
