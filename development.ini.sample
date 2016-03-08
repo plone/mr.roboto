@@ -25,7 +25,7 @@ jenkins_url = http://jenkins.plone.org/
 jenkins_username = user
 jenkins_password = user
 
-plone_versions = ['4.2', '4.3', '4.4', '5.0']
+plone_versions = ['4.2', '4.3', '5.0', '5.1']
 
 db_name = roboto
 
