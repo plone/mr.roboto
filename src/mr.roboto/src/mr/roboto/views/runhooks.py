@@ -81,7 +81,6 @@ def create_github_post_commit_hooks_view(request):
 
     # hooks URL
     commit_url = roboto_url + 'run/corecommit'
-    pull_url = roboto_url + 'run/pullrequest'
 
     messages = []
     # set hooks on github
@@ -104,8 +103,8 @@ def create_github_post_commit_hooks_view(request):
                     hook.delete()
 
         # Add the new hooks
-        msg = 'Creating hook {0} and {1}'
-        add_log(request, 'github', msg.format(commit_url, pull_url))
+        msg = 'Creating hook {0} on {1}'
+        add_log(request, 'github', msg.format(commit_url, repo.name))
         messages.append('Creating hook ' + commit_url)
         try:
             if debug:
