@@ -10,7 +10,6 @@ github_password = X
 
 roboto_url = http://localhost:6543/
 api_key = 
-core_pulls_db = pulls.txt
 
 mail.host = smtp.gmail.com
 mail.port = X
@@ -26,8 +25,6 @@ jenkins_username = user
 jenkins_password = user
 
 plone_versions = ['4.2', '4.3', '5.0', '5.1']
-
-db_name = roboto
 
 pyramid.reload_templates = true
 pyramid.debug_authorization = false

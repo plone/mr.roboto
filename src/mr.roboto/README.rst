@@ -3,33 +3,6 @@
 Introduction
 ============
 
-DB
-==
-
-Pushes
-------
-
-Stores the pushes we did to plone packages
-
- * data (commit_info)
- * repo
- * branch
- * who
- * payload
- * date
- * internal_id
-
-Jenkins Jobs
-------------
-
-Stores the jobs that are running on jenkins
-
- * push_internal_id
- * job_name (job on jenkins)
- * jk_id (push_internal_id + job_name)
- * type ('core', 'plip')
-
-
 WebServices
 ===========
 
