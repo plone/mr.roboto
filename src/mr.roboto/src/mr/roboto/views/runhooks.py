@@ -116,5 +116,5 @@ def create_github_post_commit_hooks_view(request):
                 }
                 repo.create_hook('web', data, 'push', True)
         except GithubException, e:
-            add_log(request, 'github', e)
+            logging.exception('on repo {0}'.format(repo.name))
     return json.dumps(messages)
