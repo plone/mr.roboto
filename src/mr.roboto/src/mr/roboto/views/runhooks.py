@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
+from github.GithubException import GithubException
 from mr.roboto.buildout import PloneCoreBuildout
 from mr.roboto.security import validate_token
 
@@ -115,6 +116,6 @@ def create_github_post_commit_hooks_view(request):
                     'secret': request.registry.settings['api_key']
                 }
                 repo.create_hook('web', data, 'push', True)
-        except Exception:
-            pass
+        except GithubException, e:
+            add_log(request, 'github', e)
     return json.dumps(messages)
