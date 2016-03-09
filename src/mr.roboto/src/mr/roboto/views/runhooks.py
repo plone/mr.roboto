@@ -114,7 +114,7 @@ def create_github_post_commit_hooks_view(request):
                     'url': commit_url,
                     'secret': request.registry.settings['api_key']
                 }
-                repo.create_hook('web', data, 'push', True)
+                repo.create_hook('web', data, ['push', ], True)
         except GithubException, e:
             logging.exception('on repo {0}'.format(repo.name))
     return json.dumps(messages)
