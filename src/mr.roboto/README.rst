@@ -1,5 +1,6 @@
 .. contents::
 
+============
 Introduction
 ============
 
@@ -17,5 +18,4 @@ WebServices
 /run/githubcommithooks
 
   Security : parameter based ?token=XXXXX
-  Creates github post-commit hooks to all plone repositories in
-  buildout.coredev sources.cfg.
+  Creates github post-commit hooks to all plone repositories in buildout.coredev sources.cfg.
