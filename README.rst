@@ -50,3 +50,22 @@ WebServices
   Creates github post-commit hooks to all plone repositories in
   buildout.coredev sources.cfg.
 
+
+Development
+===========
+
+To test changes locally,
+do the following:
+
+- rename ``development.ini.sample`` to ``development.ini`` and edit as needed
+- run buildout::
+
+      virtualenv .
+      source bin/activate
+      bin/buildout
+
+- start pyramid::
+
+      bin/pserve development.ini --reload
+
+- *hack away!*
