@@ -1,35 +1,29 @@
 [app:mr.roboto]
 use = egg:mr.roboto
 
-cookie.secret = seekrit
+debug = True
+api_key = trololo
 
-clau_compartida = seekrit
+mail.host = smtp.gmail.com
+mail.port = 587
+mail.tls = true
+mail.username = X
+mail.password = X
+
+plone_versions = ['4.3', '5.0', '5.1']
+
+sources_file = sources.pickle
+checkouts_file = checkouts.pickle
+
+roboto_url = http://localhost:6543/
 
 github_user = X
 github_password = X
 
-roboto_url = http://localhost:6543/
-api_key = 
-
-mail.host = smtp.gmail.com
-mail.port = X
-mail.tls = true
-mail.ssl = true
-mail.username = X
-mail.password = X
-
-callback_url = http://localhost:6543
-
-jenkins_url = http://jenkins.plone.org/
-jenkins_username = user
-jenkins_password = user
-
-plone_versions = ['4.2', '4.3', '5.0', '5.1']
-
 pyramid.reload_templates = true
-pyramid.debug_authorization = false
-pyramid.debug_notfound = false
-pyramid.debug_routematch = false
+pyramid.debug_authorization = true
+pyramid.debug_notfound = true
+pyramid.debug_routematch = true
 pyramid.debug_templates = true
 pyramid.default_locale_name = en
 pyramid.includes = pyramid_debugtoolbar
