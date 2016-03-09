@@ -190,12 +190,12 @@ class PloneCoreBuildout(object):
     def __init__(self, core_version=None):
         self.core_version = core_version
         self.location = mkdtemp()
-        self.repo = self._clone()
+        self.clone()
         self.sources = SourcesFile(self.location + '/sources.cfg')
         self.versions = VersionsFile(self.location + '/versions.cfg')
         self.checkouts = CheckoutsFile(self.location + '/checkouts.cfg')
 
-    def _clone(self):
+    def clone(self):
         logger.info(
             'Cloning github repository {0}, branch={1}'.format(
                 self.location,
