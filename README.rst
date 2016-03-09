@@ -1,60 +1,52 @@
+.. -*- coding: utf-8 -*-
+
 =========
 mr.roboto
 =========
+The main goal of mr.roboto is to make sure `Plone's Jenkins CI <http://jenkins.plone.org>`_ test every single change made by Plone developers.
 
-The main goal of mr.roboto is to maintain sync between jenkins and github, taking
-care of the specific user cases of plone architecture.
+This way not only Plone contributors will be promptly notified (by Jenkins) that a change broke the tests,
+but at the same time,
+and most importantly,
+they will be able to know exactly what change broke the build.
 
 Use Cases
 =========
 
 See log
 -------
+To see the log that's being processed:
 
-To see the log that's being processed
+http://jenkins.plone.org/roboto/log?token=XXXXX
 
-https://jenkins.plone.org/roboto/log?token=XXXXX
+Autoconfigure hooks
+-------------------
+mr.roboto needs to get notified whenever a change has been made on a Plone core package,
+so it can take all the necessary actions to ensure our CI system gets notified,
+if needed,
+and runs tests for certain Plone versions.
 
+For that, mr.roboto needs to add a hook to all Plone Github repositories.
 
-Autoconfigure the github repositories that are on core-dev sources
-------------------------------------------------------------------
+At the same time it removes all previously installed hooks to be sure no cruft is left behind.
 
-It scans all the github repositories on core-dev sources and adds as hook the mr.roboto
-webservices. It will clean all the hooks on plone core-dev packages.
+To do so, call this URL:
 
-Who to call :
-
-https://jenkins.plone.org/roboto/run/githubcommithooks?token=XXXXX
-
+http://jenkins.plone.org/roboto/run/githubcommithooks?token=XXXXX
 
 There is a commit to a package that's on the core-dev sources
 -------------------------------------------------------------
+The hook installed on all Plone Github repositories notify this end-point whenever a change happens in them.
 
+This way mr.roboto can make all the needed actions to ensure our CI setup is notified and runs the necessary jobs.
 
+The URL that's being called is:
 
-There is a pull request to a package that's on the core-dev sources
--------------------------------------------------------------------
-
-
-WebServices
-===========
-
-/run/corecommit
-
-  Security : parameter based ?token=XXXXX
-  It runs the jobs from jenkins responsible of the core-dev testing
-
-/run/githubcommithooks
-
-  Security : parameter based ?token=XXXXX
-  Creates github post-commit hooks to all plone repositories in
-  buildout.coredev sources.cfg.
-
+http://jenkins.plone.org/roboto/run/corecommit?token=XXXXX
 
 Development
 ===========
-
-To test changes locally,
+To test mr.roboto locally,
 do the following:
 
 - rename ``development.ini.sample`` to ``development.ini`` and edit as needed
