@@ -54,7 +54,7 @@ def create_github_post_commit_hooks_view(request):
         messages.append('Creating hook {0}'.format(commit_url))
         try:
             if debug:
-                print 'Debug creating hook'
+                logger.info('Debug creating hook')
             else:
                 config = {
                     'url': commit_url,
@@ -62,6 +62,6 @@ def create_github_post_commit_hooks_view(request):
                 }
                 repo.create_hook('web', config, ['push', ], True)
         except GithubException:
-            logging.exception('Error creating hook on {0}'.format(repo.name))
+            logger.exception('Error creating hook on {0}'.format(repo.name))
 
     return json.dumps(messages)
