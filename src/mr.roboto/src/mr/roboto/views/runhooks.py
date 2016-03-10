@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
 from github.GithubException import GithubException
-from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.security import validate_token
 
 import json
@@ -29,9 +28,6 @@ def create_github_post_commit_hooks_view(request):
     debug = request.registry.settings['debug']
     github = request.registry.settings['github']
     roboto_url = request.registry.settings['roboto_url']
-
-    # update
-    get_sources_and_checkouts(request)
 
     # hooks URL
     commit_url = '{0}/run/corecommit'.format(roboto_url)
