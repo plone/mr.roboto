@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.security import validate_request_token
 from pyramid.view import view_config
 
+import json
 import os
 import pickle
 
@@ -45,3 +47,10 @@ def checkout(context, request):
     with open(checkouts_file) as f:
         d = pickle.load(f)
     return d
+
+
+@view_config(route_name='update_pickles', renderer='json')
+@validate_request_token
+def update_pickles(context, request):
+    get_sources_and_checkouts(request)
+    return json.dumps({'message': 'updated!'})

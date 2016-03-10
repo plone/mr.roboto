@@ -59,6 +59,7 @@ def main(global_config, **settings):
     config.add_route('log', '/log')
     config.add_route('sources', '/sources.json')
     config.add_route('checkouts', '/checkouts.json')
+    config.add_route('update_pickles', '/update-sources-and-checkouts')
 
     # Automatic views
     config.scan('mr.roboto.views')
