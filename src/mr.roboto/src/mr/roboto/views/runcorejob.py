@@ -3,11 +3,11 @@ from cornice import Service
 from github import InputGitAuthor
 from github import InputGitTreeElement
 from mr.roboto import templates
+from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import NewCoreDevPush
 from mr.roboto.security import validate_github
 from mr.roboto.subscriber import get_info_from_commit
-from mr.roboto.views.runhooks import get_sources_and_checkouts
 
 import datetime
 import json
