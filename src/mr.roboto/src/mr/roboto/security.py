@@ -12,13 +12,15 @@ def validate_github(fn):
             sha1_gh = request.headers['X-Hub_Signature']
             hmac_value = hmac.new(
                 request.registry.settings['api_key'],
-                request.body, sha1
+                request.body,
+                sha1,
             )
             sha1_compute = hmac_value.hexdigest()
             if sha1_gh == 'sha1=' + sha1_compute:
                 return fn(request)
-        else:
-            return {'success': False, 'message': 'Token not active'}
+
+        return {'success': False, 'message': 'Token not active'}
+
     return wrapped
 
 
@@ -27,8 +29,9 @@ def validate_token(fn):
         token = request.token
         if token == request.registry.settings['api_key']:
             return fn(request)
-        else:
-            return {'success': False, 'message': 'Token not active'}
+
+        return {'success': False, 'message': 'Token not active'}
+
     return wrapped
 
 
