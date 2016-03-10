@@ -9,12 +9,7 @@ import logging
 import pickle
 
 
-debug = False
 logger = logging.getLogger('mr.roboto')
-
-
-def add_log(request, who, message):
-    logger.info(who + ' ' + message)
 
 
 createGithubPostCommitHooks = Service(
@@ -34,12 +29,8 @@ def get_sources_and_checkouts(request):
 
     # Clean Core Packages DB and sync to GH
     for plone_version in actual_plone_versions:
-        msg = 'Checking sources and checkouts from plone {0}'
-        add_log(
-            request,
-            'roboto',
-            msg.format(plone_version)
-        )
+        msg = 'roboto Checking sources and checkouts from plone {0}'
+        logger.info(msg.format(plone_version))
 
         # Add the core package to mongo
         buildout = PloneCoreBuildout(plone_version)
@@ -94,15 +85,15 @@ def create_github_post_commit_hooks_view(request):
 
             if hook.name == 'web' and \
                     hook.config['url'].find('roboto/run/') != -1:
-                add_log(request, 'github', 'Removing hook ' + str(hook.config))
+                logger.info('github Removing hook ' + str(hook.config))
                 if debug:
                     print 'Debug removing hook'
                 else:
                     hook.delete()
 
         # Add the new hooks
-        msg = 'Creating hook {0} on {1}'
-        add_log(request, 'github', msg.format(commit_url, repo.name))
+        msg = 'github Creating hook {0} on {1}'
+        logger.info(msg.format(commit_url, repo.name))
         messages.append('Creating hook ' + commit_url)
         try:
             if debug:
