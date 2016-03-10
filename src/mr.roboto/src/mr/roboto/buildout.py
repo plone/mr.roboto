@@ -14,7 +14,9 @@ import re
 
 logger = logging.getLogger('mr.roboto')
 
-PATH_RE = '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)'
+PATH_RE = re.compile(
+    '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)'
+)
 
 
 class Source(object):
@@ -46,7 +48,7 @@ class Source(object):
     @property
     def path(self):
         if self.url:
-            match = re.match(PATH_RE, self.url)
+            match = PATH_RE.match(self.url)
             if match:
                 return match.groupdict()['path']
         return None
@@ -61,7 +63,7 @@ class VersionsFile(object):
     def versions(self):
         config = ConfigParser(interpolation=ExtendedInterpolation())
         with open(self.file_location) as f:
-            config.readfp(f)
+            config.read_file(f)
         return config['versions']
 
     def __contains__(self, package_name):
@@ -110,7 +112,7 @@ class SourcesFile(UserDict):
         config = ConfigParser(interpolation=ExtendedInterpolation())
         config.optionxform = str
         with open(self.file_location) as f:
-            config.readfp(f)
+            config.read_file(f)
         sources_dict = OrderedDict()
         for name, value in config['sources'].items():
             source = Source().create_from_string(value)
@@ -133,7 +135,7 @@ class CheckoutsFile(UserDict):
     def data(self):
         config = ConfigParser(interpolation=ExtendedInterpolation())
         with open(self.file_location) as f:
-            config.readfp(f)
+            config.read_file(f)
         checkouts = config.get('buildout', 'auto-checkout')
         checkout_list = checkouts.split('\n')
         return checkout_list
@@ -167,15 +169,6 @@ class CheckoutsFile(UserDict):
     def __delitem__(self, package_name):
         return self.__setitem__(package_name, False)
 
-    # def setAutoCheckouts(self, checkouts_list):
-    #     config = ConfigParser(interpolation=ExtendedInterpolation())
-    #     with open(self.file_location) as f:
-    #         config.readfp(f)
-    #     checkouts = '\n'.join(checkouts_list)
-    #     config.set('buildout', 'auto-checkout', checkouts)
-    #     with open(self.file_location, 'w') as f:
-    #         config.write(f)
-
     def add(self, package_name):
         # TODO: Handle test-fix-only as well
         return self.__setitem__(package_name, True)
@@ -192,9 +185,15 @@ class PloneCoreBuildout(object):
         self.core_version = core_version
         self.location = mkdtemp()
         self.clone()
-        self.sources = SourcesFile(self.location + '/sources.cfg')
-        self.versions = VersionsFile(self.location + '/versions.cfg')
-        self.checkouts = CheckoutsFile(self.location + '/checkouts.cfg')
+        self.sources = SourcesFile(
+            '{0}/sources.cfg'.format(self.location)
+        )
+        self.versions = VersionsFile(
+            '{0}/versions.cfg'.format(self.location)
+        )
+        self.checkouts = CheckoutsFile(
+            '{0}/checkouts.cfg'.format(self.location)
+        )
 
     def clone(self):
         logger.info(
