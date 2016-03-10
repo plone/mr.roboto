@@ -24,7 +24,7 @@ def validate_github(fn):
     return wrapped
 
 
-def validate_token(fn):
+def validate_service_token(fn):
     def wrapped(request):
         token = request.token
         if token == request.registry.settings['api_key']:

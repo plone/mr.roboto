@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
 from github.GithubException import GithubException
-from mr.roboto.security import validate_token
+from mr.roboto.security import validate_service_token
 
 import json
 import logging
@@ -18,7 +18,7 @@ createGithubPostCommitHooks = Service(
 
 
 @createGithubPostCommitHooks.get()
-@validate_token
+@validate_service_token
 def create_github_post_commit_hooks_view(request):
     """Re-create hooks on github
 
