@@ -38,7 +38,3 @@ class RequestWithAttributes(Request):
     def token(self):
         if 'token' in self.GET:
             return self.GET['token']
-
-    @reify
-    def core(self):
-        return self.registry.settings['core']
