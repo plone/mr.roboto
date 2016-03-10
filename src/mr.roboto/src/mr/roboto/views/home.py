@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
-from mr.roboto.security import validate_token
 from pyramid.view import view_config
 
-import logging
 import pickle
-
-
-log = logging.getLogger('HOME')
 
 
 @view_config(route_name='home', renderer='mr.roboto:templates/home.pt')
@@ -16,10 +11,13 @@ def home_page(context, request):
 
 
 @view_config(route_name='log', renderer='mr.roboto:templates/log.pt')
-@validate_token
 def log_page(context, request):
-    with open('roboto.log') as f:
-        log = f.read()
+    token = request.token
+    if token == request.registry.settings['api_key']:
+        with open('roboto.log') as f:
+            log = f.read()
+    else:
+        log = 'Wrong/no token provided'
     return dict(log=log)
 
 
