@@ -21,51 +21,51 @@ createGithubPostCommitHooks = Service(
 @createGithubPostCommitHooks.get()
 @validate_token
 def create_github_post_commit_hooks_view(request):
-    # sources_dict
-    # {('package_path', 'branch'): ['5.0', '4.3']}
-    #
-    # checkouts_dict
-    # {'5.0': ['package', '...']}
+    """Re-create hooks on github
+
+    Removes all existing hooks on all repositories on github plone organization
+    and creates them anew.
+    """
     debug = request.registry.settings['debug']
-    # We should remove all the actual hooks
     github = request.registry.settings['github']
     roboto_url = request.registry.settings['roboto_url']
 
+    # update
     get_sources_and_checkouts(request)
 
     # hooks URL
-    commit_url = roboto_url + 'run/corecommit'
+    commit_url = '{0}/run/corecommit'.format(roboto_url)
 
     messages = []
-    # set hooks on github
     for repo in github.get_organization('plone').get_repos():
 
+        # Remove old hooks
         hooks = repo.get_hooks()
-
-        # Remove the old hooks
         for hook in hooks:
-
             if hook.name == 'web' and \
                     hook.config['url'].find('roboto/run/') != -1:
-                logger.info('github Removing hook ' + str(hook.config))
+                logger.info(
+                    'github Removing hook {0}'.format(str(hook.config))
+                )
                 if debug:
-                    print 'Debug removing hook'
+                    logger.info('Debug removing hook {0}'.format(repo.name))
                 else:
                     hook.delete()
 
-        # Add the new hooks
+        # Add new hooks
         msg = 'github Creating hook {0} on {1}'
         logger.info(msg.format(commit_url, repo.name))
-        messages.append('Creating hook ' + commit_url)
+        messages.append('Creating hook {0}'.format(commit_url))
         try:
             if debug:
                 print 'Debug creating hook'
             else:
-                data = {
+                config = {
                     'url': commit_url,
                     'secret': request.registry.settings['api_key']
                 }
-                repo.create_hook('web', data, ['push', ], True)
-        except GithubException, e:
-            logging.exception('on repo {0}'.format(repo.name))
+                repo.create_hook('web', config, ['push', ], True)
+        except GithubException:
+            logging.exception('Error creating hook on {0}'.format(repo.name))
+
     return json.dumps(messages)
