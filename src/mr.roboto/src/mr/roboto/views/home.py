@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from pyramid.view import view_config
 
+import os
 import pickle
 
 
@@ -12,13 +13,19 @@ def home_page(context, request):
 
 @view_config(route_name='log', renderer='mr.roboto:templates/log.pt')
 def log_page(context, request):
+    filename = 'roboto.log'
+    file_size = os.stat(filename).st_size
+
     token = request.token
     if token == request.registry.settings['api_key']:
-        with open('roboto.log') as f:
+        with open(filename) as f:
             log = f.read()
     else:
         log = 'Wrong/no token provided'
-    return dict(log=log)
+    return {
+        'file_size': file_size,
+        'log': log,
+    }
 
 
 @view_config(route_name='sources', renderer='json')
