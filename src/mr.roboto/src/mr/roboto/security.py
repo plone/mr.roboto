@@ -35,6 +35,17 @@ def validate_service_token(fn):
     return wrapped
 
 
+def validate_request_token(fn):
+    def wrapped(context, request):
+        token = request.token
+        if token == request.registry.settings['api_key']:
+            return fn(context, request)
+
+        return {'success': False, 'message': 'Token not active'}
+
+    return wrapped
+
+
 class RequestWithAttributes(Request):
 
     @reify

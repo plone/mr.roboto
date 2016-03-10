@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from mr.roboto.security import validate_request_token
 from pyramid.view import view_config
 
 import os
@@ -12,16 +13,14 @@ def home_page(context, request):
 
 
 @view_config(route_name='log', renderer='mr.roboto:templates/log.pt')
+@validate_request_token
 def log_page(context, request):
     filename = 'roboto.log'
     file_size = os.stat(filename).st_size
 
-    token = request.token
-    if token == request.registry.settings['api_key']:
-        with open(filename) as f:
-            log = f.read()
-    else:
-        log = 'Wrong/no token provided'
+    with open(filename) as f:
+        log = f.read()
+
     return {
         'file_size': file_size,
         'log': log,
