@@ -229,7 +229,7 @@ def get_sources_and_checkouts(request):
 
         for source in buildout.sources:
             source_obj = buildout.sources[source]
-            if source_obj.path is not None:
+            if source_obj.path:
                 key = (source_obj.path, source_obj.branch)
                 if key not in sources_dict:
                     sources_dict[key] = [plone_version]
