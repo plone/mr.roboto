@@ -15,8 +15,8 @@ def home_page(context, request):
     return dict(info=info)
 
 
-@validate_token
 @view_config(route_name='log', renderer='mr.roboto:templates/log.pt')
+@validate_token
 def log_page(context, request):
     with open('roboto.log') as f:
         log = f.read()
