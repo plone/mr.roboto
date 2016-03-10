@@ -32,9 +32,9 @@ def log_page(context, request):
 def sources(context, request):
     sources_file = request.registry.settings['sources_file']
     with open(sources_file) as f:
-        d = pickle.load(f)
+        data = pickle.load(f)
     output = {}
-    for key, value in d.items():
+    for key, value in data.items():
         new_key = '{0}/{1}'.format(key[0], key[1])
         output[new_key] = value
     return output

@@ -1,40 +1,42 @@
 <html>
-    <head>
-        <title>Mr. Roboto</title>
+<head>
+  <title>Mr. Roboto</title>
 
-        <link href='http://fonts.googleapis.com/css?family=Raleway:400,700' rel='stylesheet' type='text/css'/>
+  <link
+      href='http://fonts.googleapis.com/css?family=Raleway:400,700'
+      rel='stylesheet'
+      type='text/css'/>
 
-        <style>
-            body {
-                background-color: rgb(0,149,211);
-                font-family: 'Raleway', sans-serif;
-            }
-            #logo {
-                width: 100%;
-                height: 100%;
-                background: url('static/roboto.png') no-repeat 50% 50%;
-            }
-            #options {
-                position: absolute;
-                top: 10px;
-                left: 10px;
-            }
-            a {
-                text-decoration: none;
-            }
-            a:link {
-                color: white;
-            }
-            a:visited {
-                color: white;
-            }
-            ul {
-                list-style-type: none
-            }
-        </style>
-    </head>
-    <body>
-        <div id="logo">
-        </div>
-    </body>
+  <style>
+    body {
+      background-color: rgb(0,149,211);
+      font-family: 'Raleway', sans-serif;
+    }
+    #logo {
+      width: 100%;
+      height: 100%;
+      background: url('static/roboto.png') no-repeat 50% 50%;
+    }
+    #options {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+    a {
+      text-decoration: none;
+    }
+    a:link {
+      color: white;
+    }
+    a:visited {
+      color: white;
+    }
+    ul {
+      list-style-type: none
+    }
+  </style>
+</head>
+<body>
+  <div id="logo"></div>
+</body>
 </html>
