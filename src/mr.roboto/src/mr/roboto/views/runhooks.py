@@ -20,22 +20,23 @@ createGithubPostCommitHooks = Service(
 
 
 def get_sources_and_checkouts(request):
+    """Get sources.cfg and checkouts.cfg from buildout.coredev
+
+    Get them for all major plone releases
+    (see plone_versions on mr.roboto's configuration),
+    process and store their data on pickle files for later usage.
+    """
     sources_dict = {}
     checkouts_dict = {}
-    # We should remove all the actual hooks
-    sources_file = request.registry.settings['sources_file']
-    checkouts_file = request.registry.settings['checkouts_file']
+
     actual_plone_versions = request.registry.settings['plone_versions']
 
-    # Clean Core Packages DB and sync to GH
     for plone_version in actual_plone_versions:
-        msg = 'roboto Checking sources and checkouts from plone {0}'
+        msg = 'Checking sources and checkouts from plone {0}'
         logger.info(msg.format(plone_version))
-
-        # Add the core package to mongo
         buildout = PloneCoreBuildout(plone_version)
-        sources = buildout.sources.keys()
-        for source in sources:
+
+        for source in buildout.sources:
             source_obj = buildout.sources[source]
             if source_obj.path is not None:
                 key = (source_obj.path, source_obj.branch)
@@ -46,12 +47,14 @@ def get_sources_and_checkouts(request):
 
         checkouts_dict[plone_version] = []
         for checkout in buildout.checkouts.data:
-            if checkout != '':
+            if checkout:
                 checkouts_dict[plone_version].append(checkout)
 
+    sources_file = request.registry.settings['sources_file']
     with open(sources_file, 'w') as sf:
         sf.write(pickle.dumps(sources_dict))
 
+    checkouts_file = request.registry.settings['checkouts_file']
     with open(checkouts_file, 'w') as sf:
         sf.write(pickle.dumps(checkouts_dict))
 
