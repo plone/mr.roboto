@@ -14,16 +14,16 @@ templates = PageTemplateLoader(
 
 
 def main(global_config, **settings):
-    """This function returns a Pyramid WSGI application."""
+    """This function returns a Pyramid WSGI application"""
     config = Configurator(
         settings=settings,
         request_factory=RequestWithAttributes
     )
 
-    # adds cornice
+    # add webservice support
     config.include('cornice')
 
-    # adds pyramid_mailer
+    # adds mailer and chameleon templates
     config.include('pyramid_mailer')
     config.include('pyramid_chameleon')
 
@@ -39,10 +39,9 @@ def main(global_config, **settings):
     config.registry.settings['api_key'] = settings['api_key']
 
     # Debug
+    config.registry.settings['debug'] = False
     if 'debug' in settings:
         config.registry.settings['debug'] = (settings['debug'] == 'True')
-    else:
-        config.registry.settings['debug'] = False
 
     config.registry.settings['sources_file'] = settings['sources_file']
     config.registry.settings['checkouts_file'] = settings['checkouts_file']
