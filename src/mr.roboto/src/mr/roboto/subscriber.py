@@ -36,7 +36,7 @@ def get_info_from_commit(commit):
     }
 
 
-def send_to_missing_checkout(mailer, who, repo, branch, pv, email):
+def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
         subject='CHECKOUT ERROR {0} {1}'.format(repo, branch),
         sender='Jenkins Job FAIL <jenkins@plone.org>',
@@ -54,37 +54,38 @@ def send_to_missing_checkout(mailer, who, repo, branch, pv, email):
     mailer.send_immediately(msg, fail_silently=False)
 
 
-def send_to_cvs(payload, mailer, result=''):
-    # Send a mail
-    if len(payload['commits']) < 40:
-        # safeguard against github getting confused and sending us the entire
-        # history
-        for commit in payload['commits']:
+def mail_to_cvs(payload, mailer, result=''):
+    # safeguard against github getting confused and sending us the entire
+    # history
+    if len(payload['commits']) > 40:
+        return
 
-            commit_data = get_info_from_commit(commit)
+    for commit in payload['commits']:
 
-            data = {
-                'push': payload,
-                'commit': commit,
-                'files': '\n'.join(commit_data['files']),
-                'diff': commit_data['diff'],
-                'result': result
-            }
+        commit_data = get_info_from_commit(commit)
 
-            msg = Message(
-                subject='{0}/{1}: {2}'.format(
-                    payload['repository']['name'],
-                    payload['ref'].split('/')[-1],
-                    commit_data['short_commit_msg']),
-                sender='{0} <svn-changes@plone.org>'.format(
-                    commit['committer']['name']
-                ),
-                recipients=['plone-cvs@lists.sourceforge.net'],
-                body=templates['commit_email.pt'](**data),
-                extra_headers={'Reply-To': commit_data['reply_to']}
-            )
+        data = {
+            'push': payload,
+            'commit': commit,
+            'files': '\n'.join(commit_data['files']),
+            'diff': commit_data['diff'],
+            'result': result
+        }
 
-            mailer.send_immediately(msg, fail_silently=False)
+        msg = Message(
+            subject='{0}/{1}: {2}'.format(
+                payload['repository']['name'],
+                payload['ref'].split('/')[-1],
+                commit_data['short_commit_msg']),
+            sender='{0} <svn-changes@plone.org>'.format(
+                commit['committer']['name']
+            ),
+            recipients=['plone-cvs@lists.sourceforge.net'],
+            body=templates['commit_email.pt'](**data),
+            extra_headers={'Reply-To': commit_data['reply_to']}
+        )
+
+        mailer.send_immediately(msg, fail_silently=False)
 
 
 @subscriber(NewCoreDevPush)
@@ -93,16 +94,15 @@ def send_main_on_coredev(event):
     payload = event.payload
     msg = 'Sending mail because of push to coredev {0}'
     logger.info(msg.format(payload['repository']['name']))
-    send_to_cvs(payload, mailer)
+    mail_to_cvs(payload, mailer)
 
 
 @subscriber(CommitAndMissingCheckout)
 def send_main_on_missing_checkout(event):
     mailer = get_mailer(event.request)
-    msg = 'Sending mail because of push to coredev without correct checkout ' \
-          '{0} {1}'
+    msg = 'Sending mail because of push to coredev and no checkout {0} {1}'
     logger.info(msg.format(event.repo, event.who))
-    send_to_missing_checkout(
+    mail_missing_checkout(
         mailer,
         event.who,
         event.repo,
