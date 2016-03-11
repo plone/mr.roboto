@@ -44,6 +44,23 @@ The URL that's being called is:
 
 http://jenkins.plone.org/roboto/run/corecommit?token=XXXXX
 
+Get sources and checkouts
+-------------------------
+For debugging purposes,
+knowing what exactly mr.roboto has in its sources and checkouts can be really useful.
+
+http://jenkins.plone.org/roboto/sources.json
+
+http://jenkins.plone.org/roboto/checkouts.json
+
+Update sources and checkouts
+----------------------------
+If there is something wrong with sources or checkouts,
+or they are empty (new deployment),
+you can force them to be created:
+
+http://jenkins.plone.org/roboto/update-sources-and-checkouts?token=XXX
+
 Development
 ===========
 To test mr.roboto locally,
