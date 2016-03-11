@@ -10,7 +10,9 @@ import pickle
 
 @view_config(route_name='home', renderer='mr.roboto:templates/home.pt')
 def home_page(context, request):
-    info = {}
+    info = {
+        'roboto_url': request.registry.settings['roboto_url']
+    }
     return dict(info=info)
 
 
