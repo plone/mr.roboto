@@ -11,6 +11,12 @@ long_description = '{0}\n{1}\n{2}\n'.format(
     open('CHANGES.rst').read(),
 )
 
+test_requires = [
+    'pyramid_debugtoolbar',
+    'pytest',
+    'WebTest',
+]
+
 setup(
     name='mr.roboto',
     version=version,
@@ -42,12 +48,9 @@ setup(
         'setuptools',
     ],
     extras_require={
-        'test': [
-            'pyramid_debugtoolbar',
-            'pytest',
-            'WebTest',
-        ],
+        'test': test_requires,
     },
+    tests_require=test_requires,
     test_suite='mr.roboto.tests',
     entry_points="""
     [paste.app_factory]
