@@ -37,15 +37,19 @@ setup(
         'gitpython',
         'PyGithub',
         'pyramid_chameleon',
-        'pyramid_debugtoolbar',
         'pyramid_mailer',
-        'pytest',
         'requests',
         'setuptools',
-        'WebTest',
     ],
-    entry_points="""\
-      [paste.app_factory]
-      main = mr.roboto:main
-      """,
+    extras_require={
+        'test': [
+            'pyramid_debugtoolbar',
+            'pytest',
+            'WebTest',
+        ],
+    },
+    entry_points="""
+    [paste.app_factory]
+    main = mr.roboto:main
+    """,
 )
