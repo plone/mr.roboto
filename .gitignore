@@ -1,5 +1,7 @@
 bin
 eggs
+.eggs
+htmlcov
 parts
 *.egg-info
 .DS_Store
