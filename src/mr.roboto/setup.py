@@ -48,6 +48,7 @@ setup(
             'WebTest',
         ],
     },
+    test_suite='mr.roboto.tests',
     entry_points="""
     [paste.app_factory]
     main = mr.roboto:main
