@@ -10,6 +10,6 @@ class FunctionalTests(unittest.TestCase):
         from webtest import TestApp
         self.testapp = TestApp(app)
 
-    def test_run_corecommit(self):
+    def est_run_corecommit(self):
         res = self.testapp.get('/run/corecommit', status=200)
         self.assertTrue('Pyramid' in res.body)
