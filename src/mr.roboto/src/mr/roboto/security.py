@@ -16,7 +16,7 @@ def validate_github(fn):
                 sha1,
             )
             sha1_compute = hmac_value.hexdigest()
-            if sha1_gh == 'sha1=' + sha1_compute:
+            if sha1_gh == 'sha1={0}'.format(sha1_compute):
                 return fn(request)
 
         return {'success': False, 'message': 'Token not active'}
