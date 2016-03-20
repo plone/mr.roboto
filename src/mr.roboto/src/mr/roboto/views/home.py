@@ -20,12 +20,18 @@ def home_page(context, request):
 @validate_request_token
 def log_page(context, request):
     filename = 'roboto.log'
-    file_size = os.stat(filename).st_size
-
-    with open(filename) as f:
-        log = f.read()
+    try:
+        file_size = os.stat(filename).st_size
+        with open(filename) as f:
+            log = f.read()
+    except OSError:
+        return {
+            'success': False,
+            'message': 'File not found',
+        }
 
     return {
+        'success': True,
         'file_size': file_size,
         'log': log,
     }
@@ -34,8 +40,14 @@ def log_page(context, request):
 @view_config(route_name='sources', renderer='json')
 def sources(context, request):
     sources_file = request.registry.settings['sources_file']
-    with open(sources_file) as f:
-        data = pickle.load(f)
+    try:
+        with open(sources_file) as f:
+            data = pickle.load(f)
+    except IOError:
+        return {
+            'success': False,
+            'message': 'File not found',
+        }
     output = {}
     for key, value in data.items():
         new_key = '{0}/{1}'.format(key[0], key[1])
@@ -46,9 +58,15 @@ def sources(context, request):
 @view_config(route_name='checkouts', renderer='json')
 def checkout(context, request):
     checkouts_file = request.registry.settings['checkouts_file']
-    with open(checkouts_file) as f:
-        d = pickle.load(f)
-    return d
+    try:
+        with open(checkouts_file) as checkouts:
+            data = pickle.load(checkouts)
+    except IOError:
+        return {
+            'success': False,
+            'message': 'File not found',
+        }
+    return data
 
 
 @view_config(route_name='update_pickles', renderer='json')

@@ -13,7 +13,12 @@
   </style>
 </head>
 <body>
-  <p>file size: ${file_size} bytes</p>
-  <pre id="logo">${log}</pre>
+  <tal:element condition="success">
+    <p>file size: ${file_size} bytes</p>
+    <pre id="logo">${log}</pre>
+  </tal:element>
+  <tal:element condition="not: success">
+    <p>${message}</p>
+  </tal:element>
 </body>
 </html>
