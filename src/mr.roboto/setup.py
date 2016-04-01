@@ -12,6 +12,7 @@ long_description = '{0}\n{1}\n{2}\n'.format(
 )
 
 test_requires = [
+    'mock',
     'pyramid_debugtoolbar',
     'pytest',
     'WebTest',
