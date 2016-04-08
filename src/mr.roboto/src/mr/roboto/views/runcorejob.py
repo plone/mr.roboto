@@ -175,7 +175,9 @@ def run_function_core_tests(request):
         if source_or_checkout:
             get_sources_and_checkouts(request)
 
-        return json.dumps({'message': 'Thanks!'})
+        return json.dumps(
+            {'message': 'Thanks! Commit to coredev, nothing to do'}
+        )
 
     ##
     # It's not a commit to coredev repo
