@@ -2,6 +2,7 @@
 from mr.roboto import main
 from webtest import TestApp
 
+import mock
 import os
 import pickle
 import unittest
@@ -138,3 +139,21 @@ class SimpleViewsTest(unittest.TestCase):
             result.body,
         )
         self.clean_file(filename)
+
+    def test_update_pickles_security(self):
+        result = self.roboto.get('/update-sources-and-checkouts')
+        self.assertIn(
+            'Token not active',
+            result.body,
+        )
+
+    @mock.patch('mr.roboto.views.home.get_sources_and_checkouts')
+    def test_update_pickles(self, m1):
+        url = '/update-sources-and-checkouts?token={0}'.format(
+            self.settings['api_key']
+        )
+        result = self.roboto.get(url)
+        self.assertIn(
+            'updated!',
+            result.body,
+        )
