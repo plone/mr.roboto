@@ -49,9 +49,9 @@ def create_github_post_commit_hooks_view(request):
                     hook.delete()
 
         # Add new hooks
-        msg = 'github Creating hook {0} on {1}'
-        logger.info(msg.format(commit_url, repo.name))
-        messages.append('Creating hook {0}'.format(commit_url))
+        msg = 'github Creating hook {0} on {1}'.format(commit_url, repo.name)
+        logger.info(msg)
+        messages.append(msg)
         try:
             if debug:
                 logger.info('Debug creating hook')
