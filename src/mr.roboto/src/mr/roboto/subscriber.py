@@ -54,7 +54,7 @@ def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     mailer.send_immediately(msg, fail_silently=False)
 
 
-def mail_to_cvs(payload, mailer, result=''):
+def mail_to_cvs(payload, mailer):
     # safeguard against github getting confused and sending us the entire
     # history
     if len(payload['commits']) > 40:
@@ -69,7 +69,6 @@ def mail_to_cvs(payload, mailer, result=''):
             'commit': commit,
             'files': '\n'.join(commit_data['files']),
             'diff': commit_data['diff'],
-            'result': result
         }
 
         msg = Message(
