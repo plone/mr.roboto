@@ -1,0 +1,12 @@
+language: python
+python:
+  - '2.7'
+cache:
+  directories:
+    - $HOME/.cache/pip
+install:
+  - pip install zc.buildout
+  - buildout
+script:
+  - bin/code-analysis
+  - bin/py.test --cov=src src
