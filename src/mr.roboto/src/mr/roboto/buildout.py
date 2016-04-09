@@ -10,6 +10,7 @@ import logging
 import os
 import pickle
 import re
+import shutil
 
 
 logger = logging.getLogger('mr.roboto')
@@ -24,7 +25,7 @@ class Source(object):
     def __init__(self, protocol=None, url=None, push_url=None, branch=None):
         self.protocol = protocol
         self.url = url
-        self.push_url = push_url
+        self.pushurl = push_url
         self.branch = branch
 
     def create_from_string(self, source_string):
@@ -37,8 +38,8 @@ class Source(object):
                 setattr(self, key, value)
         self.protocol = protocol
         self.url = url
-        if self.push_url is not None:
-            self.push_url = self.push_url.split('=')[-1]
+        if self.pushurl is not None:
+            self.pushurl = self.pushurl.split('=')[-1]
         if self.branch is None:
             self.branch = 'master'
         else:
@@ -209,6 +210,9 @@ class PloneCoreBuildout(object):
             depth=1
         )
 
+    def cleanup(self):
+        shutil.rmtree(self.location)
+
 
 def get_sources_and_checkouts(request):
     """Get sources.cfg and checkouts.cfg from buildout.coredev
@@ -240,6 +244,8 @@ def get_sources_and_checkouts(request):
         for checkout in buildout.checkouts.data:
             if checkout:
                 checkouts_dict[plone_version].append(checkout)
+
+        buildout.cleanup()
 
     sources_file = request.registry.settings['sources_file']
     with open(sources_file, 'w') as sf:
