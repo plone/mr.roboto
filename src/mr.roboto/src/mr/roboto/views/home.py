@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import deque
 from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.security import validate_request_token
 from pyramid.view import view_config
@@ -22,8 +23,8 @@ def log_page(context, request):
     filename = 'roboto.log'
     try:
         file_size = os.stat(filename).st_size
-        with open(filename) as f:
-            log = f.read()
+        with open(filename) as log_file:
+            log = ''.join(deque(log_file, maxlen=200))
     except OSError:
         return {
             'success': False,

@@ -85,6 +85,26 @@ class SimpleViewsTest(unittest.TestCase):
         )
         self.clean_file(filename)
 
+    def test_log_view_truncated(self):
+        filename = 'roboto.log'
+        self.clean_file(filename)
+        with open(filename, 'w') as log:
+            for number in range(0, 300):
+                log.write('log line {0}\n'.format(number))
+
+        result = self.roboto.get(
+            '/log?token={0}'.format(self.settings['api_key'])
+        )
+        self.assertIn(
+            'log line 250',
+            result.body,
+        )
+        self.assertNotIn(
+            'log line 50',
+            result.body,
+        )
+        self.clean_file(filename)
+
     def test_checkouts_file_no_file(self):
         filename = self.settings['checkouts_file']
         self.clean_file(filename)
