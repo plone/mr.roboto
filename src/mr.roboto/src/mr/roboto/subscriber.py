@@ -88,18 +88,18 @@ def mail_to_cvs(payload, mailer):
 
 
 @subscriber(NewCoreDevPush)
-def send_main_on_coredev(event):
+def send_mail_on_coredev(event):
     mailer = get_mailer(event.request)
     payload = event.payload
-    msg = 'Sending mail because of push to coredev {0}'
+    msg = 'Sending mail due to a coredev push to {0}'
     logger.info(msg.format(payload['repository']['name']))
     mail_to_cvs(payload, mailer)
 
 
 @subscriber(CommitAndMissingCheckout)
-def send_main_on_missing_checkout(event):
+def send_mail_on_missing_checkout(event):
     mailer = get_mailer(event.request)
-    msg = 'Sending mail because of push to coredev and no checkout {0} {1}'
+    msg = 'Sending mail due to a coredev push and no checkout of {0} by {1}'
     logger.info(msg.format(event.repo, event.who))
     mail_missing_checkout(
         mailer,
