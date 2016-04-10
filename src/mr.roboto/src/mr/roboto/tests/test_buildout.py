@@ -19,11 +19,6 @@ Products.CMFCore = git git://github.com/plone/Products.CMFCore.git pushurl=git@g
 Products.CMFDiff = git git://github.com/plone/Products.CMFDiff.git
 """
 
-VERSIONS = """
-[versions]
-Products.CMFPlone = 5.1
-"""
-
 CHECKOUTS = """
 [buildout]
 auto-checkout =
@@ -41,7 +36,6 @@ class BuildoutTest(unittest.TestCase):
         )
 
         self._commit(SOURCES, filename='sources.cfg')
-        self._commit(VERSIONS, filename='versions.cfg')
         self._commit(CHECKOUTS, filename='checkouts.cfg')
         self.coredev_repo.create_head('4.3')
         self.coredev_repo.create_head('5.1')

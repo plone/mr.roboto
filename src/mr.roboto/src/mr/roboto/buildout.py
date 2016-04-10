@@ -55,54 +55,6 @@ class Source(object):
         return None
 
 
-class VersionsFile(object):
-
-    def __init__(self, file_location):
-        self.file_location = file_location
-
-    @property
-    def versions(self):
-        config = ConfigParser(interpolation=ExtendedInterpolation())
-        with open(self.file_location) as f:
-            config.read_file(f)
-        return config['versions']
-
-    def __contains__(self, package_name):
-        return package_name.lower() in self.versions.keys()
-
-    def __getitem__(self, package_name):
-        if self.__contains__(package_name):
-            return self.versions.get(package_name)
-        else:
-            raise KeyError
-
-    def __setitem__(self, package_name, new_version):
-        path = os.path.join(os.getcwd(), self.file_location)
-        with open(path, 'r') as f:
-            versionstxt = f.read()
-
-        if package_name not in self:
-            newline = '{0} = {1}'.format(package_name, new_version)
-            versionstxt += newline
-
-        reg = re.compile(
-            '(^{0}[\s\=]+)[0-9\.abrc]+'.format(package_name),
-            re.MULTILINE
-        )
-        new_versions_txt = reg.sub(
-            r'\g<1>{0}'.format(new_version),
-            versionstxt
-        )
-        with open(path, 'w') as f:
-            f.write(new_versions_txt)
-
-    def get(self, package_name):
-        return self.__getitem__(package_name)
-
-    def set(self, package_name, new_version):
-        return self.__setitem__(package_name, new_version)
-
-
 class SourcesFile(UserDict):
 
     def __init__(self, file_location):
@@ -188,9 +140,6 @@ class PloneCoreBuildout(object):
         self.clone()
         self.sources = SourcesFile(
             '{0}/sources.cfg'.format(self.location)
-        )
-        self.versions = VersionsFile(
-            '{0}/versions.cfg'.format(self.location)
         )
         self.checkouts = CheckoutsFile(
             '{0}/checkouts.cfg'.format(self.location)
