@@ -24,7 +24,9 @@ def log_page(context, request):
     try:
         file_size = os.stat(filename).st_size
         with open(filename) as log_file:
-            log = ''.join(deque(log_file, maxlen=200))
+            raw_data = deque(log_file, maxlen=200)
+            raw_data.reverse()
+            log = ''.join(raw_data)
     except OSError:
         return {
             'success': False,

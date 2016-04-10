@@ -103,6 +103,10 @@ class SimpleViewsTest(unittest.TestCase):
             'log line 50',
             result.body,
         )
+        self.assertIn(
+            'log line 299\nlog line 298\n',
+            result.body
+        )
         self.clean_file(filename)
 
     def test_checkouts_file_no_file(self):
