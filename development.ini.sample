@@ -20,6 +20,8 @@ roboto_url = http://localhost:6543/
 github_user = X
 github_password = X
 
+collective_repos = collective.elephantvocabulary,collective.monkeypatcher,icalendar,Products.DateRecurringIndex
+
 pyramid.reload_templates = true
 pyramid.debug_authorization = true
 pyramid.debug_notfound = true
