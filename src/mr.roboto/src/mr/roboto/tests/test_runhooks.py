@@ -7,6 +7,37 @@ import mock
 import unittest
 
 
+class DummyHook(object):
+    name = 'web'
+    config = {
+        'url': 'http://jenkins.plone.org/roboto/run/corecommit'
+    }
+
+    def delete(self):
+        return
+
+
+class DummyRepo(object):
+
+    def __init__(self, name='Products.CMFPlone'):
+        self.name = name
+
+    def get_hooks(self):
+        return [DummyHook(), ]
+
+    def create_hook(self, *args, **kwargs):
+        return
+
+
+class DummyGetRepos(object):
+
+    def get_repos(self):
+        return [DummyRepo(), ]
+
+    def get_repo(self, name):
+        return DummyRepo(name)
+
+
 class RunHooksTest(unittest.TestCase):
 
     def setUp(self):
@@ -18,6 +49,7 @@ class RunHooksTest(unittest.TestCase):
             'checkouts_file': 'checkouts_pickle',
             'github_user': 'x',
             'github_password': 'x',
+            'collective_repos': '',
         }
         app = main({}, **self.settings)
         self.roboto = TestApp(app)
@@ -42,24 +74,10 @@ class RunHooksTest(unittest.TestCase):
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_no_web_hooks(self, m1):
-        class Hook(object):
+        class DummyHook(object):
             name = 'not-web'
 
-        class Repo(object):
-            name = 'Products.CMFPlone'
-
-            def get_hooks(self):
-                return [Hook(), ]
-
-            def create_hook(self, *args, **kwargs):
-                return
-
-        class GetRepos(object):
-
-            def get_repos(self):
-                return [Repo(), ]
-
-        m1.configure_mock(return_value=GetRepos())
+        m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
             self.settings['api_key']
@@ -72,7 +90,13 @@ class RunHooksTest(unittest.TestCase):
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_exception(self, m1):
-        class Repo(object):
+        class DummyHook(object):
+            name = 'web'
+            config = {
+                'url': 'http://jenkins.plone.org/roboto/run/corecommit'
+            }
+
+        class DummyRepo(object):
             name = 'Products.CMFPlone'
 
             def get_hooks(self):
@@ -81,12 +105,11 @@ class RunHooksTest(unittest.TestCase):
             def create_hook(self, *args, **kwargs):
                 raise GithubException('one', 'two')
 
-        class GetRepos(object):
-
+        class DummyGetRepos(object):
             def get_repos(self):
-                return [Repo()]
+                return [DummyRepo(), ]
 
-        m1.configure_mock(return_value=GetRepos())
+        m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
             self.settings['api_key']
@@ -99,27 +122,7 @@ class RunHooksTest(unittest.TestCase):
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_web_hook_wrong_url(self, m1):
-        class Hook(object):
-            name = 'web'
-            config = {
-                'url': 'http://random.org'
-            }
-
-        class Repo(object):
-            name = 'Products.CMFPlone'
-
-            def get_hooks(self):
-                return [Hook(), ]
-
-            def create_hook(self, *args, **kwargs):
-                return
-
-        class GetRepos(object):
-
-            def get_repos(self):
-                return [Repo(), ]
-
-        m1.configure_mock(return_value=GetRepos())
+        m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
             self.settings['api_key']
@@ -132,30 +135,7 @@ class RunHooksTest(unittest.TestCase):
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_web_hook_roboto_url(self, m1):
-        class Hook(object):
-            name = 'web'
-            config = {
-                'url': 'http://jenkins.plone.org/roboto/run/corecommit'
-            }
-
-            def delete(self):
-                return
-
-        class Repo(object):
-            name = 'Products.CMFPlone'
-
-            def get_hooks(self):
-                return [Hook(), ]
-
-            def create_hook(self, *args, **kwargs):
-                return
-
-        class GetRepos(object):
-
-            def get_repos(self):
-                return [Repo(), ]
-
-        m1.configure_mock(return_value=GetRepos())
+        m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
             self.settings['api_key']
@@ -170,24 +150,7 @@ class RunHooksTest(unittest.TestCase):
     def test_runhook_debug(self, m1):
         self.roboto.app.registry.settings['debug'] = True
 
-        class Hook(object):
-            name = 'web'
-            config = {
-                'url': 'http://jenkins.plone.org/roboto/run/corecommit'
-            }
-
-        class Repo(object):
-            name = 'Products.CMFPlone'
-
-            def get_hooks(self):
-                return [Hook(), ]
-
-        class GetRepos(object):
-
-            def get_repos(self):
-                return [Repo(), ]
-
-        m1.configure_mock(return_value=GetRepos())
+        m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
             self.settings['api_key']
@@ -195,5 +158,23 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get(url)
         self.assertIn(
             'run/corecommit on Products.CMFPlone',
+            result.body,
+        )
+
+    @mock.patch('github.MainClass.Github.get_organization')
+    def test_runhook_collective(self, m1):
+        self.roboto.app.registry.settings['collective_repos'] = 'repo1, repo2'
+        m1.configure_mock(return_value=DummyGetRepos())
+
+        url = '/run/githubcommithooks?token={0}'.format(
+            self.settings['api_key']
+        )
+        result = self.roboto.get(url)
+        self.assertIn(
+            'run/corecommit on repo1',
+            result.body,
+        )
+        self.assertIn(
+            'run/corecommit on repo2',
             result.body,
         )
