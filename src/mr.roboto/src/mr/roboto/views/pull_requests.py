@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
 from mr.roboto.events import NewPullRequest
+from mr.roboto.events import UpdatedPullRequest
 from mr.roboto.security import validate_github
 
 import json
@@ -40,6 +41,10 @@ def handle_pull_request(request):
     if action == 'opened':
         request.registry.notify(
             NewPullRequest(pull_request, request)
+        )
+    elif action == 'synchronize':
+        request.registry.notify(
+            UpdatedPullRequest(pull_request, request)
         )
 
     msg = 'Thanks! Handlers already took care of this pull request'

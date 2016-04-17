@@ -22,3 +22,10 @@ class NewPullRequest(object):
     def __init__(self, pull_request, request):
         self.pull_request = pull_request
         self.request = request
+
+
+class UpdatedPullRequest(object):
+
+    def __init__(self, pull_request, request):
+        self.pull_request = pull_request
+        self.request = request

@@ -3,6 +3,7 @@ from hashlib import sha1
 from mr.roboto import main
 from webtest import TestApp
 
+import copy
 import hmac
 import json
 import unittest
@@ -20,6 +21,9 @@ NEW_PULL_REQUEST_PAYLOAD = {
         'html_url': 'https://github.com/plone/mr.roboto/pull/1',
     },
 }
+
+UPDATED_PULL_REQUEST_PAYLOAD = copy.deepcopy(NEW_PULL_REQUEST_PAYLOAD)
+UPDATED_PULL_REQUEST_PAYLOAD['action'] = 'synchronize'
 
 
 class RunCoreJobTest(unittest.TestCase):
@@ -77,6 +81,14 @@ class RunCoreJobTest(unittest.TestCase):
 
     def test_pull_request_view(self):
         result = self.call_view(NEW_PULL_REQUEST_PAYLOAD)
+
+        self.assertIn(
+            'Handlers already took care of this pull request',
+            result.body,
+        )
+
+    def test_update_pull_request(self):
+        result = self.call_view(UPDATED_PULL_REQUEST_PAYLOAD)
 
         self.assertIn(
             'Handlers already took care of this pull request',
