@@ -8,11 +8,11 @@ from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import NewCoreDevPush
 from mr.roboto.security import validate_github
 from mr.roboto.subscriber import get_info_from_commit
+from mr.roboto.utils import get_pickled_data
 
 import datetime
 import json
 import logging
-import pickle
 
 
 logger = logging.getLogger('mr.roboto')
@@ -37,10 +37,6 @@ class GMT1(datetime.tzinfo):
 
     def tzname(self, dt):
         return 'Europe/Catalunya'
-
-
-def get_pickled_data(filename):
-    return pickle.loads(open(filename).read())
 
 
 def get_user(data):
