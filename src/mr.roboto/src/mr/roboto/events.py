@@ -15,3 +15,10 @@ class CommitAndMissingCheckout(object):
         self.branch = branch
         self.pv = pv
         self.email = email
+
+
+class NewPullRequest(object):
+
+    def __init__(self, pull_request, request):
+        self.pull_request = pull_request
+        self.request = request
