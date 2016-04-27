@@ -2,9 +2,12 @@
 from mr.roboto import templates
 from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import NewCoreDevPush
+from mr.roboto.events import NewPullRequest
+from mr.roboto.events import UpdatedPullRequest
 from pyramid.events import subscriber
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
+from requests.exceptions import RequestException
 
 import logging
 import requests
@@ -108,3 +111,92 @@ def send_mail_on_missing_checkout(event):
         event.branch,
         event.pv,
         event.email)
+
+
+@subscriber(NewPullRequest)
+@subscriber(UpdatedPullRequest)
+def have_signed_contributors_agreement(event):
+    """Check if all users involved in a pull request have signed the CLA
+
+    :param event: NewPullRequest or UpdatePullRequest object
+    :return: None
+    """
+    # tons of data
+    github = event.request.registry.settings['github']
+    pull_request = event.pull_request
+    pull_request_url = pull_request['html_url']
+    org = pull_request['base']['repo']['owner']['login']
+    repo = pull_request['base']['repo']['name']
+    pull_number = int(pull_request['number'])
+    plone_org = github.get_organization('plone')
+    cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
+
+    try:
+        commits_data = requests.get(pull_request['commits_url'])
+    except RequestException:
+        msg = 'Error while trying to get commits from pull request {0}'
+        logger.warn(msg.format(pull_request_url))
+        return
+
+    try:
+        json_data = commits_data.json()
+    except ValueError:
+        msg = 'Error while getting JSON data from pull request {0}'
+        logger.warn(msg.format(pull_request_url))
+        return
+
+    members = []
+    not_foundation_members = []
+    for commit in json_data:
+        for user in ('committer', 'author'):
+            try:
+                login = commit[user]['login']
+            except KeyError:
+                msg = 'Commit on pull request {0} does not have {1} user info'
+                logger.warn(msg.format(pull_request_url, user))
+                continue
+
+            # avoid looking up users twice
+            if login in members or login in not_foundation_members:
+                continue
+
+            if plone_org.has_in_member(login):
+                members.append(login)
+            else:
+                not_foundation_members.append(login)
+
+    # get the pull request
+    if org == u'plone':
+        g_org = plone_org
+    else:
+        g_org = github.get_organization(org)
+
+    g_repo = g_org.get_repo(repo)
+    g_pull = g_repo.get_pull(pull_number)
+
+    # get last commit
+    last_commit = g_pull.get_commits().reversed[0]
+
+    status = u'success'
+    status_message = u'All users have signed the Contributors Agreement'
+    if not_foundation_members:
+        status = u'error'
+        status_message = u'Some users need to sign the Contributors Agreement'
+
+        # add a message mentioning all users that have not signed the
+        # Contributors Agreement
+        users = ' @'.join(not_foundation_members)
+        msg = u'@{0} you need to sign Plone Contributor Agreement in order ' \
+              u'to merge this pull request.' \
+              u'' \
+              u'Learn about the Plone Contributor Agreement: {1}'
+        last_commit.create_comment(body=msg.format(users, cla_url))
+
+    last_commit.create_status(
+        status,
+        target_url=cla_url,
+        description=status_message,
+        context='Plone Contributors Agreement verifier',
+    )
+    msg = 'Pull request {0} Contributors Agreement report: {1}'
+    logger.info(msg.format(pull_request_url, status))
