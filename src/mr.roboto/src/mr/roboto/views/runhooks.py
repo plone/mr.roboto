@@ -26,22 +26,21 @@ def create_github_post_commit_hooks_view(request):
     and creates them anew.
     """
     github = request.registry.settings['github']
-    collective_repos = request.registry.settings['collective_repos']
-
     messages = []
-    for repo in github.get_organization('plone').get_repos():
-        messages.append(
-            update_hooks_on_repo(repo, request)
-        )
 
     collective_repos = [
         repo.strip()
-        for repo in collective_repos.split(',')
+        for repo in request.registry.settings['collective_repos'].split(',')
         if repo.strip()
     ]
     collective = github.get_organization('collective')
     for repo_name in collective_repos:
         repo = collective.get_repo(repo_name.strip())
+        messages.append(
+            update_hooks_on_repo(repo, request)
+        )
+
+    for repo in github.get_organization('plone').get_repos():
         messages.append(
             update_hooks_on_repo(repo, request)
         )
