@@ -37,21 +37,21 @@
   <p>With it you can do  the following:</p>
   <ul>
     <li>
-      <a href="${info.roboto_url}log?token=XXX">Check the changelog</a>
+      <a href="${info.roboto_url}/log?token=XXX">Check the changelog</a>
       <em class="alert">Token needed</em>
     </li>
     <li>
-      <a href="${info.roboto_url}sources.json">See current sources</a>
+      <a href="${info.roboto_url}/sources.json">See current sources</a>
     </li>
     <li>
-      <a href="${info.roboto_url}checkouts.json">See current checkouts</a>
+      <a href="${info.roboto_url}/checkouts.json">See current checkouts</a>
     </li>
     <li>
-      <a href="${info.roboto_url}update-sources-and-checkouts?token=XXX">Update sources and checkouts</a>
+      <a href="${info.roboto_url}/update-sources-and-checkouts?token=XXX">Update sources and checkouts</a>
       <em class="alert">Token needed</em>
     </li>
     <li>
-      <a href="${info.roboto_url}run/githubcommithooks?token=XXXXX">Re-create GitHub commit hooks</a>
+      <a href="${info.roboto_url}/run/githubcommithooks?token=XXXXX">Re-create GitHub commit hooks</a>
       <em class="alert">Token needed</em>
     </li>
   </ul>
