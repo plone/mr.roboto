@@ -46,7 +46,7 @@ class SimpleViewsTest(unittest.TestCase):
             'run/githubcommithooks?token',
         )
         for link in links:
-            full_url = '{0}{1}'.format(self.settings['roboto_url'], link)
+            full_url = '{0}/{1}'.format(self.settings['roboto_url'], link)
             self.assertIn(
                 full_url,
                 result.body,
