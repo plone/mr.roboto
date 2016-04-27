@@ -46,6 +46,12 @@ def handle_pull_request(request):
         request.registry.notify(
             UpdatedPullRequest(pull_request, request)
         )
+    else:
+        msg = 'Action "{0}" on pull request {1} not handled'.format(
+            action,
+            payload['pull_request']['html_url']
+        )
+        return json.dumps({'message': msg, })
 
     msg = 'Thanks! Handlers already took care of this pull request'
     return json.dumps({'message': msg, })

@@ -25,6 +25,9 @@ NEW_PULL_REQUEST_PAYLOAD = {
 UPDATED_PULL_REQUEST_PAYLOAD = copy.deepcopy(NEW_PULL_REQUEST_PAYLOAD)
 UPDATED_PULL_REQUEST_PAYLOAD['action'] = 'synchronize'
 
+UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD = copy.deepcopy(NEW_PULL_REQUEST_PAYLOAD)
+UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD['action'] = 'unknown'
+
 
 class RunCoreJobTest(unittest.TestCase):
 
@@ -92,5 +95,15 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Handlers already took care of this pull request',
+            result.body,
+        )
+
+    def test_unknown_pull_request_action(self):
+        result = self.call_view(UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD)
+
+        self.assertIn(
+            'pull request {0} not handled'.format(
+                UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD['pull_request']['html_url']
+            ),
             result.body,
         )
