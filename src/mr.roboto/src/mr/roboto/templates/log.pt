@@ -4,6 +4,7 @@
   <style>
     body {
       background: url('static/roboto.png') no-repeat 50% 50%;
+      background-color: rgba(0,149,211, 0.5);
     }
     #logo {
       width: 100%;
