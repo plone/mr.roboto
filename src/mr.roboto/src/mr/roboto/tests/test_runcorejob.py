@@ -188,7 +188,7 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.subscriber.mail_to_cvs')
     def test_commit_to_coredev(self, m1, m2, m3):
         self.populate_sources_and_checkouts(
-            sources_data={'plone/plone.app.discussion/master': ['5.1', ]},
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
@@ -203,7 +203,7 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.subscriber.mail_to_cvs')
     def test_fake_commit_to_coredev(self, m1, m2, m3):
         self.populate_sources_and_checkouts(
-            sources_data={'plone/plone.app.discussion/master': ['5.1', ]},
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
@@ -218,7 +218,7 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.subscriber.mail_to_cvs')
     def test_ci_skip_commit_to_coredev(self, m1, m2, m3):
         self.populate_sources_and_checkouts(
-            sources_data={'plone/plone.app.discussion/master': ['5.1', ]},
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
@@ -234,7 +234,7 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.views.runcorejob.get_sources_and_checkouts')
     def test_sources_changed_commit_to_coredev(self, m1, m2, m3, m4):
         self.populate_sources_and_checkouts(
-            sources_data={'plone/plone.app.discussion/master': ['5.1', ]},
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
@@ -249,7 +249,7 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.subscriber.mail_to_cvs')
     def test_ci_skip_non_coredev_commit(self, m1, m2, m3):
         self.populate_sources_and_checkouts(
-            sources_data={'plone/plone.app.discussion/master': ['5.1', ]},
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
@@ -264,7 +264,7 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.subscriber.mail_to_cvs')
     def test_branch_not_in_sources_commit(self, m1, m2, m3):
         self.populate_sources_and_checkouts(
-            sources_data={'plone/plone.app.discussion/master': ['5.1', ]},
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
