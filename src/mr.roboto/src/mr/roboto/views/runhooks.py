@@ -38,7 +38,7 @@ def create_github_post_commit_hooks_view(request):
         ),
         Hook(
             '{0}/run/pull-request'.format(roboto_url),
-            ['pullrequest', ]
+            ['pull_request', ]
         ),
     ]
 
