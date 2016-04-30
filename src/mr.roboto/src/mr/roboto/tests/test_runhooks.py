@@ -84,7 +84,7 @@ class RunHooksTest(unittest.TestCase):
         )
         result = self.roboto.get(url)
         self.assertIn(
-            'run/corecommit on Products.CMFPlone',
+            'github Creating hooks on Products.CMFPlone',
             result.body,
         )
 
@@ -116,7 +116,7 @@ class RunHooksTest(unittest.TestCase):
         )
         result = self.roboto.get(url)
         self.assertIn(
-            'run/corecommit on Products.CMFPlone',
+            'github Creating hooks on Products.CMFPlone',
             result.body,
         )
 
@@ -129,7 +129,7 @@ class RunHooksTest(unittest.TestCase):
         )
         result = self.roboto.get(url)
         self.assertIn(
-            'run/corecommit on Products.CMFPlone',
+            'github Creating hooks on Products.CMFPlone',
             result.body,
         )
 
@@ -142,7 +142,7 @@ class RunHooksTest(unittest.TestCase):
         )
         result = self.roboto.get(url)
         self.assertIn(
-            'run/corecommit on Products.CMFPlone',
+            'github Creating hooks on Products.CMFPlone',
             result.body,
         )
 
@@ -157,7 +157,7 @@ class RunHooksTest(unittest.TestCase):
         )
         result = self.roboto.get(url)
         self.assertIn(
-            'run/corecommit on Products.CMFPlone',
+            'github Creating hooks on Products.CMFPlone',
             result.body,
         )
 
@@ -171,10 +171,10 @@ class RunHooksTest(unittest.TestCase):
         )
         result = self.roboto.get(url)
         self.assertIn(
-            'run/corecommit on repo1',
+            'github Creating hooks on repo1',
             result.body,
         )
         self.assertIn(
-            'run/corecommit on repo2',
+            'github Creating hooks on repo2',
             result.body,
         )
