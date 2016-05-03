@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
-from mr.roboto import main
 from webtest import TestApp
 
 import copy
@@ -29,11 +28,29 @@ UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD = copy.deepcopy(NEW_PULL_REQUEST_PAYLOAD)
 UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD['action'] = 'unknown'
 
 
-class RunCoreJobTest(unittest.TestCase):
+def minimal_main(global_config, **settings):
+    from github import Github
+    from pyramid.config import Configurator
+    config = Configurator(settings=settings)
+    config.include('cornice')
+
+    config.registry.settings['plone_versions'] = settings['plone_versions']
+    config.registry.settings['roboto_url'] = settings['roboto_url']
+    config.registry.settings['api_key'] = settings['api_key']
+    config.registry.settings['github'] = Github(
+        settings['github_user'],
+        settings['github_password']
+    )
+    config.scan('mr.roboto.views.pull_requests')
+    config.end()
+    return config.make_wsgi_app()
+
+
+class RunCoreJobTest(unittest.TestCase, ):
 
     def setUp(self):
         self.settings = {
-            'plone_versions': '["4.3",]',
+            'plone_versions': ['4.3', ],
             'roboto_url': 'http://jenkins.plone.org/roboto',
             'api_key': 'xyz1234mnop',
             'sources_file': 'sources_pickle',
@@ -41,7 +58,7 @@ class RunCoreJobTest(unittest.TestCase):
             'github_user': 'x',
             'github_password': 'x',
         }
-        app = main({}, **self.settings)
+        app = minimal_main({}, **self.settings)
         self.roboto = TestApp(app)
 
     def prepare_data(self, payload):

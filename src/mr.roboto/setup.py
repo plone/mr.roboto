@@ -16,6 +16,7 @@ test_requires = [
     'pyramid_debugtoolbar',
     'pytest',
     'WebTest',
+    'testfixtures',
 ]
 
 setup(
