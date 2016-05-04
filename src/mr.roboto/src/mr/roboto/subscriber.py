@@ -179,10 +179,10 @@ def have_signed_contributors_agreement(event):
     last_commit = g_pull.get_commits().reversed[0]
 
     status = u'success'
-    status_message = u'All users have signed the Contributors Agreement'
+    status_message = u'All users have signed it'
     if not_foundation_members:
         status = u'error'
-        status_message = u'Some users need to sign the Contributors Agreement'
+        status_message = u'Some users need to sign it'
 
         # add a message mentioning all users that have not signed the
         # Contributors Agreement
