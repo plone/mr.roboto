@@ -160,7 +160,8 @@ def have_signed_contributors_agreement(event):
             if login in members or login in not_foundation_members:
                 continue
 
-            if plone_org.has_in_member(login):
+            g_user = github.get_user(login)
+            if plone_org.has_in_members(g_user):
                 members.append(login)
             else:
                 not_foundation_members.append(login)
