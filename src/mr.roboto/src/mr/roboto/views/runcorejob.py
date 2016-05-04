@@ -24,10 +24,6 @@ runCoreTests = Service(
 )
 
 
-def add_log(request, who, message):
-    logger.info(who + ' ' + message)
-
-
 class GMT1(datetime.tzinfo):
     def utcoffset(self, dt):
         return datetime.timedelta(hours=1)
@@ -58,7 +54,7 @@ def commit_to_coredev(
     changeset_long,
     timestamp
 ):
-    add_log(request, 'github commit', 'LETS COMMIT ON COREDEV')
+    logger.info('github commit LETS COMMIT ON COREDEV')
     gh = request.registry.settings['github']
     org = gh.get_organization('plone')
     repo = org.get_repo('buildout.coredev')
@@ -155,7 +151,7 @@ def run_function_core_tests(request):
         timestamp = commit['timestamp']
 
         message = 'Commit on {0} {1} {2}'.format(repo, branch, commit['id'])
-        add_log(request, commit_data['reply_to'], message)
+        logger.info(message)
 
     if not fake and not skip:
         request.registry.notify(NewCoreDevPush(payload, request))
@@ -163,11 +159,7 @@ def run_function_core_tests(request):
     # If it is a push to buildout.coredev,
     # update sources and checkouts and quit
     if repo == 'plone/buildout.coredev':
-        add_log(
-            request,
-            commit_data['reply_to'],
-            'Commit to coredev - do nothing'
-        )
+        logger.info('Commit to coredev - do nothing')
         if source_or_checkout:
             get_sources_and_checkouts(request)
 
@@ -182,7 +174,7 @@ def run_function_core_tests(request):
     # if it's a skip commit, log and done
     if skip:
         msg = 'Commit skipping CI - {0} - {1} do nothing'
-        add_log(request, who, msg.format(repo, branch))
+        logger.info(msg.format(repo, branch))
         return json.dumps({'message': 'Thanks! Skipping CI'})
 
     # if the repo+branch are not in any plone version sources.cfg,
@@ -190,7 +182,7 @@ def run_function_core_tests(request):
     elif (repo, branch) not in sources:
         # Error repo not sources
         msg = 'Commit not in sources - {0} - {1} do nothing'
-        add_log(request, who, msg.format(repo, branch))
+        logger.info(msg.format(repo, branch))
         return json.dumps(
             {'message': 'Thanks! Commits done on a branch, nothing to do'}
         )
@@ -225,7 +217,7 @@ def run_function_core_tests(request):
             timestamp,
         )
 
-    add_log(request, who, message)
+    logger.info(message)
     return json.dumps(
         {'message': 'Thanks! Plone Jenkins CI will run tests'}
     )
