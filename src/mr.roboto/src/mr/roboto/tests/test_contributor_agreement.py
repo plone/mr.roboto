@@ -207,7 +207,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
             @property
             def settings(self):
                 inner_mock = mock.MagicMock()
-                inner_mock.has_in_member.return_value = False
+                inner_mock.has_in_members.return_value = False
                 mock_obj = mock.MagicMock()
                 mock_obj.get_organization.return_value = inner_mock
                 return {
