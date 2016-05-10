@@ -147,13 +147,17 @@ def have_signed_contributors_agreement(event):
 
     members = []
     not_foundation_members = []
+    unknown_users = []
     for commit_info in json_data:
         for user in ('committer', 'author'):
             try:
-                login = commit_info['commit'][user]['login']
-            except KeyError:
+                login = commit_info[user]['login']
+            except TypeError:
                 msg = 'Commit on pull request {0} does not have {1} user info'
                 logger.warn(msg.format(pull_request_url, user))
+                unknown_users.append(
+                    commit_info['commit']['author']['name']
+                )
                 continue
 
             # avoid looking up users twice
@@ -180,10 +184,11 @@ def have_signed_contributors_agreement(event):
 
     status = u'success'
     status_message = u'All users have signed it'
-    if not_foundation_members:
+    if not_foundation_members or unknown_users:
         status = u'error'
         status_message = u'Some users need to sign it'
 
+    if not_foundation_members:
         # add a message mentioning all users that have not signed the
         # Contributors Agreement
         users = ' @'.join(not_foundation_members)
@@ -192,6 +197,23 @@ def have_signed_contributors_agreement(event):
               u'' \
               u'Learn about the Plone Contributor Agreement: {1}'
         last_commit.create_comment(body=msg.format(users, cla_url))
+
+    if unknown_users:
+        # add a message mentioning all unknown users
+        users = ', '.join(unknown_users)
+        msg = u'{0} your emails are not known to GithHb and thus it is ' \
+              u'impossible to know if you have signed the Plone Contributor ' \
+              u'Agreement, which is required to merge this pull request.' \
+              u'' \
+              u'Learn about the Plone Contributor Agreement: {1} ' \
+              u'How to add more emails to your GitHub account: {2} '
+        last_commit.create_comment(
+            body=msg.format(
+                users,
+                cla_url,
+                u'https://help.github.com/articles/adding-an-email-address-to-your-github-account/'  # noqa
+            )
+        )
 
     last_commit.create_status(
         status,
