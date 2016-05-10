@@ -46,6 +46,26 @@ def minimal_main(global_config, **settings):
     return config.make_wsgi_app()
 
 
+class MockRequest(object):
+
+    def __init__(self):
+        self._settings = {
+            'github': mock.MagicMock()
+        }
+
+    @property
+    def registry(self):
+        return self
+
+    @property
+    def settings(self):
+        return self._settings
+
+    @settings.setter
+    def settings(self, data):
+        self._settings = data
+
+
 class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
     def setUp(self):
@@ -67,21 +87,9 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         from requests.exceptions import ReadTimeout
         m1.side_effect = ReadTimeout()
 
-        class Request(object):
-
-            @property
-            def registry(self):
-                return self
-
-            @property
-            def settings(self):
-                return {
-                    'github': mock.MagicMock()
-                }
-
         event = NewPullRequest(
             pull_request=PAYLOAD,
-            request=Request(),
+            request=MockRequest(),
         )
 
         with LogCapture() as captured_data:
@@ -107,21 +115,9 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         m1.return_value = FakeCommitsData()
 
-        class Request(object):
-
-            @property
-            def registry(self):
-                return self
-
-            @property
-            def settings(self):
-                return {
-                    'github': mock.MagicMock()
-                }
-
         event = NewPullRequest(
             pull_request=PAYLOAD,
-            request=Request(),
+            request=MockRequest(),
         )
 
         with LogCapture() as captured_data:
@@ -159,21 +155,9 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         m1.return_value = FakeCommitsData()
 
-        class Request(object):
-
-            @property
-            def registry(self):
-                return self
-
-            @property
-            def settings(self):
-                return {
-                    'github': mock.MagicMock()
-                }
-
         event = NewPullRequest(
             pull_request=PAYLOAD,
-            request=Request(),
+            request=MockRequest(),
         )
 
         with LogCapture() as captured_data:
@@ -204,25 +188,20 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         m1.return_value = FakeCommitsData()
 
-        class Request(object):
+        inner_mock = mock.MagicMock()
+        inner_mock.has_in_members.return_value = False
+        mock_obj = mock.MagicMock()
+        mock_obj.get_organization.return_value = inner_mock
+        settings = {
+            'github': mock_obj
+        }
 
-            @property
-            def registry(self):
-                return self
-
-            @property
-            def settings(self):
-                inner_mock = mock.MagicMock()
-                inner_mock.has_in_members.return_value = False
-                mock_obj = mock.MagicMock()
-                mock_obj.get_organization.return_value = inner_mock
-                return {
-                    'github': mock_obj
-                }
+        request = MockRequest()
+        request.settings = settings
 
         event = NewPullRequest(
             pull_request=PAYLOAD,
-            request=Request(),
+            request=request,
         )
 
         with LogCapture() as captured_data:
@@ -262,21 +241,9 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         m1.return_value = FakeCommitsData()
 
-        class Request(object):
-
-            @property
-            def registry(self):
-                return self
-
-            @property
-            def settings(self):
-                return {
-                    'github': mock.MagicMock()
-                }
-
         event = NewPullRequest(
             pull_request=COLLECTIVE_PAYLOAD,
-            request=Request(),
+            request=MockRequest(),
         )
 
         with LogCapture() as captured_data:
