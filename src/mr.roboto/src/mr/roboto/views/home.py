@@ -77,3 +77,11 @@ def checkout(context, request):
 def update_pickles(context, request):
     get_sources_and_checkouts(request)
     return json.dumps({'message': 'updated!'})
+
+
+@view_config(
+    route_name='missing_changelog',
+    renderer='mr.roboto:templates/missing_changelog.pt'
+)
+def missing_changelog(context, request):
+    return {}
