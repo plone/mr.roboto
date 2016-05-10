@@ -19,6 +19,10 @@ logger = logging.getLogger('mr.roboto')
 
 VALID_CHANGELOG_FILES = re.compile(r'(CHANGES|HISTORY).(txt|rst)$')
 
+IGNORE_NO_CHANGELOG = (
+    'documentation',
+)
+
 
 def get_info_from_commit(commit):
     diff = requests.get(commit['url'] + '.diff').content
@@ -239,6 +243,13 @@ def warn_if_no_changelog_entry(event):
     github = event.request.registry.settings['github']
     pull_request = event.pull_request
     pull_request_url = pull_request['html_url']
+    repo_name = pull_request['base']['repo']['name']
+
+    if repo_name in IGNORE_NO_CHANGELOG:
+        pull_request_url = pull_request['html_url']
+        msg = 'Pull request {0} whitelisted for changelog entries'
+        logger.info(msg.format(pull_request_url))
+        return
 
     status = u'success'
     description = u'Entry found'
