@@ -148,6 +148,12 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
                         'committer': {
                             'login': 'user',
                         },
+                        'author': None,
+                        'commit': {
+                            'author': {
+                                'name': 'My name',
+                            },
+                        },
                     },
                 ]
 
@@ -242,6 +248,14 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
                     {
                         'committer': {
                             'login': 'user',
+                        },
+                        'author': {
+                            'login': 'user',
+                        },
+                        'commit': {
+                            'author': {
+                                'name': 'My name',
+                            },
                         },
                     },
                 ]
