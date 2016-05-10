@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from mr.roboto.subscriber import have_signed_contributors_agreement
 from testfixtures import LogCapture
-from webtest import TestApp
 
 import copy
 import mock
@@ -30,22 +29,6 @@ COLLECTIVE_PAYLOAD = copy.deepcopy(PAYLOAD)
 COLLECTIVE_PAYLOAD['base']['repo']['owner']['login'] = 'collective'
 
 
-def minimal_main(global_config, **settings):
-    from github import Github
-    from pyramid.config import Configurator
-    config = Configurator(settings=settings)
-    config.include('cornice')
-
-    config.registry.settings['plone_versions'] = settings['plone_versions']
-    config.registry.settings['roboto_url'] = settings['roboto_url']
-    config.registry.settings['api_key'] = settings['api_key']
-    config.registry.settings['github'] = Github(
-        settings['github_user'],
-        settings['github_password']
-    )
-    return config.make_wsgi_app()
-
-
 class MockRequest(object):
 
     def __init__(self):
@@ -67,19 +50,6 @@ class MockRequest(object):
 
 
 class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
-
-    def setUp(self):
-        self.settings = {
-            'plone_versions': ['4.3', ],
-            'roboto_url': 'http://jenkins.plone.org/roboto',
-            'api_key': 'xyz1234mnop',
-            'sources_file': 'sources_pickle',
-            'checkouts_file': 'checkouts_pickle',
-            'github_user': 'x',
-            'github_password': 'x',
-        }
-        app = minimal_main({}, **self.settings)
-        self.roboto = TestApp(app)
 
     @mock.patch('requests.get')
     def test_error_getting_commits(self, m1):
