@@ -147,10 +147,10 @@ def have_signed_contributors_agreement(event):
 
     members = []
     not_foundation_members = []
-    for commit in json_data:
+    for commit_info in json_data:
         for user in ('committer', 'author'):
             try:
-                login = commit[user]['login']
+                login = commit_info['commit'][user]['login']
             except KeyError:
                 msg = 'Commit on pull request {0} does not have {1} user info'
                 logger.warn(msg.format(pull_request_url, user))
