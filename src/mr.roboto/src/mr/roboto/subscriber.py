@@ -4,6 +4,7 @@ from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import NewCoreDevPush
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
+from mr.roboto.utils import plone_versions_targeted
 from pyramid.events import subscriber
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
@@ -298,3 +299,39 @@ def warn_if_no_changelog_entry(event):
 
     msg = 'Pull request {0} changelog entry: {1}'
     logger.info(msg.format(pull_request_url, status))
+
+
+@subscriber(NewPullRequest)
+@subscriber(UpdatedPullRequest)
+def warn_test_need_to_run(event):
+    """Create waiting status for all pull request jobs that should be run
+    before a pull request can be safely merged
+    """
+    request = event.request
+    github = request.registry.settings['github']
+    pull_request = event.pull_request
+    pull_request_url = pull_request['html_url']
+    target_branch = pull_request['base']['ref']
+    repo = pull_request['base']['repo']['full_name']
+
+    plone_versions = plone_versions_targeted(repo, target_branch, request)
+    if not plone_versions:
+        msg = 'Pull request {0} does not target any Plone version'
+        logger.info(msg.format(pull_request_url))
+        return
+
+    # get the pull request and last commit
+    g_pull, last_commit = get_github_pull_request(github, pull_request)
+
+    url = 'http://jenkins.plone.org/job/pull-request-{0}/build?delay=0sec'
+    context = 'Plone Jenkins CI - pull-request-{0}'
+    for version in plone_versions:
+
+        last_commit.create_status(
+            u'pending',
+            target_url=url.format(version),
+            description='Please run the jenkins job',
+            context=context.format(version),
+        )
+        msg = '{0} created pending status for plone {1}'
+        logger.info(msg.format(pull_request_url, version))
