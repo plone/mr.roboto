@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
-from mr.roboto import main
 from mr.roboto.views.runcorejob import get_pickled_data
 from mr.roboto.views.runcorejob import get_user
 from tempfile import NamedTemporaryFile
@@ -105,7 +104,23 @@ SAMPLE_DATA_SOURCES = {
 }
 
 GET_INFO = 'mr.roboto.views.runcorejob.get_info_from_commit'
-GET_INFO2 = 'mr.roboto.subscriber.get_info_from_commit'
+
+
+def minimal_main(global_config, **settings):
+    from github import Github
+    from pyramid.config import Configurator
+    config = Configurator(settings=settings)
+    config.include('cornice')
+
+    config.registry.settings['plone_versions'] = settings['plone_versions']
+    config.registry.settings['roboto_url'] = settings['roboto_url']
+    config.registry.settings['api_key'] = settings['api_key']
+    config.registry.settings['github'] = Github(
+        settings['github_user'],
+        settings['github_password']
+    )
+    config.scan('mr.roboto.views.runcorejob')
+    return config.make_wsgi_app()
 
 
 class RunCoreJobTest(unittest.TestCase):
@@ -120,7 +135,7 @@ class RunCoreJobTest(unittest.TestCase):
             'github_user': 'x',
             'github_password': 'x',
         }
-        app = main({}, **self.settings)
+        app = minimal_main({}, **self.settings)
         self.roboto = TestApp(app)
 
     def tearDown(self):
@@ -142,7 +157,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.settings['sources_file'] = sources_pickle
         self.settings['checkouts_file'] = checkouts_pickle
-        app = main({}, **self.settings)
+        app = minimal_main({}, **self.settings)
         self.roboto = TestApp(app)
 
     def prepare_data(self, payload):
@@ -184,9 +199,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
-    @mock.patch(GET_INFO2, return_value=SAMPLE_DATA)
-    @mock.patch('mr.roboto.subscriber.mail_to_cvs')
-    def test_commit_to_coredev(self, m1, m2, m3):
+    def test_commit_to_coredev(self, m1):
         self.populate_sources_and_checkouts(
             sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
@@ -199,9 +212,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_FAKE)
-    @mock.patch(GET_INFO2, return_value=SAMPLE_DATA_FAKE)
-    @mock.patch('mr.roboto.subscriber.mail_to_cvs')
-    def test_fake_commit_to_coredev(self, m1, m2, m3):
+    def test_fake_commit_to_coredev(self, m1):
         self.populate_sources_and_checkouts(
             sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
@@ -214,9 +225,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
-    @mock.patch(GET_INFO2, return_value=SAMPLE_DATA_CI_SKIP)
-    @mock.patch('mr.roboto.subscriber.mail_to_cvs')
-    def test_ci_skip_commit_to_coredev(self, m1, m2, m3):
+    def test_ci_skip_commit_to_coredev(self, m1):
         self.populate_sources_and_checkouts(
             sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
@@ -229,10 +238,8 @@ class RunCoreJobTest(unittest.TestCase):
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_SOURCES)
-    @mock.patch(GET_INFO2, return_value=SAMPLE_DATA_SOURCES)
-    @mock.patch('mr.roboto.subscriber.mail_to_cvs')
     @mock.patch('mr.roboto.views.runcorejob.get_sources_and_checkouts')
-    def test_sources_changed_commit_to_coredev(self, m1, m2, m3, m4):
+    def test_sources_changed_commit_to_coredev(self, m1, m2):
         self.populate_sources_and_checkouts(
             sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
@@ -245,9 +252,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
-    @mock.patch(GET_INFO2, return_value=SAMPLE_DATA_CI_SKIP)
-    @mock.patch('mr.roboto.subscriber.mail_to_cvs')
-    def test_ci_skip_non_coredev_commit(self, m1, m2, m3):
+    def test_ci_skip_non_coredev_commit(self, m1):
         self.populate_sources_and_checkouts(
             sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
@@ -260,9 +265,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
-    @mock.patch(GET_INFO2, return_value=SAMPLE_DATA)
-    @mock.patch('mr.roboto.subscriber.mail_to_cvs')
-    def test_branch_not_in_sources_commit(self, m1, m2, m3):
+    def test_branch_not_in_sources_commit(self, m1):
         self.populate_sources_and_checkouts(
             sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
@@ -275,11 +278,8 @@ class RunCoreJobTest(unittest.TestCase):
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
-    @mock.patch(GET_INFO2, return_value=SAMPLE_DATA)
-    @mock.patch('mr.roboto.subscriber.mail_to_cvs')
-    @mock.patch('mr.roboto.subscriber.mail_missing_checkout')
     @mock.patch('mr.roboto.views.runcorejob.commit_to_coredev')
-    def test_branch_in_sources_commit(self, m1, m2, m3, m4, m5):
+    def test_branch_in_sources_commit(self, m1, m2):
         self.populate_sources_and_checkouts(
             sources_data={('plone/Products.CMFPlone', 'master', ): ['5.1', ]},
             checkouts_data={'5.1': ['plone.app.upgrade'], },
