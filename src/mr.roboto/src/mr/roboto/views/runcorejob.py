@@ -9,6 +9,7 @@ from mr.roboto.events import NewCoreDevPush
 from mr.roboto.security import validate_github
 from mr.roboto.subscriber import get_info_from_commit
 from mr.roboto.utils import get_pickled_data
+from mr.roboto.utils import plone_versions_targeted
 
 import datetime
 import json
@@ -105,11 +106,7 @@ def run_function_core_tests(request):
     skip = False
     source_or_checkout = False
 
-    commit_data = None
     message = ''
-
-    sources = get_pickled_data(request.registry.settings['sources_file'])
-    checkouts = get_pickled_data(request.registry.settings['checkouts_file'])
 
     repo_name = payload['repository']['name']
     repo = payload['repository']['full_name']
@@ -179,7 +176,8 @@ def run_function_core_tests(request):
 
     # if the repo+branch are not in any plone version sources.cfg,
     # log and done
-    elif (repo, branch) not in sources:
+    plone_versions = plone_versions_targeted(repo, branch, request)
+    if not plone_versions:
         # Error repo not in sources
         msg = 'Commit not in sources - {0} - {1} do nothing'
         logger.info(msg.format(repo, branch))
@@ -190,8 +188,8 @@ def run_function_core_tests(request):
     ##
     # a commit on a branch that's part of a plone version
     ##
-    affected_plone_versions = sources[(repo, branch)]
-    for plone_version in affected_plone_versions:
+    checkouts = get_pickled_data(request.registry.settings['checkouts_file'])
+    for plone_version in plone_versions:
         # if the repository is not on checkouts.cfg things could be broken
         # at a later point when it's added, warn about it!!
         if repo_name not in checkouts[plone_version]:
