@@ -259,7 +259,9 @@ def warn_if_no_changelog_entry(event):
 
     # check if the pull request modifies the changelog file
     diff_url = pull_request['diff_url']
-    diff_data = requests.get(diff_url)
+    # temporal workaround (not verifying SSL certificates) until
+    # https://github.com/plone/jenkins.plone.org/issues/170 is fixed
+    diff_data = requests.get(diff_url, verify=False)
     patch_data = PatchSet(diff_data, encoding=diff_data.encoding)
 
     for diff_file in patch_data:
