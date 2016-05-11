@@ -48,6 +48,7 @@ setup(
         'pyramid_mailer',
         'requests',
         'setuptools',
+        'unidiff',
     ],
     extras_require={
         'test': test_requires,

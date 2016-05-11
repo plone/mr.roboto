@@ -8,12 +8,20 @@ from pyramid.events import subscriber
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
 from requests.exceptions import RequestException
+from unidiff import PatchSet
 
 import logging
+import re
 import requests
 
 
 logger = logging.getLogger('mr.roboto')
+
+VALID_CHANGELOG_FILES = re.compile(r'(CHANGES|HISTORY).(txt|rst)$')
+
+IGNORE_NO_CHANGELOG = (
+    'documentation',
+)
 
 
 def get_info_from_commit(commit):
@@ -113,6 +121,21 @@ def send_mail_on_missing_checkout(event):
         event.email)
 
 
+def get_github_pull_request(github, pull_request_data):
+    """Get pygithub's pull request object and the last commit on it"""
+    repo_data = pull_request_data['base']['repo']
+    org = repo_data['owner']['login']
+    repo = repo_data['name']
+    pull_number = int(pull_request_data['number'])
+
+    g_org = github.get_organization(org)
+
+    g_repo = g_org.get_repo(repo)
+    g_pull = g_repo.get_pull(pull_number)
+    last_commit = g_pull.get_commits().reversed[0]
+    return g_pull, last_commit
+
+
 @subscriber(NewPullRequest)
 @subscriber(UpdatedPullRequest)
 def have_signed_contributors_agreement(event):
@@ -125,9 +148,6 @@ def have_signed_contributors_agreement(event):
     github = event.request.registry.settings['github']
     pull_request = event.pull_request
     pull_request_url = pull_request['html_url']
-    org = pull_request['base']['repo']['owner']['login']
-    repo = pull_request['base']['repo']['name']
-    pull_number = int(pull_request['number'])
     plone_org = github.get_organization('plone')
     cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
 
@@ -170,17 +190,8 @@ def have_signed_contributors_agreement(event):
             else:
                 not_foundation_members.append(login)
 
-    # get the pull request
-    if org == u'plone':
-        g_org = plone_org
-    else:
-        g_org = github.get_organization(org)
-
-    g_repo = g_org.get_repo(repo)
-    g_pull = g_repo.get_pull(pull_number)
-
-    # get last commit
-    last_commit = g_pull.get_commits().reversed[0]
+    # get the pull request and last commit
+    g_pull, last_commit = get_github_pull_request(github, pull_request)
 
     status = u'success'
     status_message = u'All users have signed it'
@@ -222,4 +233,51 @@ def have_signed_contributors_agreement(event):
         context='Plone Contributors Agreement verifier',
     )
     msg = 'Pull request {0} Contributors Agreement report: {1}'
+    logger.info(msg.format(pull_request_url, status))
+
+
+@subscriber(NewPullRequest)
+@subscriber(UpdatedPullRequest)
+def warn_if_no_changelog_entry(event):
+    """If the pull request does not add a changelog entry, warn about it"""
+    github = event.request.registry.settings['github']
+    pull_request = event.pull_request
+    pull_request_url = pull_request['html_url']
+    repo_name = pull_request['base']['repo']['name']
+
+    if repo_name in IGNORE_NO_CHANGELOG:
+        pull_request_url = pull_request['html_url']
+        msg = 'Pull request {0} whitelisted for changelog entries'
+        logger.info(msg.format(pull_request_url))
+        return
+
+    status = u'success'
+    description = u'Entry found'
+    status_url = '{0}/missing-changelog'.format(
+        event.request.registry.settings['roboto_url']
+    )
+
+    # check if the pull request modifies the changelog file
+    diff_url = pull_request['diff_url']
+    diff_data = requests.get(diff_url)
+    patch_data = PatchSet(diff_data, encoding=diff_data.encoding)
+
+    for diff_file in patch_data:
+        if VALID_CHANGELOG_FILES.search(diff_file.path):
+            break
+    else:
+        status = u'error'
+        description = u'No entry found!'
+
+    # get the pull request and last commit
+    g_pull, last_commit = get_github_pull_request(github, pull_request)
+
+    last_commit.create_status(
+        status,
+        target_url=status_url,
+        description=description,
+        context=u'Changelog verifier',
+    )
+
+    msg = 'Pull request {0} changelog entry: {1}'
     logger.info(msg.format(pull_request_url, status))

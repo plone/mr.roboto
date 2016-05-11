@@ -1,0 +1,44 @@
+<html>
+<head>
+  <title>Mr. Roboto</title>
+
+  <link
+      href='http://fonts.googleapis.com/css?family=Raleway:400,700'
+      rel='stylesheet'
+      type='text/css'/>
+
+  <style>
+    body {
+      font-family: 'Raleway', sans-serif;
+      background: url('static/roboto.png') no-repeat 60% 0%;
+      font-size: 18px;
+    }
+    a {
+      text-decoration: none;
+    }
+    a:link {
+      color: white;
+    }
+    a:visited {
+      color: white;
+    }
+    .alert {
+      color: brown;
+    }
+    .plone {
+      background-color: rgb(0,149,211);
+    }
+  </style>
+</head>
+<body class="plone">
+  <h1>Pull request missing a change log entry</h1>
+  <p>Every change made in plone, specially the ones made through a pull request,
+  is worth noting it down on the change log file (usually <em>CHANGES.rst</em>).</p>
+
+  <p>Thanks to this change log entries it is easier to know what happened on a given package,
+  who has been lately working on it, etc.</p>
+
+  <p>So please, add a change log entry <em>:-)</em></p>
+
+</body>
+</html>

@@ -181,3 +181,10 @@ class SimpleViewsTest(unittest.TestCase):
             'updated!',
             result.body,
         )
+
+    def test_no_changelog_view(self):
+        result = self.roboto.get('/missing-changelog')
+        self.assertIn(
+            'add a change log entry',
+            result.body,
+        )
