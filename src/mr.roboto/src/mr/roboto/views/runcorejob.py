@@ -180,7 +180,7 @@ def run_function_core_tests(request):
     # if the repo+branch are not in any plone version sources.cfg,
     # log and done
     elif (repo, branch) not in sources:
-        # Error repo not sources
+        # Error repo not in sources
         msg = 'Commit not in sources - {0} - {1} do nothing'
         logger.info(msg.format(repo, branch))
         return json.dumps(
