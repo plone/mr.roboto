@@ -8,11 +8,6 @@
       type='text/css'/>
 
   <style>
-    body {
-      font-family: 'Raleway', sans-serif;
-      background: url('static/roboto.png') no-repeat 60% 0%;
-      font-size: 18px;
-    }
     a {
       text-decoration: none;
     }
