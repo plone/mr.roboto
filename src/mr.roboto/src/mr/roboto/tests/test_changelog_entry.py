@@ -41,7 +41,6 @@ index 2a20bdc..57ce05f 100644
      'WebTest',
 +    'testfixtures',
  ]
-
  setup(
 """
 
@@ -56,7 +55,20 @@ index 2a20bdc..57ce05f 100644
      'WebTest',
 +    'testfixtures',
  ]
+ setup(
+"""
 
+DIFF_WITH_CHANGELOG_ON_HISTORY_txt = \
+    """diff --git a/src/mr.roboto/HISTORY.rst b/src/mr.roboto/HISTORY.rst
+index 2a20bdc..57ce05f 100644
+--- a/src/mr.roboto/HISTORY.rst
++++ b/src/mr.roboto/HISTORY.rst
+@@ -16,6 +16,7 @@
+     'pyramid_debugtoolbar',
+     'pytest',
+     'WebTest',
++    'testfixtures',
+ ]
  setup(
 """
 
@@ -84,9 +96,9 @@ class MockDiff(object):
     def encoding(self):
         return 'utf-8'
 
-    def __iter__(self):
-        for line in self.data.splitlines(True):
-            yield line
+    @property
+    def content(self):
+        return self.data
 
 
 class ChangeLogEntrySubscriberTest(unittest.TestCase):
@@ -125,6 +137,23 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
     @mock.patch('requests.get')
     def test_with_change_log_file(self, m1):
         m1.return_value = MockDiff(DIFF_WITH_CHANGELOG)
+
+        event = NewPullRequest(
+            pull_request=PAYLOAD,
+            request=MockRequest(),
+        )
+
+        with LogCapture() as captured_data:
+            warn_if_no_changelog_entry(event)
+
+        self.assertIn(
+            'changelog entry: success',
+            captured_data.records[-1].msg
+        )
+
+    @mock.patch('requests.get')
+    def test_with_change_log_file_history(self, m1):
+        m1.return_value = MockDiff(DIFF_WITH_CHANGELOG_ON_HISTORY_txt)
 
         event = NewPullRequest(
             pull_request=PAYLOAD,

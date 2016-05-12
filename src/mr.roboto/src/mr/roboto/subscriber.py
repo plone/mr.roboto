@@ -262,7 +262,10 @@ def warn_if_no_changelog_entry(event):
     # temporal workaround (not verifying SSL certificates) until
     # https://github.com/plone/jenkins.plone.org/issues/170 is fixed
     diff_data = requests.get(diff_url, verify=False)
-    patch_data = PatchSet(diff_data, encoding=diff_data.encoding)
+    patch_data = PatchSet(
+        diff_data.content.splitlines(),
+        encoding=diff_data.encoding,
+    )
 
     for diff_file in patch_data:
         if VALID_CHANGELOG_FILES.search(diff_file.path):
