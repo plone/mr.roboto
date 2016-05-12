@@ -19,7 +19,7 @@ PAYLOAD = {
     'diff_url': 'https://github.com/plone/mr.roboto/pull/34.diff',
     'base': {
         'repo': {
-            'name': 'mr.roboto',
+            'name': 'Products.CMFPlone',
             'owner': {
                 'login': 'plone',
             },
