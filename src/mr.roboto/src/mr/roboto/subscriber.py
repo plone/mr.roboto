@@ -21,6 +21,8 @@ VALID_CHANGELOG_FILES = re.compile(r'(CHANGES|HISTORY).(txt|rst)$')
 
 IGNORE_NO_CHANGELOG = (
     'documentation',
+    'mr.roboto',
+    'jenkins.plone.org',
 )
 
 IGNORE_NO_AGREEMENT = (
