@@ -23,6 +23,10 @@ IGNORE_NO_CHANGELOG = (
     'documentation',
 )
 
+IGNORE_NO_AGREEMENT = (
+    'icalendar',
+)
+
 
 def get_info_from_commit(commit):
     diff = requests.get(commit['url'] + '.diff').content
@@ -148,8 +152,14 @@ def have_signed_contributors_agreement(event):
     github = event.request.registry.settings['github']
     pull_request = event.pull_request
     pull_request_url = pull_request['html_url']
+    repo = pull_request['base']['repo']['name']
     plone_org = github.get_organization('plone')
     cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
+
+    if repo in IGNORE_NO_AGREEMENT:
+        msg = 'Repo {0} whitelisted for contributors agreement'
+        logger.info(msg.format(pull_request_url))
+        return
 
     try:
         commits_data = requests.get(pull_request['commits_url'])

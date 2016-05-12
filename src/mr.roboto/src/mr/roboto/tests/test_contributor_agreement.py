@@ -27,6 +27,8 @@ PAYLOAD = {
 }
 COLLECTIVE_PAYLOAD = copy.deepcopy(PAYLOAD)
 COLLECTIVE_PAYLOAD['base']['repo']['owner']['login'] = 'collective'
+WHITELISTED_PAYLOAD = copy.deepcopy(PAYLOAD)
+WHITELISTED_PAYLOAD['base']['repo']['name'] = 'icalendar'
 
 
 class MockRequest(object):
@@ -221,5 +223,21 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertIn(
             'Contributors Agreement report: success',
+            captured_data.records[-1].msg
+        )
+
+    def test_whitelisted(self):
+        from mr.roboto.events import NewPullRequest
+
+        event = NewPullRequest(
+            pull_request=WHITELISTED_PAYLOAD,
+            request=MockRequest(),
+        )
+
+        with LogCapture() as captured_data:
+            have_signed_contributors_agreement(event)
+
+        self.assertIn(
+            'whitelisted for contributors agreement',
             captured_data.records[-1].msg
         )
