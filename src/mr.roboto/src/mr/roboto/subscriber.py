@@ -330,7 +330,7 @@ def warn_test_need_to_run(event):
         last_commit.create_status(
             u'pending',
             target_url=url.format(version),
-            description='Please run the jenkins job',
+            description='Please run the job, click here ----------->',
             context=context.format(version),
         )
         msg = '{0} created pending status for plone {1}'
