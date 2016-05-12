@@ -12,6 +12,7 @@
       font-size: 14px;
     }
   </style>
+  <meta http-equiv="refresh" content="60" />
 </head>
 <body>
   <tal:element condition="success">
