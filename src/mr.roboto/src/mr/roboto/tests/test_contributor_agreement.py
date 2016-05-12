@@ -18,7 +18,7 @@ PAYLOAD = {
     'commits_url': 'https://github.com/plone/mr.roboto/pull/34/commits',
     'base': {
         'repo': {
-            'name': 'mr.roboto',
+            'name': 'Products.CMFPlone',
             'owner': {
                 'login': 'plone',
             },
