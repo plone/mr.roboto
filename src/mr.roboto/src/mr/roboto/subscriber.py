@@ -5,6 +5,7 @@ from mr.roboto.events import NewCoreDevPush
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
 from mr.roboto.utils import plone_versions_targeted
+from mr.roboto.utils import shorten_pull_request_url
 from pyramid.events import subscriber
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
@@ -155,27 +156,28 @@ def have_signed_contributors_agreement(event):
     github = event.request.registry.settings['github']
     pull_request = event.pull_request
     pull_request_url = pull_request['html_url']
+    short_url = shorten_pull_request_url(pull_request_url)
     repo = pull_request['base']['repo']['name']
     plone_org = github.get_organization('plone')
     cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
 
     if repo in IGNORE_NO_AGREEMENT:
-        msg = 'Repo {0} whitelisted for contributors agreement'
-        logger.info(msg.format(pull_request_url))
+        msg = 'PR {0}: whitelisted for contributors agreement'
+        logger.info(msg.format(short_url))
         return
 
     try:
         commits_data = requests.get(pull_request['commits_url'])
     except RequestException:
-        msg = 'Error while trying to get commits from pull request {0}'
-        logger.warn(msg.format(pull_request_url))
+        msg = 'PR {0}: error while trying to get its commits'
+        logger.warn(msg.format(short_url))
         return
 
     try:
         json_data = commits_data.json()
     except ValueError:
-        msg = 'Error while getting JSON data from pull request {0}'
-        logger.warn(msg.format(pull_request_url))
+        msg = 'PR {0}: error while getting its commits in JSON'
+        logger.warn(msg.format(short_url))
         return
 
     members = []
@@ -186,8 +188,8 @@ def have_signed_contributors_agreement(event):
             try:
                 login = commit_info[user]['login']
             except TypeError:
-                msg = 'Commit on pull request {0} does not have {1} user info'
-                logger.warn(msg.format(pull_request_url, user))
+                msg = 'PR {0}: commit does not have {1} user info'
+                logger.warn(msg.format(short_url, user))
                 unknown_users.append(
                     commit_info['commit']['author']['name']
                 )
@@ -245,8 +247,8 @@ def have_signed_contributors_agreement(event):
         description=status_message,
         context='Plone Contributors Agreement verifier',
     )
-    msg = 'Pull request {0} Contributors Agreement report: {1}'
-    logger.info(msg.format(pull_request_url, status))
+    msg = 'PR {0}: Contributors Agreement report: {1}'
+    logger.info(msg.format(short_url, status))
 
 
 @subscriber(NewPullRequest)
@@ -256,12 +258,12 @@ def warn_if_no_changelog_entry(event):
     github = event.request.registry.settings['github']
     pull_request = event.pull_request
     pull_request_url = pull_request['html_url']
+    short_url = shorten_pull_request_url(pull_request_url)
     repo_name = pull_request['base']['repo']['name']
 
     if repo_name in IGNORE_NO_CHANGELOG:
-        pull_request_url = pull_request['html_url']
-        msg = 'Pull request {0} whitelisted for changelog entries'
-        logger.info(msg.format(pull_request_url))
+        msg = 'PR {0}: whitelisted for changelog entries'
+        logger.info(msg.format(short_url))
         return
 
     status = u'success'
@@ -297,8 +299,8 @@ def warn_if_no_changelog_entry(event):
         context=u'Changelog verifier',
     )
 
-    msg = 'Pull request {0} changelog entry: {1}'
-    logger.info(msg.format(pull_request_url, status))
+    msg = 'PR {0}: changelog entry: {1}'
+    logger.info(msg.format(short_url, status))
 
 
 @subscriber(NewPullRequest)
@@ -316,8 +318,8 @@ def warn_test_need_to_run(event):
 
     plone_versions = plone_versions_targeted(repo, target_branch, request)
     if not plone_versions:
-        msg = 'Pull request {0} does not target any Plone version'
-        logger.info(msg.format(pull_request_url))
+        msg = 'PR {0}: does not target any Plone version'
+        logger.info(msg.format(shorten_pull_request_url(pull_request_url)))
         return
 
     # get the pull request and last commit
@@ -333,5 +335,10 @@ def warn_test_need_to_run(event):
             description='Please run the job, click here ----------->',
             context=context.format(version),
         )
-        msg = '{0} created pending status for plone {1}'
-        logger.info(msg.format(pull_request_url, version))
+        msg = 'PR {0}: created pending status for plone {1}'
+        logger.info(
+            msg.format(
+                shorten_pull_request_url(pull_request_url),
+                version,
+            )
+        )

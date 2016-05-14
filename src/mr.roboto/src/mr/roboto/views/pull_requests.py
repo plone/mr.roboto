@@ -3,6 +3,7 @@ from cornice import Service
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
 from mr.roboto.security import validate_github
+from mr.roboto.utils import shorten_pull_request_url
 
 import json
 import logging
@@ -33,8 +34,8 @@ def handle_pull_request(request):
     action = payload['action']
     pull_request = payload['pull_request']
     logger.info(
-        u'Got pull request {0} with action {1}'.format(
-            payload['pull_request']['html_url'],
+        u'PR {0}: with action {1}'.format(
+            shorten_pull_request_url(payload['pull_request']['html_url']),
             action,
         )
     )

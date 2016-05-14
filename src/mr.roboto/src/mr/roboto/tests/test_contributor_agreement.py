@@ -72,7 +72,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
             1
         )
         self.assertIn(
-            'Error while trying to get commits from pull request',
+            'error while trying to get its commits',
             captured_data.records[0].msg
         )
 
@@ -100,7 +100,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
             1
         )
         self.assertIn(
-            'Error while getting JSON data from pull request',
+            'error while getting its commits in JSON',
             captured_data.records[0].msg
         )
 
