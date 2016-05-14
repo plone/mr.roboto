@@ -55,7 +55,7 @@ def commit_to_coredev(
     changeset_long,
     timestamp
 ):
-    logger.info('github commit LETS COMMIT ON COREDEV')
+    logger.info('Commit: LETS COMMIT ON COREDEV')
     gh = request.registry.settings['github']
     org = gh.get_organization('plone')
     repo = org.get_repo('buildout.coredev')
@@ -106,8 +106,6 @@ def run_function_core_tests(request):
     skip = False
     source_or_checkout = False
 
-    message = ''
-
     repo_name = payload['repository']['name']
     repo = payload['repository']['full_name']
     branch = payload['ref'].split('/')[-1]
@@ -147,8 +145,8 @@ def run_function_core_tests(request):
         # get a timestamp for later usage when creating commits
         timestamp = commit['timestamp']
 
-        message = 'Commit on {0} {1} {2}'.format(repo, branch, commit['id'])
-        logger.info(message)
+        msg = 'Commit: on {0} {1} {2}'.format(repo, branch, commit['id'])
+        logger.info(msg)
 
     if not fake and not skip:
         request.registry.notify(NewCoreDevPush(payload, request))
@@ -156,7 +154,7 @@ def run_function_core_tests(request):
     # If it is a push to buildout.coredev,
     # update sources and checkouts and quit
     if repo == 'plone/buildout.coredev':
-        logger.info('Commit to coredev - do nothing')
+        logger.info('Commit: on coredev - do nothing')
         if source_or_checkout:
             get_sources_and_checkouts(request)
 
@@ -170,7 +168,7 @@ def run_function_core_tests(request):
 
     # if it's a skip commit, log and done
     if skip:
-        msg = 'Commit skipping CI - {0} - {1} do nothing'
+        msg = 'Commit: skip CI - {0} - {1} do nothing'
         logger.info(msg.format(repo, branch))
         return json.dumps({'message': 'Thanks! Skipping CI'})
 
@@ -179,7 +177,7 @@ def run_function_core_tests(request):
     plone_versions = plone_versions_targeted(repo, branch, request)
     if not plone_versions:
         # Error repo not in sources
-        msg = 'Commit not in sources - {0} - {1} do nothing'
+        msg = 'Commit: not in sources - {0} - {1} do nothing'
         logger.info(msg.format(repo, branch))
         return json.dumps(
             {'message': 'Thanks! Commits done on a branch, nothing to do'}
@@ -215,7 +213,6 @@ def run_function_core_tests(request):
             timestamp,
         )
 
-    logger.info(message)
     return json.dumps(
         {'message': 'Thanks! Plone Jenkins CI will run tests'}
     )
