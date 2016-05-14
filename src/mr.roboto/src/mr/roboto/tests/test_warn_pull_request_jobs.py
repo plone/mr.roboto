@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from mr.roboto.subscriber import warn_test_need_to_run
-from testfixtures import LogCapture
 from tempfile import NamedTemporaryFile
+from testfixtures import LogCapture
 
 import mock
 import os
