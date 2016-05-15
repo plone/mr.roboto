@@ -25,6 +25,7 @@ IGNORE_NO_CHANGELOG = (
     'documentation',
     'mr.roboto',
     'jenkins.plone.org',
+    'buildout.coredev',
 )
 
 IGNORE_NO_AGREEMENT = (
