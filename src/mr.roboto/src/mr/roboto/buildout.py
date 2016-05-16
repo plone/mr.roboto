@@ -147,7 +147,7 @@ class PloneCoreBuildout(object):
 
     def clone(self):
         logger.info(
-            'Cloning github repository {0}, branch={1}'.format(
+            'Commit: cloning github repository {0}, branch={1}'.format(
                 self.location,
                 self.core_version
             )
@@ -176,7 +176,7 @@ def get_sources_and_checkouts(request):
     actual_plone_versions = request.registry.settings['plone_versions']
 
     for plone_version in actual_plone_versions:
-        msg = 'Checking sources and checkouts from plone {0}'
+        msg = 'Commit: checking sources and checkouts from plone {0}'
         logger.info(msg.format(plone_version))
         buildout = PloneCoreBuildout(plone_version)
 
