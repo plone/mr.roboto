@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from mr.roboto import main
+from mr.roboto.views.home import parse_log_line
 from webtest import TestApp
 
 import mock
@@ -81,25 +82,6 @@ class SimpleViewsTest(unittest.TestCase):
         )
         self.assertIn(
             'log lines',
-            result.body,
-        )
-        self.clean_file(filename)
-
-    def test_log_view_remove_logger_name(self):
-        filename = 'roboto.log'
-        self.clean_file(filename)
-        with open(filename, 'w') as log:
-            log.write('log line with [mr.roboto][waitress] in it')
-
-        result = self.roboto.get(
-            '/log?token={0}'.format(self.settings['api_key'])
-        )
-        self.assertIn(
-            'log line with in it',
-            result.body,
-        )
-        self.assertNotIn(
-            '[mr.roboto][waitress]',
             result.body,
         )
         self.clean_file(filename)
@@ -206,4 +188,72 @@ class SimpleViewsTest(unittest.TestCase):
         self.assertIn(
             'add a change log entry',
             result.body,
+        )
+
+    def test_parse_log_line_no_format(self):
+        self.assertEqual(
+            parse_log_line('la la '),
+            'la la ',
+        )
+
+    def test_parse_log_line_format_other(self):
+        msg = parse_log_line(
+            '2016-05-16 23:45:00,343 INFO [mr.roboto][lala] my message'
+        )
+
+        self.assertIn(
+            """<span class="timestamp">2016-05-16 23:45:00,343</span>""",
+            msg,
+        )
+        self.assertIn(
+            """<span class="info">INFO</span>""",
+            msg,
+        )
+        self.assertIn(
+            """<span class="message">my message</span>""",
+            msg,
+        )
+
+    def test_parse_log_line_format_commit(self):
+        msg = parse_log_line(
+            '2013-12-12 22:34 INFO [mr.roboto][lala] '
+            'Commit: on plone/ploneorg.core master '
+            'fcbc0f2764f84a027766d96493ea0d40823f7ef1'
+        )
+
+        self.assertIn(
+            """<span class="timestamp">2013-12-12 22:34</span>""",
+            msg,
+        )
+        self.assertIn(
+            """<span class="info">INFO</span>""",
+            msg,
+        )
+        self.assertIn(
+            '<span class="message">Commit: on plone/ploneorg.core master '
+            '<a href="https://github.com/plone/ploneorg.core/commit/'
+            'fcbc0f2764f84a027766d96493ea0d40823f7ef1">'
+            'fcbc0f2764f84a027766d96493ea0d40823f7ef1</a></span>',
+            msg,
+        )
+
+    def test_parse_log_line_format_pull_request(self):
+        msg = parse_log_line(
+            '2013-11-10 12:15 WARN [mr.roboto][lala] '
+            'PR plone/ploneorg.core#155: with action closed'
+        )
+
+        self.assertIn(
+            """<span class="timestamp">2013-11-10 12:15</span>""",
+            msg,
+        )
+        self.assertIn(
+            """<span class="warn">WARN</span>""",
+            msg,
+        )
+        self.assertIn(
+            '<span class="message">PR <a href="https://github.com/plone/'
+            'ploneorg.core/pull/155">plone/ploneorg.core#155</a>: '
+            'with action closed</span>',
+            msg,
         )
