@@ -85,6 +85,25 @@ class SimpleViewsTest(unittest.TestCase):
         )
         self.clean_file(filename)
 
+    def test_log_view_remove_logger_name(self):
+        filename = 'roboto.log'
+        self.clean_file(filename)
+        with open(filename, 'w') as log:
+            log.write('log line with [mr.roboto][waitress] in it')
+
+        result = self.roboto.get(
+            '/log?token={0}'.format(self.settings['api_key'])
+        )
+        self.assertIn(
+            'log line with in it',
+            result.body,
+        )
+        self.assertNotIn(
+            '[mr.roboto][waitress]',
+            result.body,
+        )
+        self.clean_file(filename)
+
     def test_log_view_truncated(self):
         filename = 'roboto.log'
         self.clean_file(filename)

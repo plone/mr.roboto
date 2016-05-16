@@ -27,6 +27,7 @@ def log_page(context, request):
             raw_data = deque(log_file, maxlen=200)
             raw_data.reverse()
             log = ''.join(raw_data)
+            log = log.replace(' [mr.roboto][waitress]', '')
     except OSError:
         return {
             'success': False,
