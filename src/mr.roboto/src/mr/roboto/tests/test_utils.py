@@ -10,7 +10,7 @@ class TestShortenPRUrls(unittest.TestCase):
         url = 'https://github.com/plone/plone.app.registry/pull/20'
         self.assertEqual(
             shorten_pull_request_url(url),
-            'plone.app.registry#20'
+            'plone/plone.app.registry#20'
         )
 
     def test_fallback(self):

@@ -3,7 +3,7 @@ import pickle
 import re
 
 
-PULL_REQUEST_URL_RE = re.compile(r'https://github.com/.+/(.+)/pull/(\d+)')
+PULL_REQUEST_URL_RE = re.compile(r'https://github.com/(.+/.+)/pull/(\d+)')
 
 
 def get_pickled_data(filename):
