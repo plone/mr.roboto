@@ -26,6 +26,8 @@ IGNORE_NO_CHANGELOG = (
     'mr.roboto',
     'jenkins.plone.org',
     'buildout.coredev',
+    'ploneorg.core',
+    'ploneorg.theme',
 )
 
 IGNORE_NO_AGREEMENT = (
