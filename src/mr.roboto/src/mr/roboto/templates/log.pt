@@ -9,6 +9,9 @@
       color: white;
       font-size: 15px;
     }
+    a:link {
+      color:white;
+    }
   </style>
   <meta http-equiv="refresh" content="60" />
 </head>
