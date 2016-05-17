@@ -325,7 +325,12 @@ def warn_test_need_to_run(event):
     repo = pull_request['base']['repo']['full_name']
 
     plone_versions = plone_versions_targeted(repo, target_branch, request)
-    if not plone_versions:
+
+    if repo == 'plone/buildout.coredev' and \
+            target_branch in request.registry.settings['plone_versions']:
+        plone_versions = (target_branch, )
+
+    elif not plone_versions:
         msg = 'PR {0}: does not target any Plone version'
         logger.info(msg.format(shorten_pull_request_url(pull_request_url)))
         return

@@ -3,6 +3,7 @@ from mr.roboto.subscriber import warn_test_need_to_run
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
 
+import copy
 import mock
 import os
 import pickle
@@ -29,12 +30,22 @@ PAYLOAD = {
     },
 }
 
+COREDEV_PAYLOAD = copy.deepcopy(PAYLOAD)
+COREDEV_PAYLOAD['html_url'] = 'https://github.com/plone/buildout.coredev/pull/3'
+COREDEV_PAYLOAD['base']['ref'] = '4.3'
+COREDEV_PAYLOAD['base']['repo']['name'] = 'buildout.coredev'
+COREDEV_PAYLOAD['base']['repo']['full_name'] = 'plone/buildout.coredev'
+
+COREDEV_RANDOM_BRANCH_PAYLOAD = copy.deepcopy(COREDEV_PAYLOAD)
+COREDEV_RANDOM_BRANCH_PAYLOAD['base']['ref'] = 'random'
+
 
 class MockRequest(object):
 
     def __init__(self):
         self._settings = {
-            'github': mock.MagicMock()
+            'github': mock.MagicMock(),
+            'plone_versions': ['4.3', '5.1', ],
         }
 
     @property
@@ -60,12 +71,15 @@ class MockRequest(object):
 
 class WarnPullRequestSubscriberTest(unittest.TestCase):
 
-    def create_event(self, sources_data):
+    def create_event(self, sources_data, payload=None):
         from mr.roboto.events import NewPullRequest
+        if not payload:
+            payload = PAYLOAD
+
         request = MockRequest()
         request.set_sources(sources_data)
         event = NewPullRequest(
-            pull_request=PAYLOAD,
+            pull_request=payload,
             request=request,
         )
         return event
@@ -139,4 +153,43 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         self.assertIn(
             'created pending status for plone 5.1',
             messages[1]
+        )
+
+    def test_buildout_coredev_not_targeting_plone_release(self):
+        event = self.create_event(
+            {},
+            payload=COREDEV_RANDOM_BRANCH_PAYLOAD
+        )
+
+        with LogCapture() as captured_data:
+            warn_test_need_to_run(event)
+
+        event.request.cleanup_sources()
+
+        self.assertEqual(
+            len(captured_data.records),
+            1
+        )
+
+        self.assertIn(
+            'PR plone/buildout.coredev#3: does not target any Plone version',
+            captured_data.records[0].msg
+        )
+
+    def test_buildout_coredev_targeting_plone_release(self):
+        event = self.create_event({}, payload=COREDEV_PAYLOAD)
+
+        with LogCapture() as captured_data:
+            warn_test_need_to_run(event)
+
+        event.request.cleanup_sources()
+
+        self.assertEqual(
+            len(captured_data.records),
+            1
+        )
+
+        self.assertIn(
+            'created pending status for plone 4.3',
+            captured_data.records[0].msg
         )
