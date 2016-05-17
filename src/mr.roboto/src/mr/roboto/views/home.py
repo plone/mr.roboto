@@ -28,7 +28,7 @@ PULL_REQUEST_LOG_MSG_RE = re.compile(
 COMMIT_LOG_MSG_RE = re.compile(
     r'\s+(\S+)'  # repo/package.name
     r'\s+\S+'  # branch name
-    r'\s+(\w+)$'  # commit hash at the end of the line
+    r'\s+([\d\w]{40})$'  # commit hash at the end of the line
 )
 
 PULL_REQUEST_URL = '<a href="https://github.com/{1}/pull/{2}">{0}</a>'
