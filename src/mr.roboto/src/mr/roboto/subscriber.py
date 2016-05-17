@@ -25,6 +25,8 @@ IGNORE_NO_CHANGELOG = (
     'documentation',
     'mr.roboto',
     'jenkins.plone.org',
+    'plone.jenkins_node',
+    'plone.jenkins_server',
     'buildout.coredev',
     'ploneorg.core',
     'ploneorg.theme',
