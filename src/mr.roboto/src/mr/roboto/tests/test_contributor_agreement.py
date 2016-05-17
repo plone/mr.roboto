@@ -141,6 +141,64 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
     @mock.patch('requests.get')
+    def test_error_no_author_on_commit_no_duplicates(self, m1):
+        from mr.roboto.events import NewPullRequest
+
+        class FakeCommitsData(object):
+
+            def json(self):
+                return [
+                    {
+                        'committer': {
+                            'login': 'user',
+                        },
+                        'author': None,
+                        'commit': {
+                            'author': {
+                                'name': 'My name',
+                            },
+                        },
+                    },
+                    {
+                        'committer': {
+                            'login': 'user',
+                        },
+                        'author': None,
+                        'commit': {
+                            'author': {
+                                'name': 'My name',
+                            },
+                        },
+                    },
+                    {
+                        'committer': {
+                            'login': 'user',
+                        },
+                        'author': None,
+                        'commit': {
+                            'author': {
+                                'name': 'My name',
+                            },
+                        },
+                    },
+                ]
+
+        m1.return_value = FakeCommitsData()
+
+        event = NewPullRequest(
+            pull_request=PAYLOAD,
+            request=MockRequest(),
+        )
+
+        with LogCapture() as captured_data:
+            have_signed_contributors_agreement(event)
+
+        self.assertIn(
+            ': My name missing contributors agreement',
+            captured_data.records[-2].msg
+        )
+
+    @mock.patch('requests.get')
     def test_no_foundation_member(self, m1):
         from mr.roboto.events import NewPullRequest
 

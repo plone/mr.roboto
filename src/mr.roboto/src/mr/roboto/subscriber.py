@@ -228,8 +228,11 @@ def have_signed_contributors_agreement(event):
         last_commit.create_comment(body=msg.format(users, cla_url))
 
     if unknown_users:
-        # add a message mentioning all unknown users
-        users = ', '.join(unknown_users)
+        # add a message mentioning all unknown users,
+        # but mention each of them only once
+        users = ', '.join(set(unknown_users))
+        msg = 'PR {0}: {1} missing contributors agreement'
+        logger.info(msg.format(short_url, users))
         msg = u'{0} your emails are not known to GithHb and thus it is ' \
               u'impossible to know if you have signed the Plone Contributor ' \
               u'Agreement, which is required to merge this pull request.' \
