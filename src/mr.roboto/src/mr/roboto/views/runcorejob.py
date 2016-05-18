@@ -84,45 +84,29 @@ def commit_to_coredev(
     head_ref.edit(sha=new_commit.sha, force=False)
 
 
-@runCoreTests.post()
-@validate_github
-def run_function_core_tests(request):
-    """When we are called by GH we want to run the jenkins builds
+def get_info(payload, repo, branch):
+    """ gather information about the commits
 
-    It's called for each push on the plone repo, so we look which tests needs
-    to run for the given repository and branch:
+    There are three special cases:
+
+    - fake: the commit was made by mr.roboto itself
+    - skip: the committer requested to skip CI for this commit,
+      usually done by the release team to avoid flooding Jenkins
+    - sources_or_checkouts: either sources.cfg or checkouts.cfg has been
+      changed (the data stored locally needs to be updated maybe)
+
+    Return the changeset, both a short and a log version, plus the special
+    cases.
     """
-    # bail out early if it's just a github check
-    payload = json.loads(request.POST['payload'])
-    if 'ref' not in payload:
-        return json.dumps({'message': 'pong'})
-
-    # lots of variables
+    timestamp = datetime.datetime.now(GMT1()).isoformat()
     changeset = ''
     changeset_long = ''
-    commits_info = []
-    timestamp = datetime.datetime.now(GMT1()).isoformat()
     fake = False
     skip = False
     source_or_checkout = False
-
-    repo_name = payload['repository']['name']
-    repo = payload['repository']['full_name']
-    branch = payload['ref'].split('/')[-1]
-
-    # who pushed the commits?
-    who = get_user(payload['pusher'])
-
-    # gather information about the commits. There are three special cases:
-    # - fake: the commit was made by mr.roboto itself
-    # - skip: the committer requested to skip CI for this commit,
-    #   usually done by the release team to avoid flooding Jenkins
-    # - sources_or_checkouts: either sources.cfg or checkouts.cfg has been
-    #   changed (the data stored locally needs to be updated maybe)
     for commit in payload['commits']:
         # get the commit data structure
         commit_data = get_info_from_commit(commit)
-        commits_info.append(commit_data)
         files = '\n'.join(commit_data['files'])
 
         if '[fc]' in commit_data['short_commit_msg']:
@@ -147,6 +131,38 @@ def run_function_core_tests(request):
 
         msg = 'Commit: on {0} {1} {2}'.format(repo, branch, commit['id'])
         logger.info(msg)
+
+    return timestamp, changeset, changeset_long, fake, skip, source_or_checkout
+
+
+@runCoreTests.post()
+@validate_github
+def run_function_core_tests(request):
+    """When we are called by GH we want to run the jenkins builds
+
+    It's called for each push on the plone repo, so we look which tests needs
+    to run for the given repository and branch:
+    """
+    # bail out early if it's just a github check
+    payload = json.loads(request.POST['payload'])
+    if 'ref' not in payload:
+        return json.dumps({'message': 'pong'})
+
+    # lots of variables
+    repo_name = payload['repository']['name']
+    repo = payload['repository']['full_name']
+    branch = payload['ref'].split('/')[-1]
+
+    # who pushed the commits?
+    who = get_user(payload['pusher'])
+
+    data = get_info(payload, repo, branch)
+    timestamp = data[0]
+    changeset = data[1]
+    changeset_long = data[2]
+    fake = data[3]
+    skip = data[4]
+    source_or_checkout = data[5]
 
     if not fake and not skip:
         request.registry.notify(NewCoreDevPush(payload, request))
