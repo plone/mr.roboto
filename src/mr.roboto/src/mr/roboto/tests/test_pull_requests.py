@@ -29,6 +29,13 @@ UPDATED_PR_PAYLOAD['action'] = 'synchronize'
 UNKNOWN_PR_ACTION_PAYLOAD = copy.deepcopy(NEW_PR_PAYLOAD)
 UNKNOWN_PR_ACTION_PAYLOAD['action'] = 'unknown'
 
+CLOSED_NOT_MERGED_PR_ACTION_PAYLOAD = copy.deepcopy(NEW_PR_PAYLOAD)
+CLOSED_NOT_MERGED_PR_ACTION_PAYLOAD['action'] = 'closed'
+
+CLOSED_AND_MERGED_PR_ACTION_PAYLOAD = copy.deepcopy(NEW_PR_PAYLOAD)
+CLOSED_AND_MERGED_PR_ACTION_PAYLOAD['action'] = 'closed'
+CLOSED_AND_MERGED_PR_ACTION_PAYLOAD['pull_request']['merged'] = True
+
 
 def minimal_main(global_config, **settings):
     from github import Github
@@ -127,6 +134,30 @@ class RunCoreJobTest(unittest.TestCase, ):
         )
 
         self.assertIn(
-            'PR plone/mr.roboto#1: action "unknown" not handled',
+            'PR plone/mr.roboto#1: action "unknown" (merged: False) '
+            'not handled',
             captured_data.records[-1].msg
+        )
+
+    def test_closed_not_merged_pull_request_action(self):
+        with LogCapture() as captured_data:
+            self.call_view(CLOSED_NOT_MERGED_PR_ACTION_PAYLOAD)
+
+        self.assertEqual(
+            len(captured_data.records),
+            2
+        )
+
+        self.assertIn(
+            'PR plone/mr.roboto#1: action "closed" (merged: False) '
+            'not handled',
+            captured_data.records[-1].msg
+        )
+
+    def test_closed_and_merged_pull_request_action(self):
+        result = self.call_view(CLOSED_AND_MERGED_PR_ACTION_PAYLOAD)
+
+        self.assertIn(
+            'Handlers already took care of this pull request',
+            result.body,
         )

@@ -54,9 +54,10 @@ def handle_pull_request(request):
             MergedPullRequest(pull_request, request)
         )
     else:
-        msg = 'PR {0}: action "{1}" not handled'.format(
+        msg = 'PR {0}: action "{1}" (merged: {2}) not handled'.format(
             short_url,
             action,
+            pull_request['merged'],
         )
         logger.info(msg)
         return json.dumps({'message': msg, })
