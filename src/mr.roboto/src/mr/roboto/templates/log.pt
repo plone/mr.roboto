@@ -8,10 +8,10 @@
     p {
       color: white;
       font-size: 15px;
+      text-shadow: 1px 1px 0px black;
     }
     .info, .warning, .error, .critical, .timestamp {
       font-size: 12px;
-      text-shadow: 1px 1px 0px black;
     }
     a:link {
       color: white;
@@ -24,7 +24,6 @@
     }
     .error, .critical {
       color: red;
-      text-shadow: 1px 1px 0px black;
     }
   </style>
   <meta http-equiv="refresh" content="60" />
