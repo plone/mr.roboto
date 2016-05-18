@@ -16,6 +16,9 @@
     a:link {
       color: white;
     }
+    a:visited {
+      color: grey;
+    }
     .timestamp {
       color: #CCC;
     }
