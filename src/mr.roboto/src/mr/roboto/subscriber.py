@@ -149,30 +149,13 @@ def get_github_pull_request(github, pull_request_data):
     return g_pull, last_commit
 
 
-@subscriber(NewPullRequest)
-@subscriber(UpdatedPullRequest)
-def have_signed_contributors_agreement(event):
-    """Check if all users involved in a pull request have signed the CLA
-
-    :param event: NewPullRequest or UpdatePullRequest object
-    :return: None
+def get_json_commits(commits_url, short_url):
+    """From a commits_url like
+    https://github.com/plone/mr.roboto/pull/34/commits
+    return the JSON provided by github, or None if something happens
     """
-    # tons of data
-    github = event.request.registry.settings['github']
-    pull_request = event.pull_request
-    pull_request_url = pull_request['html_url']
-    short_url = shorten_pull_request_url(pull_request_url)
-    repo = pull_request['base']['repo']['name']
-    plone_org = github.get_organization('plone')
-    cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
-
-    if repo in IGNORE_NO_AGREEMENT:
-        msg = 'PR {0}: whitelisted for contributors agreement'
-        logger.info(msg.format(short_url))
-        return
-
     try:
-        commits_data = requests.get(pull_request['commits_url'])
+        commits_data = requests.get(commits_url)
     except RequestException:
         msg = 'PR {0}: error while trying to get its commits'
         logger.warn(msg.format(short_url))
@@ -185,9 +168,14 @@ def have_signed_contributors_agreement(event):
         logger.warn(msg.format(short_url))
         return
 
+    return json_data
+
+
+def check_membership(json_data, short_url, github):
+    plone_org = github.get_organization('plone')
+    unknown_users = []
     members = []
     not_foundation_members = []
-    unknown_users = []
     for commit_info in json_data:
         for user in ('committer', 'author'):
             try:
@@ -209,6 +197,40 @@ def have_signed_contributors_agreement(event):
                 members.append(login)
             else:
                 not_foundation_members.append(login)
+
+    return not_foundation_members, unknown_users
+
+
+@subscriber(NewPullRequest)
+@subscriber(UpdatedPullRequest)
+def have_signed_contributors_agreement(event):
+    """Check if all users involved in a pull request have signed the CLA
+
+    :param event: NewPullRequest or UpdatePullRequest object
+    :return: None
+    """
+    # tons of data
+    github = event.request.registry.settings['github']
+    pull_request = event.pull_request
+    pull_request_url = pull_request['html_url']
+    short_url = shorten_pull_request_url(pull_request_url)
+    repo = pull_request['base']['repo']['name']
+    cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
+
+    if repo in IGNORE_NO_AGREEMENT:
+        msg = 'PR {0}: whitelisted for contributors agreement'
+        logger.info(msg.format(short_url))
+        return
+
+    json_data = get_json_commits(pull_request['commits_url'], short_url)
+    if not json_data:
+        return
+
+    not_foundation_members, unknown_users = check_membership(
+        json_data,
+        short_url,
+        github,
+    )
 
     # get the pull request and last commit
     g_pull, last_commit = get_github_pull_request(github, pull_request)

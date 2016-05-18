@@ -31,7 +31,7 @@ PAYLOAD = {
 }
 
 COREDEV_PAYLOAD = copy.deepcopy(PAYLOAD)
-COREDEV_PAYLOAD['html_url'] = 'http://github.com/plone/buildout.coredev/pull/3'
+COREDEV_PAYLOAD['html_url'] = 'https://github.com/plone/buildout.coredev/pull/3'  # noqa
 COREDEV_PAYLOAD['base']['ref'] = '4.3'
 COREDEV_PAYLOAD['base']['repo']['name'] = 'buildout.coredev'
 COREDEV_PAYLOAD['base']['repo']['full_name'] = 'plone/buildout.coredev'
