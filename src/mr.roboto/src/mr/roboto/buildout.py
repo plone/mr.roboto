@@ -123,7 +123,6 @@ class CheckoutsFile(UserDict):
         return self.__setitem__(package_name, False)
 
     def add(self, package_name):
-        # TODO: Handle test-fix-only as well
         return self.__setitem__(package_name, True)
 
     def remove(self, package_name):
