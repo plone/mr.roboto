@@ -30,3 +30,7 @@ class NewPullRequest(PullRequest):
 
 class UpdatedPullRequest(PullRequest):
     pass
+
+
+class MergedPullRequest(PullRequest):
+    pass
