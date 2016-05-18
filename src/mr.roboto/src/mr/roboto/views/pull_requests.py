@@ -30,12 +30,13 @@ def handle_pull_request(request):
     payload = json.loads(request.POST['payload'])
     if 'action' not in payload:
         return json.dumps({'message': 'No action, nothing can be done'})
+    short_url = shorten_pull_request_url(payload['pull_request']['html_url'])
 
     action = payload['action']
     pull_request = payload['pull_request']
     logger.info(
         u'PR {0}: with action {1}'.format(
-            shorten_pull_request_url(payload['pull_request']['html_url']),
+            short_url,
             action,
         )
     )
@@ -48,10 +49,11 @@ def handle_pull_request(request):
             UpdatedPullRequest(pull_request, request)
         )
     else:
-        msg = 'Action "{0}" on pull request {1} not handled'.format(
+        msg = 'PR {0}: action "{1}" not handled'.format(
+            short_url,
             action,
-            payload['pull_request']['html_url']
         )
+        logger.info(msg)
         return json.dumps({'message': msg, })
 
     msg = 'Thanks! Handlers already took care of this pull request'

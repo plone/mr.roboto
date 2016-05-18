@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
+from testfixtures import LogCapture
 from webtest import TestApp
 
 import copy
@@ -14,18 +15,19 @@ Reduced set of data sent by Github about a pull request.
 
 Each payload is adapted later on to test all corner cases.
 """
-NEW_PULL_REQUEST_PAYLOAD = {
+NEW_PR_PAYLOAD = {
     'action': 'opened',
     'pull_request': {
         'html_url': 'https://github.com/plone/mr.roboto/pull/1',
+        'merged': False
     },
 }
 
-UPDATED_PULL_REQUEST_PAYLOAD = copy.deepcopy(NEW_PULL_REQUEST_PAYLOAD)
-UPDATED_PULL_REQUEST_PAYLOAD['action'] = 'synchronize'
+UPDATED_PR_PAYLOAD = copy.deepcopy(NEW_PR_PAYLOAD)
+UPDATED_PR_PAYLOAD['action'] = 'synchronize'
 
-UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD = copy.deepcopy(NEW_PULL_REQUEST_PAYLOAD)
-UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD['action'] = 'unknown'
+UNKNOWN_PR_ACTION_PAYLOAD = copy.deepcopy(NEW_PR_PAYLOAD)
+UNKNOWN_PR_ACTION_PAYLOAD['action'] = 'unknown'
 
 
 def minimal_main(global_config, **settings):
@@ -100,7 +102,7 @@ class RunCoreJobTest(unittest.TestCase, ):
         )
 
     def test_pull_request_view(self):
-        result = self.call_view(NEW_PULL_REQUEST_PAYLOAD)
+        result = self.call_view(NEW_PR_PAYLOAD)
 
         self.assertIn(
             'Handlers already took care of this pull request',
@@ -108,7 +110,7 @@ class RunCoreJobTest(unittest.TestCase, ):
         )
 
     def test_update_pull_request(self):
-        result = self.call_view(UPDATED_PULL_REQUEST_PAYLOAD)
+        result = self.call_view(UPDATED_PR_PAYLOAD)
 
         self.assertIn(
             'Handlers already took care of this pull request',
@@ -116,11 +118,15 @@ class RunCoreJobTest(unittest.TestCase, ):
         )
 
     def test_unknown_pull_request_action(self):
-        result = self.call_view(UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD)
+        with LogCapture() as captured_data:
+            self.call_view(UNKNOWN_PR_ACTION_PAYLOAD)
+
+        self.assertEqual(
+            len(captured_data.records),
+            2
+        )
 
         self.assertIn(
-            'pull request {0} not handled'.format(
-                UNKNOWN_PULL_REQUEST_ACTION_PAYLOAD['pull_request']['html_url']
-            ),
-            result.body,
+            'PR plone/mr.roboto#1: action "unknown" not handled',
+            captured_data.records[-1].msg
         )
