@@ -17,15 +17,16 @@ class CommitAndMissingCheckout(object):
         self.email = email
 
 
-class NewPullRequest(object):
+class PullRequest(object):
 
     def __init__(self, pull_request, request):
         self.pull_request = pull_request
         self.request = request
 
 
-class UpdatedPullRequest(object):
+class NewPullRequest(PullRequest):
+    pass
 
-    def __init__(self, pull_request, request):
-        self.pull_request = pull_request
-        self.request = request
+
+class UpdatedPullRequest(PullRequest):
+    pass
