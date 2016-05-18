@@ -64,7 +64,7 @@ def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
         subject='CHECKOUT ERROR {0} {1}'.format(repo, branch),
         sender='Jenkins Job FAIL <jenkins@plone.org>',
-        recipients=[  # XXX also to testbot
+        recipients=[
             'ramon.nb@gmail.com',
             'tisto@plone.org',
             email,
