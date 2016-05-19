@@ -45,7 +45,7 @@ IGNORE_NO_AGREEMENT = (
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
-        subject='CHECKOUT ERROR {0} {1}'.format(repo, branch),
+        subject='POSSIBLE CHECKOUT ERROR {0} {1}'.format(repo, branch),
         sender='Jenkins Job FAIL <jenkins@plone.org>',
         recipients=[
             'ramon.nb@gmail.com',
