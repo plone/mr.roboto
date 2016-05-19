@@ -4,6 +4,7 @@ from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import NewCoreDevPush
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
+from mr.roboto.utils import get_info_from_commit
 from mr.roboto.utils import plone_versions_targeted
 from mr.roboto.utils import shorten_pull_request_url
 from pyramid.events import subscriber
@@ -35,29 +36,6 @@ IGNORE_NO_CHANGELOG = (
 IGNORE_NO_AGREEMENT = (
     'icalendar',
 )
-
-
-def get_info_from_commit(commit):
-    diff = requests.get(commit['url'] + '.diff').content
-
-    files = ['A {0}'.format(f) for f in commit['added']]
-    files.extend('M {0}'.format(f) for f in commit['modified'])
-    files.extend('D {0}'.format(f) for f in commit['removed'])
-
-    short_commit_msg = commit['message'].split('\n')[0][:60]
-    reply_to = '{0} <{1}>'.format(
-        commit['committer']['name'],
-        commit['committer']['email']
-    )
-
-    return {
-        'diff': diff,
-        'files': files,
-        'short_commit_msg': short_commit_msg,
-        'full_commit_msg': commit['message'],
-        'reply_to': reply_to,
-        'sha': commit['id']
-    }
 
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):

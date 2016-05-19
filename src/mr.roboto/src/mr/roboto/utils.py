@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pickle
 import re
+import requests
 
 
 PULL_REQUEST_URL_RE = re.compile(r'https://github.com/(.+/.+)/pull/(\d+)')
@@ -30,3 +31,26 @@ def shorten_pull_request_url(url):
     if re_result:
         return '{0}#{1}'.format(*re_result.groups())
     return url
+
+
+def get_info_from_commit(commit):
+    diff = requests.get(commit['url'] + '.diff').content
+
+    files = ['A {0}'.format(f) for f in commit['added']]
+    files.extend('M {0}'.format(f) for f in commit['modified'])
+    files.extend('D {0}'.format(f) for f in commit['removed'])
+
+    short_commit_msg = commit['message'].split('\n')[0][:60]
+    reply_to = '{0} <{1}>'.format(
+        commit['committer']['name'],
+        commit['committer']['email']
+    )
+
+    return {
+        'diff': diff,
+        'files': files,
+        'short_commit_msg': short_commit_msg,
+        'full_commit_msg': commit['message'],
+        'reply_to': reply_to,
+        'sha': commit['id']
+    }
