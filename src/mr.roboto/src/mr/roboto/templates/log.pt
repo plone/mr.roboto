@@ -28,6 +28,12 @@
     .error, .critical {
       color: red;
     }
+    pre {
+      font-size: 12px;
+      color: white;
+      margin: 0px;
+      background-color: black;
+    }
   </style>
   <meta http-equiv="refresh" content="60" />
 </head>

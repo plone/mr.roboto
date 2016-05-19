@@ -69,7 +69,7 @@ def parse_log_line(log_line):
             'msg': msg.strip(),
         })
     else:
-        return log_line
+        return '<pre>{0}</pre>'.format(log_line)
 
 
 @view_config(route_name='home', renderer='mr.roboto:templates/home.pt')
