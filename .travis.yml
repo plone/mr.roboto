@@ -8,6 +8,7 @@ cache:
 install:
   - pip install zc.buildout
   - buildout
+  
 script:
   - bin/code-analysis
   - bin/py.test src --cov=src --cov-report term-missing
