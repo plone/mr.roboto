@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from mr.roboto.events import NewPullRequest
-from mr.roboto.subscriber import warn_if_no_changelog_entry
+from mr.roboto.subscriber import WarnNoChangelogEntry
 from testfixtures import LogCapture
 
 import copy
@@ -110,7 +110,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_if_no_changelog_entry(event)
+            WarnNoChangelogEntry()(event)
 
         self.assertIn(
             'whitelisted for changelog entries',
@@ -127,7 +127,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_if_no_changelog_entry(event)
+            WarnNoChangelogEntry()(event)
 
         self.assertIn(
             'changelog entry: error',
@@ -144,7 +144,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_if_no_changelog_entry(event)
+            WarnNoChangelogEntry()(event)
 
         self.assertIn(
             'changelog entry: success',
@@ -161,7 +161,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_if_no_changelog_entry(event)
+            WarnNoChangelogEntry()(event)
 
         self.assertIn(
             'changelog entry: success',

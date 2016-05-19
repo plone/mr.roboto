@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from mr.roboto.subscriber import warn_test_need_to_run
+from mr.roboto.subscriber import WarnTestsNeedToRun
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
 
@@ -92,7 +92,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_test_need_to_run(event)
+            WarnTestsNeedToRun()(event)
 
         event.request.cleanup_sources()
 
@@ -113,7 +113,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_test_need_to_run(event)
+            WarnTestsNeedToRun()(event)
 
         event.request.cleanup_sources()
 
@@ -134,7 +134,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_test_need_to_run(event)
+            WarnTestsNeedToRun()(event)
 
         event.request.cleanup_sources()
 
@@ -162,7 +162,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            warn_test_need_to_run(event)
+            WarnTestsNeedToRun()(event)
 
         event.request.cleanup_sources()
 
@@ -180,7 +180,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         event = self.create_event({}, payload=COREDEV_PAYLOAD)
 
         with LogCapture() as captured_data:
-            warn_test_need_to_run(event)
+            WarnTestsNeedToRun()(event)
 
         event.request.cleanup_sources()
 
