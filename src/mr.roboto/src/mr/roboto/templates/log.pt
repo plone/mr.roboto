@@ -10,6 +10,7 @@
     p {
       color: white;
       font-size: 15px;
+      line-height: 8px;
       text-shadow: 1px 1px 0px black;
     }
     .info, .warning, .error, .critical, .timestamp {
