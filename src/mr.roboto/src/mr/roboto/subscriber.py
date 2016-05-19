@@ -201,8 +201,7 @@ def check_membership(json_data, short_url, github):
     return not_foundation_members, unknown_users
 
 
-@subscriber(NewPullRequest)
-@subscriber(UpdatedPullRequest)
+@subscriber(NewPullRequest, UpdatedPullRequest)
 def have_signed_contributors_agreement(event):
     """Check if all users involved in a pull request have signed the CLA
 
@@ -281,8 +280,7 @@ def have_signed_contributors_agreement(event):
     logger.info(msg.format(short_url, status))
 
 
-@subscriber(NewPullRequest)
-@subscriber(UpdatedPullRequest)
+@subscriber(NewPullRequest, UpdatedPullRequest)
 def warn_if_no_changelog_entry(event):
     """If the pull request does not add a changelog entry, warn about it"""
     github = event.request.registry.settings['github']
@@ -333,8 +331,7 @@ def warn_if_no_changelog_entry(event):
     logger.info(msg.format(short_url, status))
 
 
-@subscriber(NewPullRequest)
-@subscriber(UpdatedPullRequest)
+@subscriber(NewPullRequest, UpdatedPullRequest)
 def warn_test_need_to_run(event):
     """Create waiting status for all pull request jobs that should be run
     before a pull request can be safely merged
