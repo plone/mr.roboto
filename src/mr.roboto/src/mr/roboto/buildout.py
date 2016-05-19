@@ -7,7 +7,6 @@ from UserDict import UserDict
 
 import git
 import logging
-import os
 import pickle
 import re
 import shutil
@@ -72,9 +71,6 @@ class SourcesFile(UserDict):
             sources_dict[name] = source
         return sources_dict
 
-    def __setitem__(self, package_name, value):
-        raise NotImplementedError
-
     def __iter__(self):
         return self.data.__iter__()
 
@@ -92,42 +88,6 @@ class CheckoutsFile(UserDict):
         checkouts = config.get('buildout', 'auto-checkout')
         checkout_list = checkouts.split('\n')
         return checkout_list
-
-    def __contains__(self, package_name):
-        return package_name in self.data
-
-    def __setitem__(self, package_name, enabled=True):
-        path = os.path.join(os.getcwd(), self.file_location)
-        with open(path, 'r') as f:
-            checkoutstxt = f.read()
-        with open(path, 'w') as f:
-            if enabled:
-                fixes_text = '# Test fixes only'
-                reg = re.compile(
-                    '^[\s]*{0}\n'.format(fixes_text),
-                    re.MULTILINE
-                )
-                new_checkouts_txt = reg.sub(
-                    '    {0}\n{1}\n'.format(package_name, fixes_text),
-                    checkoutstxt
-                )
-            else:
-                reg = re.compile(
-                    '^[\s]*{0}\n'.format(package_name),
-                    re.MULTILINE
-                )
-                new_checkouts_txt = reg.sub('', checkoutstxt)
-            f.write(new_checkouts_txt)
-
-    def __delitem__(self, package_name):
-        return self.__setitem__(package_name, False)
-
-    def add(self, package_name):
-        return self.__setitem__(package_name, True)
-
-    def remove(self, package_name):
-        # Remove from checkouts.cfg
-        return self.__delitem__(package_name)
 
 
 class PloneCoreBuildout(object):
