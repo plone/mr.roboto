@@ -92,7 +92,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnTestsNeedToRun()(event)
+            WarnTestsNeedToRun(event)
 
         event.request.cleanup_sources()
 
@@ -113,7 +113,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnTestsNeedToRun()(event)
+            WarnTestsNeedToRun(event)
 
         event.request.cleanup_sources()
 
@@ -134,7 +134,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnTestsNeedToRun()(event)
+            WarnTestsNeedToRun(event)
 
         event.request.cleanup_sources()
 
@@ -162,7 +162,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnTestsNeedToRun()(event)
+            WarnTestsNeedToRun(event)
 
         event.request.cleanup_sources()
 
@@ -180,7 +180,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         event = self.create_event({}, payload=COREDEV_PAYLOAD)
 
         with LogCapture() as captured_data:
-            WarnTestsNeedToRun()(event)
+            WarnTestsNeedToRun(event)
 
         event.request.cleanup_sources()
 

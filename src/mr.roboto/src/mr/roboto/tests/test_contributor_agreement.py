@@ -65,7 +65,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
         with LogCapture() as captured_data:
-            ContributorsAgreementSigned()(event)
+            ContributorsAgreementSigned(event)
 
         self.assertEqual(
             len(captured_data.records),
@@ -93,7 +93,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
         with LogCapture() as captured_data:
-            ContributorsAgreementSigned()(event)
+            ContributorsAgreementSigned(event)
 
         self.assertEqual(
             len(captured_data.records),
@@ -133,7 +133,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
         with LogCapture() as captured_data:
-            ContributorsAgreementSigned()(event)
+            ContributorsAgreementSigned(event)
 
         self.assertIn(
             'does not have author user info',
@@ -191,7 +191,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
         with LogCapture() as captured_data:
-            ContributorsAgreementSigned()(event)
+            ContributorsAgreementSigned(event)
 
         self.assertIn(
             ': My name missing contributors agreement',
@@ -235,7 +235,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
         with LogCapture() as captured_data:
-            ContributorsAgreementSigned()(event)
+            ContributorsAgreementSigned(event)
 
         self.assertEqual(
             len(captured_data.records),
@@ -277,7 +277,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
         with LogCapture() as captured_data:
-            ContributorsAgreementSigned()(event)
+            ContributorsAgreementSigned(event)
 
         self.assertIn(
             'Contributors Agreement report: success',
@@ -293,7 +293,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         )
 
         with LogCapture() as captured_data:
-            ContributorsAgreementSigned()(event)
+            ContributorsAgreementSigned(event)
 
         self.assertIn(
             'whitelisted for contributors agreement',

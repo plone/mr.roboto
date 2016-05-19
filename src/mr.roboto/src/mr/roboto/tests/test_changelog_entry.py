@@ -110,7 +110,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnNoChangelogEntry()(event)
+            WarnNoChangelogEntry(event)
 
         self.assertIn(
             'whitelisted for changelog entries',
@@ -127,7 +127,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnNoChangelogEntry()(event)
+            WarnNoChangelogEntry(event)
 
         self.assertIn(
             'changelog entry: error',
@@ -144,7 +144,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnNoChangelogEntry()(event)
+            WarnNoChangelogEntry(event)
 
         self.assertIn(
             'changelog entry: success',
@@ -161,7 +161,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
         )
 
         with LogCapture() as captured_data:
-            WarnNoChangelogEntry()(event)
+            WarnNoChangelogEntry(event)
 
         self.assertIn(
             'changelog entry: success',

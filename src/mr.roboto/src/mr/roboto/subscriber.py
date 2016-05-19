@@ -114,8 +114,8 @@ def send_mail_on_missing_checkout(event):
 
 class PullRequestSubscriber(object):
 
-    def __init__(self):
-        self.event = None
+    def __init__(self, event):
+        self.event = event
         self._github = None
         self._short_url = None
         self._pull_request = None
@@ -123,6 +123,8 @@ class PullRequestSubscriber(object):
         self._repo_full_name = None
         self._g_pull = None
         self._commits_url = None
+
+        self.run()
 
     @property
     def github(self):
@@ -174,10 +176,6 @@ class PullRequestSubscriber(object):
         if self._commits_url is None:
             self._commits_url = self.pull_request['commits_url']
         return self._commits_url
-
-    def __call__(self, event):
-        self.event = event
-        self.run()
 
     def run(self):
         raise NotImplemented
@@ -239,12 +237,12 @@ class PullRequestSubscriber(object):
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class ContributorsAgreementSigned(PullRequestSubscriber):
 
-    def __init__(self):
-        super(ContributorsAgreementSigned, self).__init__()
-
+    def __init__(self, event):
         self.cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
         self.github_help_setup_email_url = u'https://help.github.com/articles/adding-an-email-address-to-your-github-account/'  # noqa
         self.status_context = u'Plone Contributors Agreement verifier'
+
+        super(ContributorsAgreementSigned, self).__init__(event)
 
     def run(self):
         """Check if all users involved in a pull request have signed the CLA"""
@@ -312,10 +310,10 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnNoChangelogEntry(PullRequestSubscriber):
 
-    def __init__(self):
-        super(WarnNoChangelogEntry, self).__init__()
-
+    def __init__(self, event):
         self.status_context = u'Changelog verifier'
+
+        super(WarnNoChangelogEntry, self).__init__(event)
 
     def run(self):
         """If the pull request does not add a changelog entry, warn about it"""
@@ -364,12 +362,12 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnTestsNeedToRun(PullRequestSubscriber):
 
-    def __init__(self):
-        super(WarnTestsNeedToRun, self).__init__()
-
+    def __init__(self, event):
         self.jenkins_pr_job_url = \
             'http://jenkins.plone.org/job/pull-request-{0}/build?delay=0sec'
         self.status_context = 'Plone Jenkins CI - pull-request-{0}'
+
+        super(WarnTestsNeedToRun, self).__init__(event)
 
     def run(self):
         """Create waiting status for all pull request jobs that should be run
