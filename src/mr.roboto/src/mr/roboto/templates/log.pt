@@ -42,10 +42,10 @@
 <body>
   <tal:element condition="success">
     <p>file size: ${file_size} bytes</p>
-    <p>${structure: log}</p>
+    ${structure: log}
   </tal:element>
   <tal:element condition="not: success">
-    ${message}
+    <p>${message}</p>
   </tal:element>
 </body>
 </html>
