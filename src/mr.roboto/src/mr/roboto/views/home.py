@@ -34,10 +34,10 @@ COMMIT_LOG_MSG_RE = re.compile(
 PULL_REQUEST_URL = '<a href="https://github.com/{1}/pull/{2}">{0}</a>'
 COMMIT_URL = '<a href="https://github.com/{0}/commit/{1}">{1}</a>'
 
-LOG_LINE = """<span class="timestamp">{timestamp}</span>
+LOG_LINE = """<p><span class="timestamp">{timestamp}</span>
 <span class="{LEVEL}">{level}</span>
 <span class="message">{msg}</span>
-<br/>"""
+</p>"""
 
 
 def parse_log_line(log_line):

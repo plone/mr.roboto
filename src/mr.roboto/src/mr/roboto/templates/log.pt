@@ -45,7 +45,7 @@
     <p>${structure: log}</p>
   </tal:element>
   <tal:element condition="not: success">
-    <p>${message}</p>
+    ${message}
   </tal:element>
 </body>
 </html>
