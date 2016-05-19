@@ -180,6 +180,9 @@ class PullRequestSubscriber(object):
     def run(self):
         raise NotImplemented
 
+    def log(self, msg):
+        logger.info('PR {0}: {1}'.format(self.short_url, msg))
+
     def get_pull_request_last_commit(self):
         return self.g_pull.get_commits().reversed[0]
 
@@ -191,15 +194,13 @@ class PullRequestSubscriber(object):
         try:
             commits_data = requests.get(self.commits_url)
         except RequestException:
-            msg = 'PR {0}: error while trying to get its commits'
-            logger.warn(msg.format(self.short_url))
+            self.log('error while trying to get its commits')
             return
 
         try:
             json_data = commits_data.json()
         except ValueError:
-            msg = 'PR {0}: error while getting its commits in JSON'
-            logger.warn(msg.format(self.short_url))
+            self.log('error while getting its commits in JSON')
             return
 
         return json_data
@@ -214,8 +215,7 @@ class PullRequestSubscriber(object):
                 try:
                     login = commit_info[user]['login']
                 except TypeError:
-                    msg = 'PR {0}: commit does not have {1} user info'
-                    logger.warn(msg.format(self.short_url, user))
+                    self.log('commit does not have {0} user info'.format(user))
                     unknown.append(
                         commit_info['commit']['author']['name']
                     )
@@ -247,8 +247,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
     def run(self):
         """Check if all users involved in a pull request have signed the CLA"""
         if self.repo_name in IGNORE_NO_AGREEMENT:
-            msg = 'PR {0}: whitelisted for contributors agreement'
-            logger.info(msg.format(self.short_url))
+            self.log('whitelisted for contributors agreement')
             return
 
         json_data = self.get_json_commits()
@@ -281,8 +280,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             # add a message mentioning all unknown users,
             # but mention each of them only once
             users = ', '.join(set(unknown))
-            msg = 'PR {0}: {1} missing contributors agreement'
-            logger.info(msg.format(self.short_url, users))
+            self.log('{0} missing contributors agreement'.format(users))
             msg = u'{0} your emails are not known to GithHb and thus it is ' \
                   u'impossible to know if you have signed the Plone ' \
                   u'Contributor Agreement, which is required to merge this ' \
@@ -303,8 +301,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             description=status_message,
             context=self.status_context,
         )
-        msg = 'PR {0}: Contributors Agreement report: {1}'
-        logger.info(msg.format(self.short_url, status))
+        self.log('Contributors Agreement report: {0}'.format(status))
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
@@ -318,8 +315,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
     def run(self):
         """If the pull request does not add a changelog entry, warn about it"""
         if self.repo_name in IGNORE_NO_CHANGELOG:
-            msg = 'PR {0}: whitelisted for changelog entries'
-            logger.info(msg.format(self.short_url))
+            self.log('whitelisted for changelog entries')
             return
 
         status = u'success'
@@ -355,8 +351,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
             context=self.status_context,
         )
 
-        msg = 'PR {0}: changelog entry: {1}'
-        logger.info(msg.format(self.short_url, status))
+        self.log('changelog entry: {0}'.format(status))
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
@@ -388,8 +383,7 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
             plone_versions = (target_branch, )
 
         elif not plone_versions:
-            msg = 'PR {0}: does not target any Plone version'
-            logger.info(msg.format(self.short_url))
+            self.log('does not target any Plone version')
             return
 
         # get the pull request and last commit
@@ -403,10 +397,4 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
                 description='Please run the job, click here ----------->',
                 context=self.status_context.format(version),
             )
-            msg = 'PR {0}: created pending status for plone {1}'
-            logger.info(
-                msg.format(
-                    self.short_url,
-                    version,
-                )
-            )
+            self.log('created pending status for plone {0}'.format(version))
