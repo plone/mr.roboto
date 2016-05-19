@@ -105,7 +105,7 @@ class SimpleViewsTest(unittest.TestCase):
             result.body,
         )
         self.assertIn(
-            'log line 299\nlog line 298\n',
+            '<pre>log line 299\n</pre><pre>log line 298\n</pre>',
             result.body
         )
         self.clean_file(filename)
@@ -193,7 +193,7 @@ class SimpleViewsTest(unittest.TestCase):
     def test_parse_log_line_no_format(self):
         self.assertEqual(
             parse_log_line('la la '),
-            'la la ',
+            '<pre>la la </pre>',
         )
 
     def test_parse_log_line_format_other(self):
