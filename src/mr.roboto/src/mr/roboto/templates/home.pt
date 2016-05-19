@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html>
 <head>
   <title>Mr. Roboto</title>
-
+  <meta charset="utf-8" />
   <link
       href='http://fonts.googleapis.com/css?family=Raleway:400,700'
       rel='stylesheet'
