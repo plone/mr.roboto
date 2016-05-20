@@ -1,10 +1,15 @@
 # -*- encoding: utf-8 -*-
+from datetime import datetime
+from github import InputGitAuthor
+from github import InputGitTreeElement
 from mr.roboto import templates
 from mr.roboto.events import CommitAndMissingCheckout
+from mr.roboto.events import MergedPullRequest
 from mr.roboto.events import NewCoreDevPush
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
 from mr.roboto.utils import get_info_from_commit
+from mr.roboto.utils import get_pickled_data
 from mr.roboto.utils import plone_versions_targeted
 from mr.roboto.utils import shorten_pull_request_url
 from pyramid.events import subscriber
@@ -40,7 +45,7 @@ IGNORE_NO_AGREEMENT = (
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
-        subject='CHECKOUT ERROR {0} {1}'.format(repo, branch),
+        subject='POSSIBLE CHECKOUT ERROR {0} {1}'.format(repo, branch),
         sender='Jenkins Job FAIL <jenkins@plone.org>',
         recipients=[
             'ramon.nb@gmail.com',
@@ -123,6 +128,7 @@ class PullRequestSubscriber(object):
         self._repo_full_name = None
         self._g_pull = None
         self._commits_url = None
+        self._target_branch = None
 
         self.run()
 
@@ -176,6 +182,12 @@ class PullRequestSubscriber(object):
         if self._commits_url is None:
             self._commits_url = self.pull_request['commits_url']
         return self._commits_url
+
+    @property
+    def target_branch(self):
+        if self._target_branch is None:
+            self._target_branch = self.pull_request['base']['ref']
+        return self._target_branch
 
     def run(self):
         raise NotImplemented
@@ -398,3 +410,95 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
                 context=self.status_context.format(version),
             )
             self.log('created pending status for plone {0}'.format(version))
+
+
+@subscriber(MergedPullRequest)
+class UpdateCoredevCheckouts(PullRequestSubscriber):
+
+    def run(self):
+        """Add package that got a pull request merged into checkouts.cfg
+
+        - only for packages that are part of Plone coredev.
+        - on all Plone coredev versions that track the branch that was
+        targeted by the pull request
+        """
+        # pull requests on buildout.coredev itself do not need any extra work
+        if self.repo_full_name == 'plone/buildout.coredev':
+            return
+
+        plone_versions = plone_versions_targeted(
+            self.repo_full_name,
+            self.target_branch,
+            self.event.request,
+        )
+        if not plone_versions:
+            msg = 'no plone coredev version tracks branch {0} ' \
+                  'of {1}, checkouts.cfg not updated'
+            self.log(msg.format(self.target_branch, self.repo_name))
+            return
+
+        checkouts = get_pickled_data(
+            self.event.request.registry.settings['checkouts_file']
+        )
+        not_in_checkouts = [
+            version
+            for version in plone_versions
+            if self.repo_name not in checkouts[version]
+        ]
+        if not not_in_checkouts:
+            msg = 'is already on checkouts.cfg of all plone ' \
+                  'versions that it targets {1}'
+            self.log(msg.format(self.short_url, plone_versions))
+            return
+
+        self.add_pacakge_to_checkouts(not_in_checkouts)
+
+    def add_pacakge_to_checkouts(self, versions):
+        """Add package to checkouts.cfg on buildout.coredev plone version"""
+        g_user = self.github.get_user(self.pull_request['user']['login'])
+        user = InputGitAuthor(
+            g_user.author.name,
+            g_user.author.email,
+            datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+        )
+        org = self.github.get_organization('plone')
+        repo = org.get_repo('buildout.coredev')
+        filename = u'checkouts.cfg'
+        for version in versions:
+            head_ref = repo.get_git_ref('heads/{0}'.format(version))
+            checkouts_cfg_file = repo.get_file_contents(
+                'checkouts.cfg',
+                head_ref.object.sha,
+            )
+            line = '    {0}\n'.format(self.repo_name)
+            checkouts_new_data = checkouts_cfg_file.decoded_content + line
+            latest_commit = repo.get_git_commit(head_ref.object.sha)
+            base_tree = latest_commit.tree
+            mode = [
+                t.mode
+                for t in base_tree.tree
+                if t.path == filename
+                ]
+            if mode:
+                mode = mode[0]
+            else:
+                mode = '100644'
+
+            element = InputGitTreeElement(
+                path=filename,
+                mode=mode,
+                type=checkouts_cfg_file.type,
+                content=checkouts_new_data
+            )
+            new_tree = repo.create_git_tree([element], base_tree)
+
+            new_commit = repo.create_git_commit(
+                'Add {0} to checkouts.cfg'.format(self.repo_name),
+                new_tree,
+                [latest_commit, ],
+                user,
+                user,
+            )
+            head_ref.edit(sha=new_commit.sha, force=False)
+            msg = 'add to checkouts.cfg of buildout.coredev {0}'
+            self.log(msg.format(version))

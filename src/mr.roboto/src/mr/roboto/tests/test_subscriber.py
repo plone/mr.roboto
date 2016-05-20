@@ -51,7 +51,7 @@ class SubscribersTest(unittest.TestCase):
         mail = mock_mail.send_immediately.call_args[0][0]
         self.assertEqual(
             mail.subject,
-            'CHECKOUT ERROR plone/Products.CMFPlone master',
+            'POSSIBLE CHECKOUT ERROR plone/Products.CMFPlone master',
         )
         self.assertEqual(
             mail.sender,

@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from cornice import Service
+from mr.roboto.events import MergedPullRequest
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
 from mr.roboto.security import validate_github
@@ -48,10 +49,15 @@ def handle_pull_request(request):
         request.registry.notify(
             UpdatedPullRequest(pull_request, request)
         )
+    elif action == 'closed' and pull_request['merged']:
+        request.registry.notify(
+            MergedPullRequest(pull_request, request)
+        )
     else:
-        msg = 'PR {0}: action "{1}" not handled'.format(
+        msg = 'PR {0}: action "{1}" (merged: {2}) not handled'.format(
             short_url,
             action,
+            pull_request['merged'],
         )
         logger.info(msg)
         return json.dumps({'message': msg, })
