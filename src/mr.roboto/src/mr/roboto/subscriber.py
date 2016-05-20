@@ -455,10 +455,10 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
 
     def add_pacakge_to_checkouts(self, versions):
         """Add package to checkouts.cfg on buildout.coredev plone version"""
-        g_user = self.github.get_user(self.pull_request['user']['login'])
+        last_commit = self.get_pull_request_last_commit()
         user = InputGitAuthor(
-            g_user.author.name,
-            g_user.author.email,
+            last_commit.commit.author.name,
+            last_commit.commit.author.email,
             datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
         )
         org = self.github.get_organization('plone')

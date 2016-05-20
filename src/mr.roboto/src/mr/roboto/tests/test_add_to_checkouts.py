@@ -23,6 +23,9 @@ PAYLOAD = {
         'repo': {
             'full_name': 'plone/buildout.coredev',
             'name': 'buildout.coredev',
+            'owner': {
+                'login': 'plone',
+            },
         },
     },
     'user': {
@@ -41,25 +44,7 @@ PLONE_VERSION_PAYLOAD = copy.deepcopy(NO_PLONE_VERSION_PAYLOAD)
 PLONE_VERSION_PAYLOAD['base']['ref'] = 'master'
 
 
-class FakeUser(object):
-
-    @property
-    def author(self):
-        return self
-
-    @property
-    def name(self):
-        return 'Mr bean'
-
-    @property
-    def email(self):
-        return 'mr@bean.org'
-
-
 class FakeGithub(object):
-
-    def get_user(self, name):
-        return FakeUser()
 
     def get_organization(self, name):
         return self
@@ -105,6 +90,32 @@ class FakeGithub(object):
 
     def create_git_tree(self, one, two):
         return mock.MagicMock()
+
+    def get_pull(self, one):
+        return self
+
+    def get_commits(self):
+        return self
+
+    @property
+    def reversed(self):
+        return [self, ]
+
+    @property
+    def commit(self):
+        return self
+
+    @property
+    def author(self):
+        return self
+
+    @property
+    def name(self):
+        return 'someone'
+
+    @property
+    def email(self):
+        return 'hi@dummy.com'
 
 
 class MockRequest(object):
