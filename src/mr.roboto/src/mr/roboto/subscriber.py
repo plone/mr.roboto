@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from datetime import datetime
+from github import GithubException
 from github import InputGitAuthor
 from github import InputGitTreeElement
 from mr.roboto import templates
@@ -192,7 +193,10 @@ class PullRequestSubscriber(object):
     def run(self):
         raise NotImplemented
 
-    def log(self, msg):
+    def log(self, msg, level='info'):
+        if level == 'warn':
+            logger.warn('PR {0}: {1}'.format(self.short_url, msg))
+            return
         logger.info('PR {0}: {1}'.format(self.short_url, msg))
 
     def get_pull_request_last_commit(self):
@@ -463,42 +467,59 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         )
         org = self.github.get_organization('plone')
         repo = org.get_repo('buildout.coredev')
-        filename = u'checkouts.cfg'
+
         for version in versions:
-            head_ref = repo.get_git_ref('heads/{0}'.format(version))
-            checkouts_cfg_file = repo.get_file_contents(
-                'checkouts.cfg',
-                head_ref.object.sha,
-            )
-            line = '    {0}\n'.format(self.repo_name)
-            checkouts_new_data = checkouts_cfg_file.decoded_content + line
-            latest_commit = repo.get_git_commit(head_ref.object.sha)
-            base_tree = latest_commit.tree
-            mode = [
-                t.mode
-                for t in base_tree.tree
-                if t.path == filename
-                ]
-            if mode:
-                mode = mode[0]
-            else:
-                mode = '100644'
+            attempts = 0
+            while attempts < 5:
+                try:
+                    self.make_commit(repo, version, user)
+                except GithubException:
+                    attempts += 1
+                    if attempts == 5:
+                        msg = 'Could not update checkouts.cfg of {0} with {1}'
+                        self.log(
+                            msg.format(version, self.repo_name),
+                            level='warn',
+                        )
+                else:
+                    msg = 'add to checkouts.cfg of buildout.coredev {0}'
+                    self.log(msg.format(version))
+                    break
 
-            element = InputGitTreeElement(
-                path=filename,
-                mode=mode,
-                type=checkouts_cfg_file.type,
-                content=checkouts_new_data
-            )
-            new_tree = repo.create_git_tree([element], base_tree)
+    def make_commit(self, repo, version, user):
+        filename = u'checkouts.cfg'
+        head_ref = repo.get_git_ref('heads/{0}'.format(version))
+        checkouts_cfg_file = repo.get_file_contents(
+            filename,
+            head_ref.object.sha,
+        )
+        line = '    {0}\n'.format(self.repo_name)
+        checkouts_new_data = checkouts_cfg_file.decoded_content + line
+        latest_commit = repo.get_git_commit(head_ref.object.sha)
+        base_tree = latest_commit.tree
+        mode = [
+            t.mode
+            for t in base_tree.tree
+            if t.path == filename
+            ]
+        if mode:
+            mode = mode[0]
+        else:
+            mode = '100644'
 
-            new_commit = repo.create_git_commit(
-                'Add {0} to checkouts.cfg'.format(self.repo_name),
-                new_tree,
-                [latest_commit, ],
-                user,
-                user,
-            )
-            head_ref.edit(sha=new_commit.sha, force=False)
-            msg = 'add to checkouts.cfg of buildout.coredev {0}'
-            self.log(msg.format(version))
+        element = InputGitTreeElement(
+            path=filename,
+            mode=mode,
+            type=checkouts_cfg_file.type,
+            content=checkouts_new_data
+        )
+        new_tree = repo.create_git_tree([element], base_tree)
+
+        new_commit = repo.create_git_commit(
+            'Add {0} to {1}'.format(self.repo_name, filename),
+            new_tree,
+            [latest_commit, ],
+            user,
+            user,
+        )
+        head_ref.edit(sha=new_commit.sha, force=False)
