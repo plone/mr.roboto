@@ -516,7 +516,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         new_tree = repo.create_git_tree([element], base_tree)
 
         new_commit = repo.create_git_commit(
-            'Add {0} to {1}'.format(self.repo_name, filename),
+            '[fc] Add {0} to {1}'.format(self.repo_name, filename),
             new_tree,
             [latest_commit, ],
             user,
