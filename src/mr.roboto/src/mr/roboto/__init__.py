@@ -5,12 +5,8 @@ from pyramid.config import Configurator
 from mr.roboto.security import RequestWithAttributes
 
 import ast
-import logging
 import os
 
-
-logging.getLogger('requests').setLevel(logging.WARNING)
-logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 templates = PageTemplateLoader(
     os.path.join(os.path.dirname(__file__), 'templates')
