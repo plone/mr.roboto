@@ -30,22 +30,19 @@ def create_github_post_commit_hooks_view(request):
     roboto_url = request.registry.settings['roboto_url']
 
     # hooks URL
-    Hook = namedtuple('Hook', ['url', 'events', 'content_type', ])
+    Hook = namedtuple('Hook', ['url', 'events', ])
     roboto_hooks = [
         Hook(
             '{0}/run/corecommit'.format(roboto_url),
             ['push', ],
-            'json',
         ),
         Hook(
             '{0}/run/pull-request'.format(roboto_url),
             ['pull_request', ],
-            'json',
         ),
         Hook(
             'http://78.47.49.108/github-webhook/',
             ['*', ],
-            'form',
         ),
     ]
 
@@ -98,7 +95,6 @@ def update_hooks_on_repo(repo=None, new_hooks=None, request=None):
                 config = {
                     'url': hook.url,
                     'secret': request.registry.settings['api_key'],
-                    'content_type': hook.content_type,
                 }
                 repo.create_hook('web', config, hook.events, True)
     except GithubException:
