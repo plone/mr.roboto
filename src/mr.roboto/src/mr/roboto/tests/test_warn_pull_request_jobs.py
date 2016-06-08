@@ -39,6 +39,11 @@ COREDEV_PAYLOAD['base']['repo']['full_name'] = 'plone/buildout.coredev'
 COREDEV_RANDOM_BRANCH_PAYLOAD = copy.deepcopy(COREDEV_PAYLOAD)
 COREDEV_RANDOM_BRANCH_PAYLOAD['base']['ref'] = 'random'
 
+WHITELISTED_REPO = copy.deepcopy(PAYLOAD)
+WHITELISTED_REPO['html_url'] = 'https://github.com/plone/plone.releaser/pull/5'
+WHITELISTED_REPO['base']['repo']['full_name'] = 'plone/plone.releaser'
+WHITELISTED_REPO['base']['repo']['name'] = 'plone.releaser'
+
 
 class MockRequest(object):
 
@@ -191,5 +196,23 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertIn(
             'created pending status for plone 4.3',
+            captured_data.records[0].msg
+        )
+
+    def test_whitelisted(self):
+        event = self.create_event({}, payload=WHITELISTED_REPO)
+
+        with LogCapture() as captured_data:
+            WarnTestsNeedToRun(event)
+
+        event.request.cleanup_sources()
+
+        self.assertEqual(
+            len(captured_data.records),
+            1
+        )
+
+        self.assertIn(
+            'skip adding test warnings, repo whitelisted',
             captured_data.records[0].msg
         )

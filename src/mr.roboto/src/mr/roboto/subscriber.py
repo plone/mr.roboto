@@ -43,6 +43,10 @@ IGNORE_NO_AGREEMENT = (
     'icalendar',
 )
 
+IGNORE_NO_TEST_NEEDED = (
+    'plone.releaser',
+)
+
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
@@ -384,6 +388,10 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         """Create waiting status for all pull request jobs that should be run
         before a pull request can be safely merged
         """
+        if self.repo_name in IGNORE_NO_TEST_NEEDED:
+            self.log('skip adding test warnings, repo whitelisted')
+            return
+
         target_branch = self.pull_request['base']['ref']
 
         plone_versions = plone_versions_targeted(
