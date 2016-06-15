@@ -284,6 +284,39 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
             captured_data.records[-1].msg
         )
 
+    @mock.patch('requests.get')
+    def test_ignore_witelisted_users(self, m1):
+        from mr.roboto.events import NewPullRequest
+
+        class FakeCommitsData(object):
+
+            def json(self):
+                return [
+                    {
+                        'committer': {
+                            'login': 'web-flow',
+                        },
+                        'author': {
+                            'login': 'user',
+                        },
+                    },
+                ]
+
+        m1.return_value = FakeCommitsData()
+
+        event = NewPullRequest(
+            pull_request=COLLECTIVE_PAYLOAD,
+            request=MockRequest(),
+        )
+
+        with LogCapture() as captured_data:
+            ContributorsAgreementSigned(event)
+
+        self.assertIn(
+            'Contributors Agreement report: success',
+            captured_data.records[-1].msg
+        )
+
     def test_whitelisted(self):
         from mr.roboto.events import NewPullRequest
 

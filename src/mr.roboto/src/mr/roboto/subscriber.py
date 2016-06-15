@@ -43,6 +43,10 @@ IGNORE_NO_AGREEMENT = (
     'icalendar',
 )
 
+IGNORE_USER_NO_AGREEMENT = (
+    'web-flow',
+)
+
 IGNORE_NO_TEST_NEEDED = (
     'plone.releaser',
 )
@@ -239,6 +243,9 @@ class PullRequestSubscriber(object):
                     unknown.append(
                         commit_info['commit']['author']['name']
                     )
+                    continue
+
+                if login in IGNORE_USER_NO_AGREEMENT:
                     continue
 
                 # avoid looking up users twice
