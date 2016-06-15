@@ -53,6 +53,12 @@ http://jenkins.plone.org/roboto/sources.json
 
 http://jenkins.plone.org/roboto/checkouts.json
 
+Branches overview
+-----------------
+Get an overview of which branch of each package is being used on any plone release.
+
+http://jenkins.plone.org/roboto/branches
+
 Update sources and checkouts
 ----------------------------
 If there is something wrong with sources or checkouts,

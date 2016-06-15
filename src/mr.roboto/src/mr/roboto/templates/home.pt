@@ -48,6 +48,9 @@
       <a href="${info.roboto_url}/checkouts.json">See current checkouts</a>
     </li>
     <li>
+      <a href="${info.roboto_url}/branches">Overview of branches and where are being used</a>
+    </li>
+    <li>
       <a href="${info.roboto_url}/update-sources-and-checkouts?token=XXX">Update sources and checkouts</a>
       <em class="alert">Token needed</em>
     </li>
