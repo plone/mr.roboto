@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from collections import defaultdict
 from collections import deque
 from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.security import validate_request_token
+from mr.roboto.utils import get_pickled_data
 from pyramid.view import view_config
 
 import json
@@ -151,3 +153,42 @@ def update_pickles(context, request):
 )
 def missing_changelog(context, request):
     return {}
+
+
+@view_config(
+    route_name='branches',
+    renderer='mr.roboto:templates/branches.pt'
+)
+def branches(context, request):
+    plone_versions = request.registry.settings['plone_versions']
+    sources = get_pickled_data(request.registry.settings['sources_file'])
+    checkouts = get_pickled_data(request.registry.settings['checkouts_file'])
+
+    def plone_versions_dict():
+        """Provide a dict prefilled with all plone versions"""
+        _dict = {
+            v: {'branch': None, 'active': None, }
+            for v in plone_versions
+        }
+        _dict['id'] = None
+        return _dict
+
+    data = defaultdict(plone_versions_dict)
+
+    for dist_with_branch, target_versions in sources.items():
+        dist, branch = dist_with_branch
+        dist = dist.split('/')[1]
+        data[dist]['id'] = dist
+        for version in target_versions:
+            data[dist][version]['branch'] = branch
+
+    for target_version, dists in checkouts.items():
+        for dist in dists:
+            data[dist][target_version]['active'] = 'red'
+
+    sorted_data = [data[x] for x in sorted(data.keys())]
+
+    return {
+        'versions': sorted(plone_versions),
+        'data': sorted_data,
+    }
