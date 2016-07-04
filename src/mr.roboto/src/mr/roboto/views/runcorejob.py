@@ -113,6 +113,8 @@ def get_info(payload, repo, branch):
             fake = True
         if '[ci skip]' in commit_data['full_commit_msg']:
             skip = True
+        if '[ci-skip]' in commit_data['full_commit_msg']:
+            skip = True
         if 'sources.cfg' in files or 'checkouts.cfg' in files:
             source_or_checkout = True
 
