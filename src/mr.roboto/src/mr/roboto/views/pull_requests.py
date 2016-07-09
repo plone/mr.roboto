@@ -41,7 +41,7 @@ def handle_pull_request(request):
             action,
         )
     )
-    if action == 'opened':
+    if action in ('opened', 'reopened'):
         request.registry.notify(
             NewPullRequest(pull_request, request)
         )
