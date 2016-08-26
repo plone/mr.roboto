@@ -6,7 +6,7 @@ cache:
     - $HOME/.cache/pip
     - $HOME/eggs
 install:
-  - pip install zc.buildout
+  - pip install -U zc.buildout setuptools
   - buildout
 script:
   - bin/code-analysis
