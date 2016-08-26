@@ -37,10 +37,12 @@ IGNORE_NO_CHANGELOG = (
     'buildout.coredev',
     'ploneorg.core',
     'ploneorg.theme',
+    'planet.plone.org',
 )
 
 IGNORE_NO_AGREEMENT = (
     'icalendar',
+    'planet.plone.org',
 )
 
 IGNORE_USER_NO_AGREEMENT = (
