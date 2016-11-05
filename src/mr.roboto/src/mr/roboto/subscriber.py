@@ -43,6 +43,7 @@ IGNORE_NO_CHANGELOG = (
 IGNORE_NO_AGREEMENT = (
     'icalendar',
     'planet.plone.org',
+    'documentation',
 )
 
 IGNORE_USER_NO_AGREEMENT = (
