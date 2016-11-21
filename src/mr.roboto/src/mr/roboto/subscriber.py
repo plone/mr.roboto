@@ -26,7 +26,9 @@ import requests
 
 logger = logging.getLogger('mr.roboto')
 
-VALID_CHANGELOG_FILES = re.compile(r'(CHANGES|HISTORY).(txt|rst)$')
+VALID_CHANGELOG_FILES = re.compile(
+    r'(CHANGES|HISTORY|CHANGELOG).(txt|rst)$'
+)
 
 IGNORE_NO_CHANGELOG = (
     'documentation',
