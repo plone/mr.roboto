@@ -46,6 +46,7 @@ IGNORE_NO_AGREEMENT = (
     'icalendar',
     'planet.plone.org',
     'documentation',
+    'training',
 )
 
 IGNORE_USER_NO_AGREEMENT = (
