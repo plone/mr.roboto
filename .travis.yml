@@ -5,12 +5,15 @@ cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/eggs
+    
 install:
   - pip install -U zc.buildout setuptools
   - buildout
+  
 script:
   - bin/code-analysis
   - bin/py.test src --cov=src --cov-report term-missing
+
 after_success:
   - pip install -q coveralls
   - coveralls
