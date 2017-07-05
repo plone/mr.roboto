@@ -75,3 +75,20 @@ class TestGetInfoFromCommitTest(unittest.TestCase):
                 'Files changed:\nM CHANGES.rst\nM setup.py'
             )
         )
+
+    @mock.patch('requests.get')
+    def test_unicode_on_messages(self, mock_get):
+        mock_get.content = mock.Mock(return_value='diff data')
+        commit_data = COMMIT
+        commit_data['message'] = u'Höla què tal\n' \
+            u'Files changed:\nM CHÄNGES.rst\nM setup.py'
+        data = get_info_from_commit(commit_data)
+        self.assertEqual(
+            data['short_commit_msg'],
+            'Hla qu tal',
+        )
+        self.assertTrue(
+            data['full_commit_msg'].endswith(
+                'Files changed:\nM CHNGES.rst\nM setup.py'
+            )
+        )
