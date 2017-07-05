@@ -40,7 +40,8 @@ def get_info_from_commit(commit):
     files.extend('M {0}'.format(f) for f in commit['modified'])
     files.extend('D {0}'.format(f) for f in commit['removed'])
 
-    short_commit_msg = commit['message'].split('\n')[0][:60]
+    encoded_message = commit['message'].encode('ascii', 'ignore')
+    short_commit_msg = encoded_message.split('\n')[0][:60]
     reply_to = '{0} <{1}>'.format(
         commit['committer']['name'],
         commit['committer']['email']
@@ -50,7 +51,7 @@ def get_info_from_commit(commit):
         'diff': diff,
         'files': files,
         'short_commit_msg': short_commit_msg,
-        'full_commit_msg': commit['message'],
+        'full_commit_msg': encoded_message,
         'reply_to': reply_to,
         'sha': commit['id']
     }
