@@ -276,14 +276,3 @@ class SimpleViewsTest(unittest.TestCase):
             'with action closed</span>',
             msg,
         )
-
-    def test_parse_log_line_requests_connection(self):
-        """If requests (the python package) does a connection it always logs
-        a message about it, discard them
-        """
-        msg = parse_log_line(
-            '2016-05-11 21:37:25,600 INFO  '
-            '[requests.packages.urllib3.connectionpool][waitress] '
-            'Starting new HTTPS connection (1): github.com'
-        )
-        self.assertEqual(msg, '')

@@ -47,9 +47,6 @@ def parse_log_line(log_line):
     if line_parsed:
         groups = line_parsed.groups()
         msg = groups[2]
-        # ignore messages from requests
-        if 'Starting new HTTPS connection' in msg:
-            return ''
         pull_request_log = PULL_REQUEST_LOG_MSG_RE.search(msg)
         if pull_request_log:
             pull_request_groups = pull_request_log.groups()
