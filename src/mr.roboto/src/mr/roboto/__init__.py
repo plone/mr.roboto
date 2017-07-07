@@ -5,8 +5,13 @@ from pyramid.config import Configurator
 from mr.roboto.security import RequestWithAttributes
 
 import ast
+import logging
 import os
 
+
+# change requests logging so that it does not log so much
+requests_logger = logging.getLogger('requests.packages.urllib3.connectionpool')
+requests_logger.setLevel(logging.ERROR)
 
 templates = PageTemplateLoader(
     os.path.join(os.path.dirname(__file__), 'templates')
