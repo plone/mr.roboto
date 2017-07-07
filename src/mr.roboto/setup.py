@@ -30,7 +30,7 @@ setup(
         'Programming Language :: Python',
     ],
     keywords='',
-    author='',
+    author='Plone Foundation',
     author_email='',
     url='https://github.com/plone/mr.roboto',
     license='gpl',
