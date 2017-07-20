@@ -312,14 +312,14 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
         if unknown:
             # add a message mentioning all unknown users,
             # but mention each of them only once
-            users = ', '.join(set(unknown))
+            users = ', '.join(set(unknown)).encode('utf-8')
             self.log('{0} missing contributors agreement'.format(users))
-            msg = u'{0} your emails are not known to GithHb and thus it is ' \
-                  u'impossible to know if you have signed the Plone ' \
-                  u'Contributor Agreement, which is required to merge this ' \
-                  u'pull request.\n\n' \
-                  u'Learn about the Plone Contributor Agreement: {1} ' \
-                  u'How to add more emails to your GitHub account: {2} '
+            msg = '{0} your emails are not known to GithHb and thus it is ' \
+                  'impossible to know if you have signed the Plone ' \
+                  'Contributor Agreement, which is required to merge this ' \
+                  'pull request.\n\n' \
+                  'Learn about the Plone Contributor Agreement: {1} ' \
+                  'How to add more emails to your GitHub account: {2} '
             last_commit.create_comment(
                 body=msg.format(
                     users,

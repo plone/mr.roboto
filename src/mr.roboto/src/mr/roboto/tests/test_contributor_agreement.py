@@ -155,7 +155,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
                         'author': None,
                         'commit': {
                             'author': {
-                                'name': 'My name',
+                                'name': u'My näme',
                             },
                         },
                     },
@@ -194,7 +194,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
             ContributorsAgreementSigned(event)
 
         self.assertIn(
-            ': My name missing contributors agreement',
+            'me missing contributors agreement',
             captured_data.records[-2].msg
         )
 
