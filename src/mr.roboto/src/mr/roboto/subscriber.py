@@ -302,8 +302,8 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             # add a message mentioning all users that have not signed the
             # Contributors Agreement
             users = ' @'.join(not_foundation)
-            msg = u'@{0} you need to sign Plone Contributor Agreement in ' \
-                  u'order to merge this pull request.\n\n' \
+            msg = u'@{0} you need to sign the Plone Contributor Agreement ' \
+                  u'in order to merge this pull request. \n\n' \
                   u'Learn about the Plone Contributor Agreement: {1}'
             last_commit.create_comment(
                 body=msg.format(users, self.cla_url),
@@ -314,7 +314,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             # but mention each of them only once
             users = ', '.join(set(unknown)).encode('utf-8')
             self.log('{0} missing contributors agreement'.format(users))
-            msg = '{0} your emails are not known to GithHb and thus it is ' \
+            msg = '{0} your emails are not known to GitHub and thus it is ' \
                   'impossible to know if you have signed the Plone ' \
                   'Contributor Agreement, which is required to merge this ' \
                   'pull request.\n\n' \
