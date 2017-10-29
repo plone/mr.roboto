@@ -40,6 +40,7 @@ IGNORE_NO_CHANGELOG = (
     'ploneorg.core',
     'ploneorg.theme',
     'planet.plone.org',
+    'training',
 )
 
 IGNORE_NO_AGREEMENT = (
