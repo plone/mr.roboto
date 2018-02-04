@@ -27,6 +27,7 @@ def create_github_post_commit_hooks_view(request):
     collective organizations and creates them anew.
     """
     github = request.registry.settings['github']
+    jenkins_url = request.registry.settings['jenkins_url']
     roboto_url = request.registry.settings['roboto_url']
 
     # hooks URL
@@ -41,7 +42,7 @@ def create_github_post_commit_hooks_view(request):
             ['pull_request', ],
         ),
         Hook(
-            'http://78.47.49.108/github-webhook/',
+            '{0}/github-webhook/'.format(jenkins_url),
             ['*', ],
         ),
     ]
