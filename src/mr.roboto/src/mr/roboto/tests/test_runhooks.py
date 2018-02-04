@@ -50,6 +50,7 @@ class RunHooksTest(unittest.TestCase):
             'github_user': 'x',
             'github_password': 'x',
             'collective_repos': '',
+            'jenkins_url': 'https://jenkins.plone.org'
         }
         app = main({}, **self.settings)
         self.roboto = TestApp(app)
