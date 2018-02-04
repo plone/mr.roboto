@@ -75,15 +75,17 @@ def update_hooks_on_repo(repo=None, new_hooks=None, request=None):
     # Remove old hooks
     hooks = repo.get_hooks()
     for hook in hooks:
-        if hook.name == 'web' and \
-                hook.config['url'].find('roboto/run/') != -1:
-            logger.info(
-                'github Removing hook {0}'.format(str(hook.config))
-            )
-            if debug:
-                logger.info('Debug removing hook {0}'.format(repo.name))
-            else:
-                hook.delete()
+        if hook.name == 'web':
+            hook_url = hook.config['url']
+            if hook_url.find('roboto/run/') != -1 or \
+                    hook_url.find('github-webhook') != -1:
+                logger.info(
+                    'github Removing hook {0}'.format(str(hook.config))
+                )
+                if debug:
+                    logger.info('Debug removing hook {0}'.format(repo.name))
+                else:
+                    hook.delete()
 
     # Add new hooks
     msg = 'github Creating hooks on {0}'.format(repo.name)
