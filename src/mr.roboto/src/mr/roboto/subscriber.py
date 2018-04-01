@@ -27,7 +27,7 @@ import requests
 logger = logging.getLogger('mr.roboto')
 
 VALID_CHANGELOG_FILES = re.compile(
-    r'(CHANGES|HISTORY|CHANGELOG).(txt|rst|md)$'
+    r'(CHANGES|HISTORY|CHANGELOG).(txt|rst|md)$',
 )
 
 IGNORE_NO_CHANGELOG = (
@@ -100,11 +100,11 @@ def mail_to_cvs(payload, mailer):
                 payload['ref'].split('/')[-1],
                 commit_data['short_commit_msg']),
             sender='{0} <svn-changes@plone.org>'.format(
-                commit['committer']['name']
+                commit['committer']['name'],
             ),
             recipients=['plone-cvs@lists.sourceforge.net'],
             body=templates['commit_email.pt'](**data),
-            extra_headers={'Reply-To': commit_data['reply_to']}
+            extra_headers={'Reply-To': commit_data['reply_to']},
         )
 
         mailer.send_immediately(msg, fail_silently=False)
@@ -158,7 +158,7 @@ class PullRequestSubscriber(object):
     def short_url(self):
         if self._short_url is None:
             self._short_url = shorten_pull_request_url(
-                self.event.pull_request['html_url']
+                self.event.pull_request['html_url'],
             )
         return self._short_url
 
@@ -248,7 +248,7 @@ class PullRequestSubscriber(object):
                 except TypeError:
                     self.log('commit does not have {0} user info'.format(user))
                     unknown.append(
-                        commit_info['commit']['author']['name']
+                        commit_info['commit']['author']['name'],
                     )
                     continue
 
@@ -326,7 +326,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                     users,
                     self.cla_url,
                     self.github_help_setup_email_url,
-                )
+                ),
             )
 
         last_commit.create_status(
@@ -355,7 +355,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
         status = u'success'
         description = u'Entry found'
         status_url = '{0}/missing-changelog'.format(
-            self.event.request.registry.settings['roboto_url']
+            self.event.request.registry.settings['roboto_url'],
         )
 
         # check if the pull request modifies the changelog file
@@ -411,7 +411,7 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         plone_versions = plone_versions_targeted(
             self.repo_full_name,
             target_branch,
-            self.event.request
+            self.event.request,
         )
 
         tracked_versions = \
@@ -464,7 +464,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             return
 
         checkouts = get_pickled_data(
-            self.event.request.registry.settings['checkouts_file']
+            self.event.request.registry.settings['checkouts_file'],
         )
         not_in_checkouts = [
             version
@@ -533,14 +533,14 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             path=filename,
             mode=mode,
             type=checkouts_cfg_file.type,
-            content=checkouts_new_data
+            content=checkouts_new_data,
         )
         new_tree = repo.create_git_tree([element], base_tree)
 
         new_commit = repo.create_git_commit(
             '[fc] Add {0} to {1}'.format(self.repo_name, filename),
             new_tree,
-            [latest_commit, ],
+            [latest_commit],
             user,
             user,
         )

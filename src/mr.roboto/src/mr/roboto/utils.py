@@ -44,7 +44,7 @@ def get_info_from_commit(commit):
     short_commit_msg = encoded_message.split('\n')[0][:60]
     reply_to = '{0} <{1}>'.format(
         commit['committer']['name'],
-        commit['committer']['email']
+        commit['committer']['email'],
     )
 
     return {
@@ -53,5 +53,5 @@ def get_info_from_commit(commit):
         'short_commit_msg': short_commit_msg,
         'full_commit_msg': encoded_message,
         'reply_to': reply_to,
-        'sha': commit['id']
+        'sha': commit['id'],
     }

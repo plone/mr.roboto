@@ -35,7 +35,7 @@ class MockRequest(object):
 
     def __init__(self):
         self._settings = {
-            'github': mock.MagicMock()
+            'github': mock.MagicMock(),
         }
 
     @property
@@ -51,7 +51,7 @@ class MockRequest(object):
         self._settings = data
 
 
-class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
+class ContributorsAgreementSubscriberTest(unittest.TestCase):
 
     @mock.patch('requests.get')
     def test_error_getting_commits(self, m1):
@@ -69,11 +69,11 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
         self.assertIn(
             'error while trying to get its commits',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     @mock.patch('requests.get')
@@ -97,11 +97,11 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
         self.assertIn(
             'error while getting its commits in JSON',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     @mock.patch('requests.get')
@@ -137,7 +137,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertIn(
             'does not have author user info',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     @mock.patch('requests.get')
@@ -195,7 +195,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertIn(
             'me missing contributors agreement',
-            captured_data.records[-2].msg
+            captured_data.records[-2].msg,
         )
 
     @mock.patch('requests.get')
@@ -223,7 +223,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
         mock_obj = mock.MagicMock()
         mock_obj.get_organization.return_value = inner_mock
         settings = {
-            'github': mock_obj
+            'github': mock_obj,
         }
 
         request = MockRequest()
@@ -239,11 +239,11 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
         self.assertIn(
             'Contributors Agreement report: error',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     @mock.patch('requests.get')
@@ -281,7 +281,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertIn(
             'Contributors Agreement report: success',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )
 
     @mock.patch('requests.get')
@@ -314,7 +314,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertIn(
             'Contributors Agreement report: success',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )
 
     def test_whitelisted(self):
@@ -330,5 +330,5 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase, ):
 
         self.assertIn(
             'whitelisted for contributors agreement',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )

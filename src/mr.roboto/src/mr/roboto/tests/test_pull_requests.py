@@ -19,7 +19,7 @@ NEW_PR_PAYLOAD = {
     'action': 'opened',
     'pull_request': {
         'html_url': 'https://github.com/plone/mr.roboto/pull/1',
-        'merged': False
+        'merged': False,
     },
 }
 
@@ -48,18 +48,18 @@ def minimal_main(global_config, **settings):
     config.registry.settings['api_key'] = settings['api_key']
     config.registry.settings['github'] = Github(
         settings['github_user'],
-        settings['github_password']
+        settings['github_password'],
     )
     config.scan('mr.roboto.views.pull_requests')
     config.end()
     return config.make_wsgi_app()
 
 
-class RunCoreJobTest(unittest.TestCase, ):
+class RunCoreJobTest(unittest.TestCase):
 
     def setUp(self):
         self.settings = {
-            'plone_versions': ['4.3', ],
+            'plone_versions': ['4.3'],
             'roboto_url': 'http://jenkins.plone.org/roboto',
             'api_key': 'xyz1234mnop',
             'sources_file': 'sources_pickle',
@@ -130,13 +130,13 @@ class RunCoreJobTest(unittest.TestCase, ):
 
         self.assertEqual(
             len(captured_data.records),
-            2
+            2,
         )
 
         self.assertIn(
             'PR plone/mr.roboto#1: action "unknown" (merged: False) '
             'not handled',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )
 
     def test_closed_not_merged_pull_request_action(self):
@@ -145,13 +145,13 @@ class RunCoreJobTest(unittest.TestCase, ):
 
         self.assertEqual(
             len(captured_data.records),
-            2
+            2,
         )
 
         self.assertIn(
             'PR plone/mr.roboto#1: action "closed" (merged: False) '
             'not handled',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )
 
     def test_closed_and_merged_pull_request_action(self):

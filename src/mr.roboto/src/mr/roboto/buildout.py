@@ -15,7 +15,7 @@ import shutil
 logger = logging.getLogger('mr.roboto')
 
 PATH_RE = re.compile(
-    '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)'
+    '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)',
 )
 
 
@@ -98,24 +98,24 @@ class PloneCoreBuildout(object):
         self.location = mkdtemp()
         self.clone()
         self.sources = SourcesFile(
-            '{0}/sources.cfg'.format(self.location)
+            '{0}/sources.cfg'.format(self.location),
         )
         self.checkouts = CheckoutsFile(
-            '{0}/checkouts.cfg'.format(self.location)
+            '{0}/checkouts.cfg'.format(self.location),
         )
 
     def clone(self):
         logger.info(
             'Commit: cloning github repository {0}, branch={1}'.format(
                 self.location,
-                self.core_version
-            )
+                self.core_version,
+            ),
         )
         git.Repo.clone_from(
             self.PLONE_COREDEV_LOCATION,
             self.location,
             branch=self.core_version,
-            depth=1
+            depth=1,
         )
 
     def cleanup(self):

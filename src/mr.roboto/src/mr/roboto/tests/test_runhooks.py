@@ -10,7 +10,7 @@ import unittest
 class DummyHook(object):
     name = 'web'
     config = {
-        'url': 'http://jenkins.plone.org/roboto/run/corecommit'
+        'url': 'http://jenkins.plone.org/roboto/run/corecommit',
     }
 
     def delete(self):
@@ -23,7 +23,7 @@ class DummyRepo(object):
         self.name = name
 
     def get_hooks(self):
-        return [DummyHook(), ]
+        return [DummyHook()]
 
     def create_hook(self, *args, **kwargs):
         return
@@ -32,7 +32,7 @@ class DummyRepo(object):
 class DummyGetRepos(object):
 
     def get_repos(self):
-        return [DummyRepo(), ]
+        return [DummyRepo()]
 
     def get_repo(self, name):
         return DummyRepo(name)
@@ -50,7 +50,7 @@ class RunHooksTest(unittest.TestCase):
             'github_user': 'x',
             'github_password': 'x',
             'collective_repos': '',
-            'jenkins_url': 'https://jenkins.plone.org'
+            'jenkins_url': 'https://jenkins.plone.org',
         }
         app = main({}, **self.settings)
         self.roboto = TestApp(app)
@@ -65,7 +65,7 @@ class RunHooksTest(unittest.TestCase):
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_no_repo(self, m1):
         url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertEqual(
@@ -81,7 +81,7 @@ class RunHooksTest(unittest.TestCase):
         m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertIn(
@@ -94,7 +94,7 @@ class RunHooksTest(unittest.TestCase):
         class DummyHook(object):
             name = 'web'
             config = {
-                'url': 'http://jenkins.plone.org/roboto/run/corecommit'
+                'url': 'http://jenkins.plone.org/roboto/run/corecommit',
             }
 
         class DummyRepo(object):
@@ -108,12 +108,12 @@ class RunHooksTest(unittest.TestCase):
 
         class DummyGetRepos(object):
             def get_repos(self):
-                return [DummyRepo(), ]
+                return [DummyRepo()]
 
         m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertIn(
@@ -126,7 +126,7 @@ class RunHooksTest(unittest.TestCase):
         m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertIn(
@@ -139,7 +139,7 @@ class RunHooksTest(unittest.TestCase):
         m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertIn(
@@ -154,7 +154,7 @@ class RunHooksTest(unittest.TestCase):
         m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertIn(
@@ -168,7 +168,7 @@ class RunHooksTest(unittest.TestCase):
         m1.configure_mock(return_value=DummyGetRepos())
 
         url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertIn(

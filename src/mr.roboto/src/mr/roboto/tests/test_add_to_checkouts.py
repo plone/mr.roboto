@@ -99,7 +99,7 @@ class FakeGithub(object):
 
     @property
     def reversed(self):
-        return [self, ]
+        return [self]
 
     @property
     def commit(self):
@@ -123,7 +123,7 @@ class MockRequest(object):
     def __init__(self):
         self._settings = {
             'github': FakeGithub(),
-            'plone_versions': ['4.3', '5.1', ],
+            'plone_versions': ['4.3', '5.1'],
         }
 
     @property
@@ -201,10 +201,10 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
 
     def test_in_checkouts(self):
         checkouts = {
-            '5.1': ['plone.uuid', ],
+            '5.1': ['plone.uuid'],
         }
         sources = {
-            ('plone/plone.uuid', 'master'): ['5.1', ],
+            ('plone/plone.uuid', 'master'): ['5.1'],
         }
         event = self.create_event(
             checkouts,
@@ -229,11 +229,11 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
 
     def test_in_multiple_checkouts(self):
         checkouts = {
-            '5.0': ['plone.uuid', ],
-            '5.1': ['plone.uuid', ],
+            '5.0': ['plone.uuid'],
+            '5.1': ['plone.uuid'],
         }
         sources = {
-            ('plone/plone.uuid', 'master'): ['5.1', '5.0', ],
+            ('plone/plone.uuid', 'master'): ['5.1', '5.0'],
         }
         event = self.create_event(
             checkouts,
@@ -259,10 +259,10 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
     def test_not_in_checkouts(self):
         checkouts = {
             '5.0': [],
-            '5.1': ['plone.uuid', ],
+            '5.1': ['plone.uuid'],
         }
         sources = {
-            ('plone/plone.uuid', 'master'): ['5.1', '5.0', ],
+            ('plone/plone.uuid', 'master'): ['5.1', '5.0'],
         }
         event = self.create_event(
             checkouts,
@@ -288,10 +288,10 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
         checkouts = {
             '4.3': [],
             '5.0': [],
-            '5.1': ['plone.uuid', ],
+            '5.1': ['plone.uuid'],
         }
         sources = {
-            ('plone/plone.uuid', 'master'): ['5.1', '5.0', '4.3', ],
+            ('plone/plone.uuid', 'master'): ['5.1', '5.0', '4.3'],
         }
         event = self.create_event(
             checkouts,

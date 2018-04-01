@@ -69,13 +69,13 @@ class BuildoutTest(unittest.TestCase):
         dummy_file = os.path.join(self.coredev_repo.working_tree_dir, filename)
         with open(dummy_file, 'w') as afile:
             afile.write(content)
-        self.coredev_repo.index.add([dummy_file, ])
+        self.coredev_repo.index.add([dummy_file])
         self.coredev_repo.index.commit('Random commit')
 
     def test_get_sources_and_checkouts(self):
         self.roboto.get(
             '/update-sources-and-checkouts?token={0}'.format(
-                self.settings['api_key']
+                self.settings['api_key'],
             ),
         )
 
@@ -84,11 +84,11 @@ class BuildoutTest(unittest.TestCase):
 
         self.assertEqual(
             data[('plone/Products.CMFPlone', 'master')],
-            ['5.1', '4.3', ]
+            ['5.1', '4.3'],
         )
         self.assertEqual(
             data[('plone/Products.CMFCore', '2.2.x')],
-            ['5.1', '4.3', ]
+            ['5.1', '4.3'],
         )
 
         with open(self.settings['checkouts_file']) as checkouts:
@@ -96,9 +96,9 @@ class BuildoutTest(unittest.TestCase):
 
         self.assertEqual(
             data['5.1'],
-            ['plone.app.contenttypes', 'Products.CMFPlone', ]
+            ['plone.app.contenttypes', 'Products.CMFPlone'],
         )
         self.assertEqual(
             data['4.3'],
-            ['plone.app.contenttypes', 'Products.CMFPlone', ]
+            ['plone.app.contenttypes', 'Products.CMFPlone'],
         )

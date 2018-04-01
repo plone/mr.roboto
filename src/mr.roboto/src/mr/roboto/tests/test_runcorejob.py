@@ -33,12 +33,12 @@ COREDEV_COMMIT_PAYLOAD = {
             'author': {
                 'name': 'mister-roboto',
                 'email': 'mr.roboto@plone.org',
-                'username': 'mister-roboto'
+                'username': 'mister-roboto',
             },
             'committer': {
                 'name': 'mister-roboto',
                 'email': 'mr.roboto@plone.org',
-                'username': 'mister-roboto'
+                'username': 'mister-roboto',
             },
             'added': [
 
@@ -47,18 +47,18 @@ COREDEV_COMMIT_PAYLOAD = {
 
             ],
             'modified': [
-                'last_commit.txt'
-            ]
-        }
+                'last_commit.txt',
+            ],
+        },
     ],
     'repository': {
         'name': 'buildout.coredev',
         'full_name': 'plone/buildout.coredev',
-        'organization': 'plone'
+        'organization': 'plone',
     },
     'pusher': {
         'name': 'mister-roboto',
-        'email': 'mr.roboto@plone.org'
+        'email': 'mr.roboto@plone.org',
     },
 }
 
@@ -72,7 +72,7 @@ Sample data returned by mr.roboto.subscriber.get_info_from_commit for all
 different use cases that need to be tested.
 """
 SAMPLE_DATA = {
-    'files': ['M CHANGES.rst', 'M setup.py', ],
+    'files': ['M CHANGES.rst', 'M setup.py'],
     'short_commit_msg': 'Random commit',
     'full_commit_msg': 'Random commit\n\nLonger explanation',
     'diff': '+ something added\n- something removed\n',
@@ -80,7 +80,7 @@ SAMPLE_DATA = {
 }
 
 SAMPLE_DATA_FAKE = {
-    'files': ['M CHANGES.rst', 'M setup.py', ],
+    'files': ['M CHANGES.rst', 'M setup.py'],
     'short_commit_msg': '[fc] Repository: mockup',
     'full_commit_msg': '[fc] Repository: mockup\n\nBranch: refs/heads/master',
     'diff': '+ something added\n- something removed\n',
@@ -88,7 +88,7 @@ SAMPLE_DATA_FAKE = {
 }
 
 SAMPLE_DATA_CI_SKIP = {
-    'files': ['M CHANGES.rst', 'M setup.py', ],
+    'files': ['M CHANGES.rst', 'M setup.py'],
     'short_commit_msg': 'Back to development: 1.3.25',
     'full_commit_msg': 'Back to development: 1.3.25\n[ci skip]',
     'diff': '+ something added\n- something removed\n',
@@ -96,7 +96,7 @@ SAMPLE_DATA_CI_SKIP = {
 }
 
 SAMPLE_DATA_SOURCES = {
-    'files': ['M sources.cfg', 'M setup.py', ],
+    'files': ['M sources.cfg', 'M setup.py'],
     'short_commit_msg': 'Back to development: 1.3.25',
     'full_commit_msg': 'Back to development: 1.3.25\n[',
     'diff': '+ something added\n- something removed\n',
@@ -117,7 +117,7 @@ def minimal_main(global_config, **settings):
     config.registry.settings['api_key'] = settings['api_key']
     config.registry.settings['github'] = Github(
         settings['github_user'],
-        settings['github_password']
+        settings['github_password'],
     )
     config.scan('mr.roboto.views.runcorejob')
     return config.make_wsgi_app()
@@ -201,8 +201,8 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
     def test_commit_to_coredev(self, m1):
         self.populate_sources_and_checkouts(
-            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
-            checkouts_data={'5.1': ['plone.app.upgrade'], },
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1']},
+            checkouts_data={'5.1': ['plone.app.upgrade']},
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
@@ -214,8 +214,8 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_FAKE)
     def test_fake_commit_to_coredev(self, m1):
         self.populate_sources_and_checkouts(
-            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
-            checkouts_data={'5.1': ['plone.app.upgrade'], },
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1']},
+            checkouts_data={'5.1': ['plone.app.upgrade']},
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
@@ -227,8 +227,8 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
     def test_ci_skip_commit_to_coredev(self, m1):
         self.populate_sources_and_checkouts(
-            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
-            checkouts_data={'5.1': ['plone.app.upgrade'], },
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1']},
+            checkouts_data={'5.1': ['plone.app.upgrade']},
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
@@ -241,8 +241,8 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.views.runcorejob.get_sources_and_checkouts')
     def test_sources_changed_commit_to_coredev(self, m1, m2):
         self.populate_sources_and_checkouts(
-            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
-            checkouts_data={'5.1': ['plone.app.upgrade'], },
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1']},
+            checkouts_data={'5.1': ['plone.app.upgrade']},
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
@@ -254,8 +254,8 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
     def test_ci_skip_non_coredev_commit(self, m1):
         self.populate_sources_and_checkouts(
-            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
-            checkouts_data={'5.1': ['plone.app.upgrade'], },
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1']},
+            checkouts_data={'5.1': ['plone.app.upgrade']},
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
 
@@ -267,8 +267,8 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
     def test_branch_not_in_sources_commit(self, m1):
         self.populate_sources_and_checkouts(
-            sources_data={('plone/plone.app.discussion', 'master'): ['5.1', ]},
-            checkouts_data={'5.1': ['plone.app.upgrade'], },
+            sources_data={('plone/plone.app.discussion', 'master'): ['5.1']},
+            checkouts_data={'5.1': ['plone.app.upgrade']},
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
 
@@ -281,8 +281,8 @@ class RunCoreJobTest(unittest.TestCase):
     @mock.patch('mr.roboto.views.runcorejob.commit_to_coredev')
     def test_branch_in_sources_commit(self, m1, m2):
         self.populate_sources_and_checkouts(
-            sources_data={('plone/Products.CMFPlone', 'master', ): ['5.1', ]},
-            checkouts_data={'5.1': ['plone.app.upgrade'], },
+            sources_data={('plone/Products.CMFPlone', 'master'): ['5.1']},
+            checkouts_data={'5.1': ['plone.app.upgrade']},
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
 
@@ -297,13 +297,13 @@ class AuxiliaryFunctionsTest(unittest.TestCase):
     def test_get_user_none(self):
         self.assertEqual(
             get_user({'name': u'none'}),
-            'NoBody <nobody@plone.org>'
+            'NoBody <nobody@plone.org>',
         )
 
     def test_get_user(self):
         self.assertEqual(
             get_user({'name': u'jon', 'email': 'jon@plone.org'}),
-            'jon <jon@plone.org>'
+            'jon <jon@plone.org>',
         )
 
     def test_load_data(self):

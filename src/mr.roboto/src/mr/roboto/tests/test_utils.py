@@ -18,16 +18,16 @@ COMMIT = {
     'author': {
         'name': 'mister-roboto',
         'email': 'mr.roboto@plone.org',
-        'username': 'mister-roboto'
+        'username': 'mister-roboto',
     },
     'committer': {
         'name': 'mister-roboto',
         'email': 'mr.roboto@plone.org',
-        'username': 'mister-roboto'
+        'username': 'mister-roboto',
     },
     'added': [],
     'removed': [],
-    'modified': ['last_commit.txt', ],
+    'modified': ['last_commit.txt'],
 }
 
 
@@ -37,14 +37,14 @@ class TestShortenPRUrls(unittest.TestCase):
         url = 'https://github.com/plone/plone.app.registry/pull/20'
         self.assertEqual(
             shorten_pull_request_url(url),
-            'plone/plone.app.registry#20'
+            'plone/plone.app.registry#20',
         )
 
     def test_fallback(self):
         url = 'https://github.com/plone/random/url'
         self.assertEqual(
             shorten_pull_request_url(url),
-            url
+            url,
         )
 
 
@@ -56,7 +56,7 @@ class TestGetInfoFromCommitTest(unittest.TestCase):
         data = get_info_from_commit(COMMIT)
         self.assertEqual(
             data['files'],
-            ['M last_commit.txt', ],
+            ['M last_commit.txt'],
         )
         self.assertEqual(
             data['sha'],
@@ -72,8 +72,8 @@ class TestGetInfoFromCommitTest(unittest.TestCase):
         )
         self.assertTrue(
             data['full_commit_msg'].endswith(
-                'Files changed:\nM CHANGES.rst\nM setup.py'
-            )
+                'Files changed:\nM CHANGES.rst\nM setup.py',
+            ),
         )
 
     @mock.patch('requests.get')
@@ -89,6 +89,6 @@ class TestGetInfoFromCommitTest(unittest.TestCase):
         )
         self.assertTrue(
             data['full_commit_msg'].endswith(
-                'Files changed:\nM CHNGES.rst\nM setup.py'
-            )
+                'Files changed:\nM CHNGES.rst\nM setup.py',
+            ),
         )

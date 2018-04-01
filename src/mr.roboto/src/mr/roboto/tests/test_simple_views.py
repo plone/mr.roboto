@@ -34,7 +34,7 @@ class SimpleViewsTest(unittest.TestCase):
         result = self.roboto.get('/', status=200)
         self.assertIn(
             'Welcome to mr.roboto!',
-            result.body
+            result.body,
         )
 
     def test_home_links(self):
@@ -64,7 +64,7 @@ class SimpleViewsTest(unittest.TestCase):
         filename = 'roboto.log'
         self.clean_file(filename)
         result = self.roboto.get(
-            '/log?token={0}'.format(self.settings['api_key'])
+            '/log?token={0}'.format(self.settings['api_key']),
         )
         self.assertIn(
             'File not found',
@@ -78,7 +78,7 @@ class SimpleViewsTest(unittest.TestCase):
             log.write('log lines')
 
         result = self.roboto.get(
-            '/log?token={0}'.format(self.settings['api_key'])
+            '/log?token={0}'.format(self.settings['api_key']),
         )
         self.assertIn(
             'log lines',
@@ -94,7 +94,7 @@ class SimpleViewsTest(unittest.TestCase):
                 log.write('log line {0}\n'.format(number))
 
         result = self.roboto.get(
-            '/log?token={0}'.format(self.settings['api_key'])
+            '/log?token={0}'.format(self.settings['api_key']),
         )
         self.assertIn(
             'log line 250',
@@ -106,7 +106,7 @@ class SimpleViewsTest(unittest.TestCase):
         )
         self.assertIn(
             '<pre>log line 299\n</pre><pre>log line 298\n</pre>',
-            result.body
+            result.body,
         )
         self.clean_file(filename)
 
@@ -175,7 +175,7 @@ class SimpleViewsTest(unittest.TestCase):
     @mock.patch('mr.roboto.views.home.get_sources_and_checkouts')
     def test_update_pickles(self, m1):
         url = '/update-sources-and-checkouts?token={0}'.format(
-            self.settings['api_key']
+            self.settings['api_key'],
         )
         result = self.roboto.get(url)
         self.assertIn(
@@ -198,7 +198,7 @@ class SimpleViewsTest(unittest.TestCase):
 
     def test_parse_log_line_format_other(self):
         msg = parse_log_line(
-            '2016-05-16 23:45:00,343 INFO [mr.roboto][lala] my message'
+            '2016-05-16 23:45:00,343 INFO [mr.roboto][lala] my message',
         )
 
         self.assertIn(
@@ -218,7 +218,7 @@ class SimpleViewsTest(unittest.TestCase):
         msg = parse_log_line(
             '2013-12-12 22:34 INFO [mr.roboto][lala] '
             'Commit: on plone/ploneorg.core master '
-            'fcbc0f2764f84a027766d96493ea0d40823f7ef1'
+            'fcbc0f2764f84a027766d96493ea0d40823f7ef1',
         )
 
         self.assertIn(
@@ -240,7 +240,7 @@ class SimpleViewsTest(unittest.TestCase):
     def test_parse_log_line_format_commit_no_link(self):
         msg = parse_log_line(
             '2013-12-12 22:34 INFO [mr.roboto][lala] '
-            'Commit: LETS COMMIT ON COREDEV'
+            'Commit: LETS COMMIT ON COREDEV',
         )
 
         self.assertIn(
@@ -259,7 +259,7 @@ class SimpleViewsTest(unittest.TestCase):
     def test_parse_log_line_format_pull_request(self):
         msg = parse_log_line(
             '2013-11-10 12:15 WARN [mr.roboto][lala] '
-            'PR plone/ploneorg.core#155: with action closed'
+            'PR plone/ploneorg.core#155: with action closed',
         )
 
         self.assertIn(

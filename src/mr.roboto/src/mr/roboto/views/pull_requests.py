@@ -15,7 +15,7 @@ logger = logging.getLogger('mr.roboto')
 pull_request_service = Service(
     name='Handle pull requests',
     path='/run/pull-request',
-    description='Emit an event if the pull request is to a Plone core package'
+    description='Emit an event if the pull request is to a Plone core package',
 )
 
 
@@ -39,19 +39,19 @@ def handle_pull_request(request):
         u'PR {0}: with action {1}'.format(
             short_url,
             action,
-        )
+        ),
     )
     if action in ('opened', 'reopened'):
         request.registry.notify(
-            NewPullRequest(pull_request, request)
+            NewPullRequest(pull_request, request),
         )
     elif action == 'synchronize':
         request.registry.notify(
-            UpdatedPullRequest(pull_request, request)
+            UpdatedPullRequest(pull_request, request),
         )
     elif action == 'closed' and pull_request['merged']:
         request.registry.notify(
-            MergedPullRequest(pull_request, request)
+            MergedPullRequest(pull_request, request),
         )
     else:
         msg = 'PR {0}: action "{1}" (merged: {2}) not handled'.format(
@@ -60,7 +60,7 @@ def handle_pull_request(request):
             pull_request['merged'],
         )
         logger.info(msg)
-        return json.dumps({'message': msg, })
+        return json.dumps({'message': msg})
 
     msg = 'Thanks! Handlers already took care of this pull request'
-    return json.dumps({'message': msg, })
+    return json.dumps({'message': msg})

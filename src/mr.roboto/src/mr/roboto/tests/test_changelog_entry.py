@@ -83,7 +83,7 @@ class MockRequest(object):
     def settings(self):
         return {
             'github': mock.MagicMock(),
-            'roboto_url': 'http://jenkins.plone.org/roboto'
+            'roboto_url': 'http://jenkins.plone.org/roboto',
         }
 
 
@@ -114,7 +114,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
 
         self.assertIn(
             'whitelisted for changelog entries',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )
 
     @mock.patch('requests.get')
@@ -131,7 +131,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
 
         self.assertIn(
             'changelog entry: error',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )
 
     @mock.patch('requests.get')
@@ -148,7 +148,7 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
 
         self.assertIn(
             'changelog entry: success',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )
 
     @mock.patch('requests.get')
@@ -165,5 +165,5 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
 
         self.assertIn(
             'changelog entry: success',
-            captured_data.records[-1].msg
+            captured_data.records[-1].msg,
         )

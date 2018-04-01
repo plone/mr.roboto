@@ -19,16 +19,16 @@ COMMIT = {
     'author': {
         'name': 'mister-roboto',
         'email': 'mr.roboto@plone.org',
-        'username': 'mister-roboto'
+        'username': 'mister-roboto',
     },
     'committer': {
         'name': 'mister-roboto',
         'email': 'mr.roboto@plone.org',
-        'username': 'mister-roboto'
+        'username': 'mister-roboto',
     },
     'added': [],
     'removed': [],
-    'modified': ['last_commit.txt', ],
+    'modified': ['last_commit.txt'],
 }
 
 
@@ -42,10 +42,10 @@ class SubscribersTest(unittest.TestCase):
             'plone/Products.CMFPlone',
             'master',
             '5.1',
-            'roboto@plone.org'
+            'roboto@plone.org',
         )
         self.assertTrue(
-            mock_mail.send_immediately.called
+            mock_mail.send_immediately.called,
         )
 
         mail = mock_mail.send_immediately.call_args[0][0]
@@ -59,16 +59,16 @@ class SubscribersTest(unittest.TestCase):
         )
         self.assertEqual(
             mail.recipients,
-            ['ramon.nb@gmail.com', 'tisto@plone.org', 'roboto@plone.org']
+            ['ramon.nb@gmail.com', 'tisto@plone.org', 'roboto@plone.org'],
         )
 
     def test_to_cvs_ignore(self):
         payload = {
-            'commits': [x for x in range(0, 50)]
+            'commits': [x for x in range(0, 50)],
         }
 
         self.assertIsNone(
-            mail_to_cvs(payload, '')
+            mail_to_cvs(payload, ''),
         )
 
     @mock.patch('requests.get')
@@ -86,11 +86,11 @@ class SubscribersTest(unittest.TestCase):
 
         mock_mail = mock.MagicMock()
         self.assertIsNone(
-            mail_to_cvs(payload, mock_mail)
+            mail_to_cvs(payload, mock_mail),
         )
 
         self.assertTrue(
-            mock_mail.send_immediately.called
+            mock_mail.send_immediately.called,
         )
 
         mail = mock_mail.send_immediately.call_args[0][0]
@@ -104,5 +104,5 @@ class SubscribersTest(unittest.TestCase):
         )
         self.assertEqual(
             mail.recipients,
-            ['plone-cvs@lists.sourceforge.net', ]
+            ['plone-cvs@lists.sourceforge.net'],
         )
