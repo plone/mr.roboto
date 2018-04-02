@@ -21,7 +21,7 @@ logger = logging.getLogger('mr.roboto')
 runCoreTests = Service(
     name='Run core tests',
     path='/run/corecommit',
-    description='Run the core-dev buildout'
+    description='Run the core-dev buildout',
 )
 
 
@@ -42,7 +42,7 @@ def get_user(data):
     else:
         who = '{0} <{1}>'.format(
             data['name'],
-            data['email']
+            data['email'],
         )
     return who
 
@@ -53,7 +53,7 @@ def commit_to_coredev(
     plone_version,
     changeset,
     changeset_long,
-    timestamp
+    timestamp,
 ):
     logger.info('Commit: LETS COMMIT ON COREDEV')
     gh = request.registry.settings['github']
@@ -66,7 +66,7 @@ def commit_to_coredev(
         path='last_commit.txt',
         mode='100644',
         type='blob',
-        content=changeset_long
+        content=changeset_long,
     )
     new_tree = repo.create_git_tree([element], base_tree)
     new_user = InputGitAuthor(
@@ -77,7 +77,7 @@ def commit_to_coredev(
     new_commit = repo.create_git_commit(
         '[fc] {0}'.format(changeset),
         new_tree,
-        [latest_commit, ],
+        [latest_commit],
         new_user,
         new_user,
     )
@@ -177,7 +177,7 @@ def run_function_core_tests(request):
             get_sources_and_checkouts(request)
 
         return json.dumps(
-            {'message': 'Thanks! Commit to coredev, nothing to do'}
+            {'message': 'Thanks! Commit to coredev, nothing to do'},
         )
 
     ##
@@ -198,7 +198,7 @@ def run_function_core_tests(request):
         msg = 'Commit: not in sources - {0} - {1} do nothing'
         logger.info(msg.format(repo, branch))
         return json.dumps(
-            {'message': 'Thanks! Commits done on a branch, nothing to do'}
+            {'message': 'Thanks! Commits done on a branch, nothing to do'},
         )
 
     ##
@@ -216,8 +216,8 @@ def run_function_core_tests(request):
                     repo,
                     branch,
                     plone_version,
-                    payload['pusher']['email']  # duplicated, already on 'who'
-                )
+                    payload['pusher']['email'],  # duplicated, already on 'who'
+                ),
             )
         # commit to the plone version branch. This way jenkins will trigger a
         # build and will get the latest changes from the repository that
@@ -232,5 +232,5 @@ def run_function_core_tests(request):
         )
 
     return json.dumps(
-        {'message': 'Thanks! Plone Jenkins CI will run tests'}
+        {'message': 'Thanks! Plone Jenkins CI will run tests'},
     )

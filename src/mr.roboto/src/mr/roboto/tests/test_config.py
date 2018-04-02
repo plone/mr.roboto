@@ -25,31 +25,31 @@ class ConfigurationTest(unittest.TestCase):
     def test_plone_versions(self):
         self.assertEqual(
             self.settings['plone_versions'],
-            ['4.3', '5.1', ]
+            ['4.3', '5.1'],
         )
 
     def test_roboto_url(self):
         self.assertEqual(
             self.settings['roboto_url'],
-            'http://mr.roboto.plone.org'
+            'http://mr.roboto.plone.org',
         )
 
     def test_api_key(self):
         self.assertEqual(
             self.settings['api_key'],
-            '1234567890'
+            '1234567890',
         )
 
     def test_sources_file(self):
         self.assertEqual(
             self.settings['sources_file'],
-            'sources.pickle'
+            'sources.pickle',
         )
 
     def test_checkouts_file(self):
         self.assertEqual(
             self.settings['checkouts_file'],
-            'checkouts.pickle'
+            'checkouts.pickle',
         )
 
     def test_debug(self):

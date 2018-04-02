@@ -1,4 +1,4 @@
 meld3==1.0.2
-supervisor==3.3.0
-setuptools==22.0.5
-zc.buildout==2.5.1
+supervisor==3.3.4
+setuptools==39.0.1
+zc.buildout==2.11.2

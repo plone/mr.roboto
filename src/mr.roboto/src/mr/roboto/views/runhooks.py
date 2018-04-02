@@ -14,7 +14,7 @@ logger = logging.getLogger('mr.roboto')
 createGithubPostCommitHooks = Service(
     name='Create github post-commit hooks',
     path='/run/githubcommithooks',
-    description='Creates github post-commit hooks.'
+    description='Creates github post-commit hooks.',
 )
 
 
@@ -31,19 +31,19 @@ def create_github_post_commit_hooks_view(request):
     roboto_url = request.registry.settings['roboto_url']
 
     # hooks URL
-    Hook = namedtuple('Hook', ['url', 'events', ])
+    Hook = namedtuple('Hook', ['url', 'events'])
     roboto_hooks = [
         Hook(
             '{0}/run/corecommit'.format(roboto_url),
-            ['push', ],
+            ['push'],
         ),
         Hook(
             '{0}/run/pull-request'.format(roboto_url),
-            ['pull_request', ],
+            ['pull_request'],
         ),
         Hook(
             '{0}/github-webhook/'.format(jenkins_url),
-            ['*', ],
+            ['*'],
         ),
     ]
 
@@ -58,12 +58,12 @@ def create_github_post_commit_hooks_view(request):
     for repo_name in collective_repos:
         repo = collective.get_repo(repo_name.strip())
         messages.append(
-            update_hooks_on_repo(repo, roboto_hooks, request)
+            update_hooks_on_repo(repo, roboto_hooks, request),
         )
 
     for repo in github.get_organization('plone').get_repos():
         messages.append(
-            update_hooks_on_repo(repo, roboto_hooks, request)
+            update_hooks_on_repo(repo, roboto_hooks, request),
         )
 
     return json.dumps(messages)
@@ -80,7 +80,7 @@ def update_hooks_on_repo(repo=None, new_hooks=None, request=None):
             if hook_url.find('roboto/run/') != -1 or \
                     hook_url.find('github-webhook') != -1:
                 logger.info(
-                    'github Removing hook {0}'.format(str(hook.config))
+                    'github Removing hook {0}'.format(str(hook.config)),
                 )
                 if debug:
                     logger.info('Debug removing hook {0}'.format(repo.name))

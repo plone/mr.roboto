@@ -17,20 +17,20 @@ LOG_LINE_RE = re.compile(
     r'(\w+)'  # log level
     r'\s+'  # space
     r'\[[\w\.]+\]\[\w+\]'  # logger name ([mr.roboto][waitress]
-    r'(.+)'  # message
+    r'(.+)',  # message
 )
 
 PULL_REQUEST_LOG_MSG_RE = re.compile(
     r'PR\s+'
     '(\S+)'  # repo/package.name.this
     '#'
-    '(\d+)'  # pull request number
+    '(\d+)',  # pull request number
 )
 
 COMMIT_LOG_MSG_RE = re.compile(
     r'\s+(\S+)'  # repo/package.name
     r'\s+\S+'  # branch name
-    r'\s+([\d\w]{40})$'  # commit hash at the end of the line
+    r'\s+([\d\w]{40})$',  # commit hash at the end of the line
 )
 
 PULL_REQUEST_URL = '<a href="https://github.com/{1}/pull/{2}">{0}</a>'
@@ -53,7 +53,7 @@ def parse_log_line(log_line):
             text = '{0}#{1}'.format(*pull_request_groups)
             msg = msg.replace(
                 text,
-                PULL_REQUEST_URL.format(text, *pull_request_groups)
+                PULL_REQUEST_URL.format(text, *pull_request_groups),
             )
         else:
             commit_log = COMMIT_LOG_MSG_RE.search(msg)
@@ -61,7 +61,7 @@ def parse_log_line(log_line):
                 commit_log_groups = commit_log.groups()
                 msg = msg.replace(
                     commit_log_groups[1],
-                    COMMIT_URL.format(*commit_log_groups)
+                    COMMIT_URL.format(*commit_log_groups),
                 )
 
         return LOG_LINE.format(**{
@@ -77,7 +77,7 @@ def parse_log_line(log_line):
 @view_config(route_name='home', renderer='mr.roboto:templates/home.pt')
 def home_page(context, request):
     info = {
-        'roboto_url': request.registry.settings['roboto_url']
+        'roboto_url': request.registry.settings['roboto_url'],
     }
     return dict(info=info)
 
@@ -146,7 +146,7 @@ def update_pickles(context, request):
 
 @view_config(
     route_name='missing_changelog',
-    renderer='mr.roboto:templates/missing_changelog.pt'
+    renderer='mr.roboto:templates/missing_changelog.pt',
 )
 def missing_changelog(context, request):
     return {}
@@ -154,7 +154,7 @@ def missing_changelog(context, request):
 
 @view_config(
     route_name='branches',
-    renderer='mr.roboto:templates/branches.pt'
+    renderer='mr.roboto:templates/branches.pt',
 )
 def branches(context, request):
     plone_versions = request.registry.settings['plone_versions']
@@ -164,7 +164,7 @@ def branches(context, request):
     def plone_versions_dict():
         """Provide a dict prefilled with all plone versions"""
         _dict = {
-            v: {'branch': None, 'active': None, }
+            v: {'branch': None, 'active': None}
             for v in plone_versions
         }
         _dict['id'] = None

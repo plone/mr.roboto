@@ -14,7 +14,7 @@ requests_logger = logging.getLogger('requests.packages.urllib3.connectionpool')
 requests_logger.setLevel(logging.ERROR)
 
 templates = PageTemplateLoader(
-    os.path.join(os.path.dirname(__file__), 'templates')
+    os.path.join(os.path.dirname(__file__), 'templates'),
 )
 
 
@@ -22,7 +22,7 @@ def main(global_config, **settings):
     """This function returns a Pyramid WSGI application"""
     config = Configurator(
         settings=settings,
-        request_factory=RequestWithAttributes
+        request_factory=RequestWithAttributes,
     )
 
     # add webservice support
@@ -34,7 +34,7 @@ def main(global_config, **settings):
 
     # plone versions
     config.registry.settings['plone_versions'] = ast.literal_eval(
-        settings['plone_versions']
+        settings['plone_versions'],
     )
 
     # roboto public url
@@ -54,7 +54,7 @@ def main(global_config, **settings):
     # github object
     config.registry.settings['github'] = Github(
         settings['github_user'],
-        settings['github_password']
+        settings['github_password'],
     )
 
     config.add_static_view('static', 'static', cache_max_age=3600)

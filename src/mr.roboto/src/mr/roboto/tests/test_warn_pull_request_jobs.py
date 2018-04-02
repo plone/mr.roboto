@@ -50,7 +50,7 @@ class MockRequest(object):
     def __init__(self):
         self._settings = {
             'github': mock.MagicMock(),
-            'plone_versions': ['4.3', '5.1', ],
+            'plone_versions': ['4.3', '5.1'],
         }
 
     @property
@@ -92,7 +92,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
     def test_not_targeting_any_source(self):
         event = self.create_event(
             {
-                ('plone/mr.roboto', 'stable'): ['5.1', ],
+                ('plone/mr.roboto', 'stable'): ['5.1'],
             },
         )
 
@@ -103,17 +103,17 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
         self.assertIn(
             'does not target any Plone version',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     def test_target_one_plone_version(self):
         event = self.create_event(
             {
-                ('plone/mr.roboto', 'master'): ['5.1', ],
+                ('plone/mr.roboto', 'master'): ['5.1'],
             },
         )
 
@@ -124,17 +124,17 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
         self.assertIn(
             'created pending status for plone 5.1',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     def test_target_multiple_plone_versions(self):
         event = self.create_event(
             {
-                ('plone/mr.roboto', 'master'): ['5.1', '4.3', ],
+                ('plone/mr.roboto', 'master'): ['5.1', '4.3'],
             },
         )
 
@@ -145,25 +145,25 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertEqual(
             len(captured_data.records),
-            2
+            2,
         )
 
         messages = sorted([m.msg for m in captured_data.records])
 
         self.assertIn(
             'created pending status for plone 4.3',
-            messages[0]
+            messages[0],
         )
 
         self.assertIn(
             'created pending status for plone 5.1',
-            messages[1]
+            messages[1],
         )
 
     def test_buildout_coredev_not_targeting_plone_release(self):
         event = self.create_event(
             {},
-            payload=COREDEV_RANDOM_BRANCH_PAYLOAD
+            payload=COREDEV_RANDOM_BRANCH_PAYLOAD,
         )
 
         with LogCapture() as captured_data:
@@ -173,12 +173,12 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
 
         self.assertIn(
             'PR plone/buildout.coredev#3: does not target any Plone version',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     def test_buildout_coredev_targeting_plone_release(self):
@@ -191,12 +191,12 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
 
         self.assertIn(
             'created pending status for plone 4.3',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
 
     def test_whitelisted(self):
@@ -209,10 +209,10 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertEqual(
             len(captured_data.records),
-            1
+            1,
         )
 
         self.assertIn(
             'skip adding test warnings, repo whitelisted',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
