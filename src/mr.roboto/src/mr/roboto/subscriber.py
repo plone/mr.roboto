@@ -371,6 +371,9 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
         for diff_file in patch_data:
             if VALID_CHANGELOG_FILES.search(diff_file.path):
                 break
+            if diff_file.path.startswith('news/'):
+                # towncrier news snippet
+                break
         else:
             status = u'error'
             description = u'No entry found!'
