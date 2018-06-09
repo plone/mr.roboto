@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
+from collections import UserDict
 from configparser import ConfigParser
 from configparser import ExtendedInterpolation
 from tempfile import mkdtemp
-from UserDict import UserDict
 
 import git
 import logging

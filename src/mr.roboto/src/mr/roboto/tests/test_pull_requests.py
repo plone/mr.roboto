@@ -71,7 +71,7 @@ class RunCoreJobTest(unittest.TestCase):
         self.roboto = TestApp(app)
 
     def prepare_data(self, payload):
-        body = urllib.urlencode(
+        body = urllib.parse.urlencode(
             {'payload': json.dumps(payload)},
         )
         hmac_value = hmac.new(
