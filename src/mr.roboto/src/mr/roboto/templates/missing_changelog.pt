@@ -29,7 +29,7 @@
   <h1>Pull request missing a change log entry</h1>
   <p>Every change made in plone, specially the ones made through a pull request,
   is worth noting it down on the change log file (usually <em>CHANGES.rst</em>).</p>
-  
+
   <p>Some packages, at least <strong>plone.app.upgrade</strong> and <strong>Products.CMFPlone</strong>
     are using <a href="https://pypi.org/project/towncrier/">towncrier</a>, so rather than editing <em>CHANGES.rst</em>
     one should add a file inside the <strong>news</strong> folder. See an <a href="https://community.plone.org/t/using-towncrier-for-changes-rst-in-plone-packages/6486">outline of how to use it</a>.
