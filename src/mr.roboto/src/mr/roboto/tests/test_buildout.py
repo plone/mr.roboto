@@ -79,7 +79,7 @@ class BuildoutTest(unittest.TestCase):
             ),
         )
 
-        with open(self.settings['sources_file']) as sources:
+        with open(self.settings['sources_file'], 'br') as sources:
             data = pickle.load(sources)
 
         self.assertEqual(
@@ -91,7 +91,7 @@ class BuildoutTest(unittest.TestCase):
             ['5.1', '4.3'],
         )
 
-        with open(self.settings['checkouts_file']) as checkouts:
+        with open(self.settings['checkouts_file'], 'br') as checkouts:
             data = pickle.load(checkouts)
 
         self.assertEqual(

@@ -11,7 +11,7 @@ def validate_github(fn):
         if 'X-Hub_Signature' in request.headers:
             sha1_gh = request.headers['X-Hub_Signature']
             hmac_value = hmac.new(
-                request.registry.settings['api_key'],
+                request.registry.settings['api_key'].encode(),
                 request.body,
                 sha1,
             )

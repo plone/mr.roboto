@@ -64,7 +64,7 @@ class MockRequest(object):
     def set_sources(self, data):
         with NamedTemporaryFile(delete=False) as tmp_file:
             sources_pickle = tmp_file.name
-            with open(sources_pickle, 'w') as tmp_file_writer:
+            with open(sources_pickle, 'bw') as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(data))
 
         self._settings['sources_file'] = sources_pickle
