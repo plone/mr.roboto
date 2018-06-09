@@ -360,9 +360,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
 
         # check if the pull request modifies the changelog file
         diff_url = self.pull_request['diff_url']
-        # temporal workaround (not verifying SSL certificates) until
-        # https://github.com/plone/jenkins.plone.org/issues/170 is fixed
-        diff_data = requests.get(diff_url, verify=False)
+        diff_data = requests.get(diff_url)
         patch_data = PatchSet(
             diff_data.content.splitlines(),
             encoding=diff_data.encoding,
