@@ -59,7 +59,7 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get('/run/githubcommithooks')
         self.assertIn(
             'Token not active',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch('github.MainClass.Github.get_organization')
@@ -69,7 +69,7 @@ class RunHooksTest(unittest.TestCase):
         )
         result = self.roboto.get(url)
         self.assertEqual(
-            result.body,
+            result.ubody,
             '"[]"',
         )
 
@@ -86,7 +86,7 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch('github.MainClass.Github.get_organization')
@@ -118,7 +118,7 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch('github.MainClass.Github.get_organization')
@@ -131,7 +131,7 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch('github.MainClass.Github.get_organization')
@@ -144,7 +144,7 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch('github.MainClass.Github.get_organization')
@@ -159,7 +159,7 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch('github.MainClass.Github.get_organization')
@@ -173,9 +173,9 @@ class RunHooksTest(unittest.TestCase):
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on repo1',
-            result.body,
+            result.ubody,
         )
         self.assertIn(
             'github Creating hooks on repo2',
-            result.body,
+            result.ubody,
         )

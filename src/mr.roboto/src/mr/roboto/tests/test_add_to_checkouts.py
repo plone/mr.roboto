@@ -137,7 +137,7 @@ class MockRequest(object):
     def set_data(self, data, key):
         with NamedTemporaryFile(delete=False) as tmp_file:
             pickle_filename = tmp_file.name
-            with open(pickle_filename, 'w') as tmp_file_writer:
+            with open(pickle_filename, 'bw') as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(data))
 
         self._settings[key] = pickle_filename

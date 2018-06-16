@@ -90,7 +90,7 @@ class MockRequest(object):
 class MockDiff(object):
 
     def __init__(self, data):
-        self.data = data
+        self.data = data.encode()
 
     @property
     def encoding(self):

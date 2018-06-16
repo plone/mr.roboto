@@ -109,7 +109,7 @@ def log_page(context, request):
 def sources(context, request):
     sources_file = request.registry.settings['sources_file']
     try:
-        with open(sources_file) as f:
+        with open(sources_file, 'br') as f:
             data = pickle.load(f)
     except IOError:
         return {
@@ -127,7 +127,7 @@ def sources(context, request):
 def checkout(context, request):
     checkouts_file = request.registry.settings['checkouts_file']
     try:
-        with open(checkouts_file) as checkouts:
+        with open(checkouts_file, 'br') as checkouts:
             data = pickle.load(checkouts)
     except IOError:
         return {

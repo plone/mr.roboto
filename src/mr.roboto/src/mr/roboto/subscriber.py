@@ -313,7 +313,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
         if unknown:
             # add a message mentioning all unknown users,
             # but mention each of them only once
-            users = ', '.join(set(unknown)).encode('utf-8')
+            users = ', '.join(set(unknown))
             self.log('{0} missing contributors agreement'.format(users))
             msg = '{0} your emails are not known to GitHub and thus it is ' \
                   'impossible to know if you have signed the Plone ' \
@@ -360,9 +360,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
 
         # check if the pull request modifies the changelog file
         diff_url = self.pull_request['diff_url']
-        # temporal workaround (not verifying SSL certificates) until
-        # https://github.com/plone/jenkins.plone.org/issues/170 is fixed
-        diff_data = requests.get(diff_url, verify=False)
+        diff_data = requests.get(diff_url)
         patch_data = PatchSet(
             diff_data.content.splitlines(),
             encoding=diff_data.encoding,

@@ -71,12 +71,12 @@ class RunCoreJobTest(unittest.TestCase):
         self.roboto = TestApp(app)
 
     def prepare_data(self, payload):
-        body = urllib.urlencode(
+        body = urllib.parse.urlencode(
             {'payload': json.dumps(payload)},
         )
         hmac_value = hmac.new(
-            self.settings['api_key'],
-            body,
+            self.settings['api_key'].encode(),
+            body.encode(),
             sha1,
         )
         digest = hmac_value.hexdigest()
@@ -97,7 +97,7 @@ class RunCoreJobTest(unittest.TestCase):
         res = self.roboto.post('/run/pull-request')
         self.assertIn(
             'Token not active',
-            res.body,
+            res.ubody,
         )
 
     def test_ping_answer(self):
@@ -105,7 +105,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'No action',
-            result.body,
+            result.ubody,
         )
 
     def test_pull_request_view(self):
@@ -113,7 +113,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Handlers already took care of this pull request',
-            result.body,
+            result.ubody,
         )
 
     def test_update_pull_request(self):
@@ -121,7 +121,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Handlers already took care of this pull request',
-            result.body,
+            result.ubody,
         )
 
     def test_unknown_pull_request_action(self):
@@ -159,5 +159,5 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Handlers already took care of this pull request',
-            result.body,
+            result.ubody,
         )

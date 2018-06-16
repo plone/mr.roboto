@@ -147,12 +147,12 @@ class RunCoreJobTest(unittest.TestCase):
     def populate_sources_and_checkouts(self, sources_data, checkouts_data):
         with NamedTemporaryFile(delete=False) as tmp_file:
             sources_pickle = tmp_file.name
-            with open(sources_pickle, 'w') as tmp_file_writer:
+            with open(sources_pickle, 'bw') as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(sources_data))
 
         with NamedTemporaryFile(delete=False) as tmp_file:
             checkouts_pickle = tmp_file.name
-            with open(checkouts_pickle, 'w') as tmp_file_writer:
+            with open(checkouts_pickle, 'bw') as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(checkouts_data))
 
         self.settings['sources_file'] = sources_pickle
@@ -161,12 +161,12 @@ class RunCoreJobTest(unittest.TestCase):
         self.roboto = TestApp(app)
 
     def prepare_data(self, payload):
-        body = urllib.urlencode(
+        body = urllib.parse.urlencode(
             {'payload': json.dumps(payload)},
         )
         hmac_value = hmac.new(
-            self.settings['api_key'],
-            body,
+            self.settings['api_key'].encode(),
+            body.encode(),
             sha1,
         )
         digest = hmac_value.hexdigest()
@@ -187,7 +187,7 @@ class RunCoreJobTest(unittest.TestCase):
         res = self.roboto.post('/run/corecommit')
         self.assertIn(
             'Token not active',
-            res.body,
+            res.ubody,
         )
 
     def test_ping_answer(self):
@@ -195,7 +195,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'pong',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
@@ -208,7 +208,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Thanks! Commit to coredev, nothing to do',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_FAKE)
@@ -221,7 +221,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Thanks! Commit to coredev, nothing to do',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
@@ -234,7 +234,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Thanks! Commit to coredev, nothing to do',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_SOURCES)
@@ -248,7 +248,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Thanks! Commit to coredev, nothing to do',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
@@ -261,7 +261,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Thanks! Skipping CI',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
@@ -274,7 +274,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Thanks! Commits done on a branch, nothing to do',
-            result.body,
+            result.ubody,
         )
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
@@ -288,7 +288,7 @@ class RunCoreJobTest(unittest.TestCase):
 
         self.assertIn(
             'Thanks! Plone Jenkins CI will run tests',
-            result.body,
+            result.ubody,
         )
 
 
@@ -310,7 +310,7 @@ class AuxiliaryFunctionsTest(unittest.TestCase):
         data = 'test string'
         with NamedTemporaryFile(delete=False) as tmp_file:
             filename = tmp_file.name
-            with open(filename, 'w') as tmp_file_writer:
+            with open(filename, 'bw') as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(data))
 
         self.assertEqual(

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
+from collections import UserDict
 from configparser import ConfigParser
 from configparser import ExtendedInterpolation
 from tempfile import mkdtemp
-from UserDict import UserDict
 
 import git
 import logging
@@ -156,9 +156,9 @@ def get_sources_and_checkouts(request):
         buildout.cleanup()
 
     sources_file = request.registry.settings['sources_file']
-    with open(sources_file, 'w') as sf:
+    with open(sources_file, 'bw') as sf:
         sf.write(pickle.dumps(sources_dict))
 
     checkouts_file = request.registry.settings['checkouts_file']
-    with open(checkouts_file, 'w') as sf:
+    with open(checkouts_file, 'bw') as sf:
         sf.write(pickle.dumps(checkouts_dict))

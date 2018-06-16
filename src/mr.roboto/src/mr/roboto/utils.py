@@ -8,7 +8,7 @@ PULL_REQUEST_URL_RE = re.compile(r'https://github.com/(.+/.+)/pull/(\d+)')
 
 
 def get_pickled_data(filename):
-    return pickle.loads(open(filename).read())
+    return pickle.loads(open(filename, 'br').read())
 
 
 def plone_versions_targeted(repo, branch, request):
@@ -40,7 +40,7 @@ def get_info_from_commit(commit):
     files.extend('M {0}'.format(f) for f in commit['modified'])
     files.extend('D {0}'.format(f) for f in commit['removed'])
 
-    encoded_message = commit['message'].encode('ascii', 'ignore')
+    encoded_message = commit['message'].encode('ascii', 'ignore').decode()
     short_commit_msg = encoded_message.split('\n')[0][:60]
     reply_to = '{0} <{1}>'.format(
         commit['committer']['name'],
