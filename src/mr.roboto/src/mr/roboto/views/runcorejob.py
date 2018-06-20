@@ -2,6 +2,7 @@
 from cornice import Service
 from github import InputGitAuthor
 from github import InputGitTreeElement
+from github.GithubException import GithubException
 from mr.roboto import templates
 from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.events import CommitAndMissingCheckout
@@ -222,14 +223,29 @@ def run_function_core_tests(request):
         # commit to the plone version branch. This way jenkins will trigger a
         # build and will get the latest changes from the repository that
         # triggered this view
-        commit_to_coredev(
-            request,
-            payload,
-            plone_version,
-            changeset,
-            changeset_long,
-            timestamp,
-        )
+        attempts = 0
+        while attempts < 3:
+            try:
+                commit_to_coredev(
+                    request,
+                    payload,
+                    plone_version,
+                    changeset,
+                    changeset_long,
+                    timestamp,
+                )
+            except GithubException:
+                logger.warning(
+                    'Got an exception while trying to commit, '
+                    'give it another try',
+                )
+                attempts += 1
+                continue
+
+            attempts = 5  # escape from the while
+
+        if attempts != 5:
+            logger.error('Could not commit to coredev!')
 
     return json.dumps(
         {'message': 'Thanks! Plone Jenkins CI will run tests'},
