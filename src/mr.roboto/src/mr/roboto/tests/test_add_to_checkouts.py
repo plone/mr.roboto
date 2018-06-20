@@ -71,8 +71,8 @@ class FakeGithub(object):
         return self
 
     @property
-    def content(self):
-        return 'some text'
+    def decoded_content(self):
+        return b'some text'
 
     def get_git_commit(self, sha):
         return self
