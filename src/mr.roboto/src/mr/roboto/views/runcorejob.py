@@ -210,43 +210,80 @@ def run_function_core_tests(request):
         # if the repository is not on checkouts.cfg things could be broken
         # at a later point when it's added, warn about it!!
         if repo_name not in checkouts[plone_version]:
-            request.registry.notify(
-                CommitAndMissingCheckout(
-                    who,
-                    request,
-                    repo,
-                    branch,
-                    plone_version,
-                    payload['pusher']['email'],  # duplicated, already on 'who'
-                ),
+            warn_repo_not_in_checkouts(
+                plone_version,
+                request,
+                who,
+                repo,
+                branch,
+                payload,
             )
-        # commit to the plone version branch. This way jenkins will trigger a
-        # build and will get the latest changes from the repository that
-        # triggered this view
-        attempts = 0
-        while attempts < 3:
-            try:
-                commit_to_coredev(
-                    request,
-                    payload,
-                    plone_version,
-                    changeset,
-                    changeset_long,
-                    timestamp,
-                )
-            except GithubException:
-                logger.warning(
-                    'Got an exception while trying to commit, '
-                    'give it another try',
-                )
-                attempts += 1
-                continue
 
-            attempts = 5  # escape from the while
-
-        if attempts != 5:
-            logger.error('Could not commit to coredev!')
+        commit_on_plone_version(
+            plone_version,
+            request,
+            payload,
+            changeset,
+            changeset_long,
+            timestamp,
+        )
 
     return json.dumps(
         {'message': 'Thanks! Plone Jenkins CI will run tests'},
     )
+
+
+def warn_repo_not_in_checkouts(
+    plone_version,
+    request,
+    who,
+    repo,
+    branch,
+    payload,
+):
+    request.registry.notify(
+        CommitAndMissingCheckout(
+            who,
+            request,
+            repo,
+            branch,
+            plone_version,
+            payload['pusher']['email'],  # duplicated, already on 'who'
+        ),
+    )
+
+
+def commit_on_plone_version(
+    plone_version,
+    request,
+    payload,
+    changeset,
+    changeset_long,
+    timestamp,
+):
+    # commit to the plone version branch. This way jenkins will trigger a
+    # build and will get the latest changes from the repository that
+    # triggered this view
+    attempts = 0
+    while attempts < 3:
+        try:
+            commit_to_coredev(
+                request,
+                payload,
+                plone_version,
+                changeset,
+                changeset_long,
+                timestamp,
+            )
+        except GithubException:
+            logger.warning(
+                'Got an exception while trying to commit, '
+                'give it another try',
+            )
+            attempts += 1
+            continue
+
+        attempts = 5  # escape from the while
+
+    if attempts != 5:
+        logger.error('Could not commit to coredev!')
