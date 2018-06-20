@@ -210,7 +210,7 @@ class PullRequestSubscriber(object):
 
     def log(self, msg, level='info'):
         if level == 'warn':
-            logger.warn('PR {0}: {1}'.format(self.short_url, msg))
+            logger.warning('PR {0}: {1}'.format(self.short_url, msg))
             return
         logger.info('PR {0}: {1}'.format(self.short_url, msg))
 
