@@ -517,7 +517,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             head_ref.object.sha,
         )
         line = '    {0}\n'.format(self.repo_name)
-        checkouts_new_data = checkouts_cfg_file.decoded_content + line
+        checkouts_new_data = checkouts_cfg_file.content + line
         latest_commit = repo.get_git_commit(head_ref.object.sha)
         base_tree = latest_commit.tree
         mode = [
