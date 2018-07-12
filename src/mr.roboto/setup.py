@@ -5,11 +5,10 @@ from setuptools import setup
 
 version = '2.0'
 
-long_description = '{0}\n{1}\n{2}\n'.format(
-    open('README.rst').read(),
-    open('CONTRIBUTORS.rst').read(),
-    open('CHANGES.rst').read(),
-)
+readme_file = open('README.rst').read()
+contributors_file = open('CONTRIBUTORS.rst').read()
+changes_file = open('CHANGES.rst').read()
+long_description = f'{readme_file}\n{contributors_file}\n{changes_file}\n'
 
 test_requires = [
     'mock',
