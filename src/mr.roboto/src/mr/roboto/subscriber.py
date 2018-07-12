@@ -61,7 +61,7 @@ IGNORE_NO_TEST_NEEDED = (
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
-        subject='POSSIBLE CHECKOUT ERROR {0} {1}'.format(repo, branch),
+        subject=f'POSSIBLE CHECKOUT ERROR {repo} {branch}',
         sender='Jenkins Job FAIL <jenkins@plone.org>',
         recipients=[
             'ramon.nb@gmail.com',
@@ -94,14 +94,12 @@ def mail_to_cvs(payload, mailer):
             'diff': commit_data['diff'],
         }
 
+        repo_name = payload['repository']['name']
+        branch = payload['ref'].split('/')[-1]
+        commit_msg = commit_data['short_commit_msg']
         msg = Message(
-            subject='{0}/{1}: {2}'.format(
-                payload['repository']['name'],
-                payload['ref'].split('/')[-1],
-                commit_data['short_commit_msg']),
-            sender='{0} <svn-changes@plone.org>'.format(
-                commit['committer']['name'],
-            ),
+            subject=f'{repo_name}/{branch}: {commit_msg}',
+            sender=f'{commit["committer"]["name"]} <svn-changes@plone.org>',
             recipients=['plone-cvs@lists.sourceforge.net'],
             body=templates['commit_email.pt'](**data),
             extra_headers={'Reply-To': commit_data['reply_to']},
@@ -114,16 +112,18 @@ def mail_to_cvs(payload, mailer):
 def send_mail_on_coredev(event):
     mailer = get_mailer(event.request)
     payload = event.payload
-    msg = 'Commit: send mail: coredev push to {0}'
-    logger.info(msg.format(payload['repository']['name']))
+    repo_name = payload['repository']['name']
+    logger.info(f'Commit: send mail: coredev push to {repo_name}')
     mail_to_cvs(payload, mailer)
 
 
 @subscriber(CommitAndMissingCheckout)
 def send_mail_on_missing_checkout(event):
     mailer = get_mailer(event.request)
-    msg = 'Commit: send mail: coredev push without checkout of {0} by {1}'
-    logger.info(msg.format(event.repo, event.who))
+    logger.info(
+        f'Commit: send mail: coredev push without checkout of '
+        f'{event.repo} by {event.who}',
+    )
     mail_missing_checkout(
         mailer,
         event.who,
@@ -210,9 +210,9 @@ class PullRequestSubscriber(object):
 
     def log(self, msg, level='info'):
         if level == 'warn':
-            logger.warning('PR {0}: {1}'.format(self.short_url, msg))
+            logger.warning(f'PR {self.short_url}: {msg}')
             return
-        logger.info('PR {0}: {1}'.format(self.short_url, msg))
+        logger.info(f'PR {self.short_url}: {msg}')
 
     def get_pull_request_last_commit(self):
         return self.g_pull.get_commits().reversed[0]
@@ -246,7 +246,7 @@ class PullRequestSubscriber(object):
                 try:
                     login = commit_info[user]['login']
                 except TypeError:
-                    self.log('commit does not have {0} user info'.format(user))
+                    self.log(f'commit does not have {user} user info')
                     unknown.append(
                         commit_info['commit']['author']['name'],
                     )
@@ -303,31 +303,28 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             # add a message mentioning all users that have not signed the
             # Contributors Agreement
             users = ' @'.join(not_foundation)
-            msg = u'@{0} you need to sign the Plone Contributor Agreement ' \
-                  u'in order to merge this pull request. \n\n' \
-                  u'Learn about the Plone Contributor Agreement: {1}'
-            last_commit.create_comment(
-                body=msg.format(users, self.cla_url),
+            msg = (
+                f'@{users} you need to sign the Plone Contributor '
+                f'Agreement in order to merge this pull request. \n\n'
+                f'Learn about the Plone Contributor Agreement: {self.cla_url}',
             )
+            last_commit.create_comment(body=msg)
 
         if unknown:
             # add a message mentioning all unknown users,
             # but mention each of them only once
             users = ', '.join(set(unknown))
-            self.log('{0} missing contributors agreement'.format(users))
-            msg = '{0} your emails are not known to GitHub and thus it is ' \
-                  'impossible to know if you have signed the Plone ' \
-                  'Contributor Agreement, which is required to merge this ' \
-                  'pull request.\n\n' \
-                  'Learn about the Plone Contributor Agreement: {1} ' \
-                  'How to add more emails to your GitHub account: {2} '
-            last_commit.create_comment(
-                body=msg.format(
-                    users,
-                    self.cla_url,
-                    self.github_help_setup_email_url,
-                ),
+            self.log(f'{users} missing contributors agreement')
+            msg = (
+                f'{users} your emails are not known to GitHub and thus it '
+                f'is impossible to know if you have signed the Plone '
+                f'Contributor Agreement, which is required to merge this '
+                f'pull request.\n\n'
+                f'Learn about the Plone Contributor Agreement: {self.cla_url} '
+                f'How to add more emails to your GitHub account: '
+                f'{self.github_help_setup_email_url} ',
             )
+            last_commit.create_comment(body=msg)
 
         last_commit.create_status(
             status,
@@ -335,7 +332,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             description=status_message,
             context=self.status_context,
         )
-        self.log('Contributors Agreement report: {0}'.format(status))
+        self.log(f'Contributors Agreement report: {status}')
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
@@ -354,9 +351,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
 
         status = u'success'
         description = u'Entry found'
-        status_url = '{0}/missing-changelog'.format(
-            self.event.request.registry.settings['roboto_url'],
-        )
+        roboto_url = self.event.request.registry.settings['roboto_url']
 
         # check if the pull request modifies the changelog file
         diff_url = self.pull_request['diff_url']
@@ -381,12 +376,12 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
 
         last_commit.create_status(
             status,
-            target_url=status_url,
+            target_url=f'{roboto_url}/missing-changelog',
             description=description,
             context=self.status_context,
         )
 
-        self.log('changelog entry: {0}'.format(status))
+        self.log(f'changelog entry: {status}')
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
@@ -436,7 +431,7 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
                 description='Please run the job, click here ----------->',
                 context=self.status_context.format(version),
             )
-            self.log('created pending status for plone {0}'.format(version))
+            self.log(f'created pending status for plone {version}')
 
 
 @subscriber(MergedPullRequest)
@@ -459,9 +454,10 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             self.event.request,
         )
         if not plone_versions:
-            msg = 'no plone coredev version tracks branch {0} ' \
-                  'of {1}, checkouts.cfg not updated'
-            self.log(msg.format(self.target_branch, self.repo_name))
+            self.log(
+                f'no plone coredev version tracks branch {self.target_branch} '
+                f'of {self.repo_name}, checkouts.cfg not updated',
+            )
             return
 
         checkouts = get_pickled_data(
@@ -473,9 +469,10 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             if self.repo_name not in checkouts[version]
         ]
         if not not_in_checkouts:
-            msg = 'is already on checkouts.cfg of all plone ' \
-                  'versions that it targets {1}'
-            self.log(msg.format(self.short_url, plone_versions))
+            self.log(
+                f'is already on checkouts.cfg of all plone '
+                f'versions that it targets {plone_versions}',
+            )
             return
 
         self.add_pacakge_to_checkouts(not_in_checkouts)
@@ -499,24 +496,25 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
                 except GithubException:
                     attempts += 1
                     if attempts == 5:
-                        msg = 'Could not update checkouts.cfg of {0} with {1}'
                         self.log(
-                            msg.format(version, self.repo_name),
+                            f'Could not update checkouts.cfg of {version} '
+                            f'with {self.repo_name}',
                             level='warn',
                         )
                 else:
-                    msg = 'add to checkouts.cfg of buildout.coredev {0}'
-                    self.log(msg.format(version))
+                    self.log(
+                        f'add to checkouts.cfg of buildout.coredev {version}',
+                    )
                     break
 
     def make_commit(self, repo, version, user):
         filename = u'checkouts.cfg'
-        head_ref = repo.get_git_ref('heads/{0}'.format(version))
+        head_ref = repo.get_git_ref(f'heads/{version}')
         checkouts_cfg_file = repo.get_file_contents(
             filename,
             head_ref.object.sha,
         )
-        line = '    {0}\n'.format(self.repo_name)
+        line = f'    {self.repo_name}\n'
         checkouts_content = checkouts_cfg_file.decoded_content.decode()
         checkouts_new_data = checkouts_content + line
         latest_commit = repo.get_git_commit(head_ref.object.sha)
@@ -540,7 +538,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         new_tree = repo.create_git_tree([element], base_tree)
 
         new_commit = repo.create_git_commit(
-            '[fc] Add {0} to {1}'.format(self.repo_name, filename),
+            f'[fc] Add {self.repo_name} to {filename}',
             new_tree,
             [latest_commit],
             user,
