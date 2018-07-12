@@ -434,6 +434,38 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
             self.log(f'created pending status for plone {version}')
 
 
+@subscriber(NewPullRequest, UpdatedPullRequest)
+class TriggerDependenciesJob(PullRequestSubscriber):
+
+    def run(self):
+        """Trigger the dependencies jenkins job"""
+        target_branch = self.pull_request['base']['ref']
+
+        if self.repo_name != 'buildout.coredev':
+            self.log('Do not run dependencies jenkins job on buildout.coredev')
+            return
+
+        settings = self.event.request.registry.settings
+        jenkins_url = settings['jenkins_url']
+
+        requests.post(
+            f'{jenkins_url}/job/qa-pkg-dependencies/buildWithParameters',
+            data={
+                'PACKAGE_NAME': self.repo_name,
+                'BRANCH': target_branch,
+            },
+            auth=(
+                settings['jenkins_user_id'],
+                settings['jenkins_user_token'],
+            ),
+        )
+
+        self.log(
+            f'Trigger dependencies jenkins job for '
+            f'pull request {self.short_url}',
+        )
+
+
 @subscriber(MergedPullRequest)
 class UpdateCoredevCheckouts(PullRequestSubscriber):
 
