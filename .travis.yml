@@ -7,6 +7,7 @@ cache:
     - $HOME/eggs
 install:
   - rm -rf /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/setuptools-36.0.1.dist-info
+  - pip install -U pip
   - pip install -r requirements.txt
   - easy_install -U zc.buildout==2.11.4
   - buildout
