@@ -47,7 +47,7 @@ class SimpleViewsTest(unittest.TestCase):
             'run/githubcommithooks?token',
         )
         for link in links:
-            full_url = '{0}/{1}'.format(self.settings['roboto_url'], link)
+            full_url = f'{self.settings["roboto_url"]}/{link}'
             self.assertIn(
                 full_url,
                 result.ubody,
@@ -64,7 +64,7 @@ class SimpleViewsTest(unittest.TestCase):
         filename = 'roboto.log'
         self.clean_file(filename)
         result = self.roboto.get(
-            '/log?token={0}'.format(self.settings['api_key']),
+            f'/log?token={self.settings["api_key"]}',
         )
         self.assertIn(
             'File not found',
@@ -78,7 +78,7 @@ class SimpleViewsTest(unittest.TestCase):
             log.write('log lines')
 
         result = self.roboto.get(
-            '/log?token={0}'.format(self.settings['api_key']),
+            f'/log?token={self.settings["api_key"]}',
         )
         self.assertIn(
             'log lines',
@@ -91,10 +91,10 @@ class SimpleViewsTest(unittest.TestCase):
         self.clean_file(filename)
         with open(filename, 'w') as log:
             for number in range(0, 300):
-                log.write('log line {0}\n'.format(number))
+                log.write(f'log line {number}\n')
 
         result = self.roboto.get(
-            '/log?token={0}'.format(self.settings['api_key']),
+            f'/log?token={self.settings["api_key"]}',
         )
         self.assertIn(
             'log line 250',
@@ -174,10 +174,9 @@ class SimpleViewsTest(unittest.TestCase):
 
     @mock.patch('mr.roboto.views.home.get_sources_and_checkouts')
     def test_update_pickles(self, m1):
-        url = '/update-sources-and-checkouts?token={0}'.format(
-            self.settings['api_key'],
+        result = self.roboto.get(
+            f'/update-sources-and-checkouts?token={self.settings["api_key"]}',
         )
-        result = self.roboto.get(url)
         self.assertIn(
             'updated!',
             result.ubody,
