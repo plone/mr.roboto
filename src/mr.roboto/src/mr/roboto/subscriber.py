@@ -441,8 +441,12 @@ class TriggerDependenciesJob(PullRequestSubscriber):
         """Trigger the dependencies jenkins job"""
         branch = self.pull_request['head']['ref']
 
-        if self.repo_name == 'buildout.coredev':
-            self.log('Do not run dependencies jenkins job on buildout.coredev')
+        if not self.is_core_package():
+            base_branch = self.pull_request['base']['ref']
+            key = f'{self.repo_full_name}/{base_branch}'
+            self.log(
+                f'No dependencies jenkins job run on a non-core package {key}',
+            )
             return
 
         settings = self.event.request.registry.settings
@@ -464,6 +468,12 @@ class TriggerDependenciesJob(PullRequestSubscriber):
             f'Trigger dependencies jenkins job for '
             f'pull request {self.short_url}',
         )
+
+    def is_core_package(self):
+        base_branch = self.pull_request['base']['ref']
+        key = f'{self.repo_full_name}/{base_branch}'
+        sources = self.event.request.registry.settings['sources_file']
+        return key in sources
 
 
 @subscriber(MergedPullRequest)
