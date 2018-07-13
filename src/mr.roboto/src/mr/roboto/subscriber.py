@@ -441,7 +441,7 @@ class TriggerDependenciesJob(PullRequestSubscriber):
         """Trigger the dependencies jenkins job"""
         target_branch = self.pull_request['base']['ref']
 
-        if self.repo_name != 'buildout.coredev':
+        if self.repo_name == 'buildout.coredev':
             self.log('Do not run dependencies jenkins job on buildout.coredev')
             return
 
