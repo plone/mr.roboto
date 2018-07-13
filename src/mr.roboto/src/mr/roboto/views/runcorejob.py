@@ -41,10 +41,7 @@ def get_user(data):
     if data['name'] == u'none':
         who = 'NoBody <nobody@plone.org>'
     else:
-        who = '{0} <{1}>'.format(
-            data['name'],
-            data['email'],
-        )
+        who = f'{data["name"]} <{data["email"]}>'
     return who
 
 
@@ -60,7 +57,7 @@ def commit_to_coredev(
     gh = request.registry.settings['github']
     org = gh.get_organization('plone')
     repo = org.get_repo('buildout.coredev')
-    head_ref = repo.get_git_ref('heads/{0}'.format(plone_version))
+    head_ref = repo.get_git_ref(f'heads/{plone_version}')
     latest_commit = repo.get_git_commit(head_ref.object.sha)
     base_tree = latest_commit.tree
     element = InputGitTreeElement(
@@ -76,7 +73,7 @@ def commit_to_coredev(
         timestamp,
     )
     new_commit = repo.create_git_commit(
-        '[fc] {0}'.format(changeset),
+        f'[fc] {changeset}',
         new_tree,
         [latest_commit],
         new_user,
@@ -132,7 +129,7 @@ def get_info(payload, repo, branch):
         # get a timestamp for later usage when creating commits
         timestamp = commit['timestamp']
 
-        msg = 'Commit: on {0} {1} {2}'.format(repo, branch, commit['id'])
+        msg = f'Commit: on {repo} {branch} {commit["id"]}'
         logger.info(msg)
 
     return timestamp, changeset, changeset_long, fake, skip, source_or_checkout
@@ -187,8 +184,7 @@ def run_function_core_tests(request):
 
     # if it's a skip commit, log and done
     if skip:
-        msg = 'Commit: skip CI - {0} - {1} do nothing'
-        logger.info(msg.format(repo, branch))
+        logger.info(f'Commit: skip CI - {repo} - {branch} do nothing')
         return json.dumps({'message': 'Thanks! Skipping CI'})
 
     # if the repo+branch are not in any plone version sources.cfg,
@@ -196,8 +192,7 @@ def run_function_core_tests(request):
     plone_versions = plone_versions_targeted(repo, branch, request)
     if not plone_versions:
         # Error repo not in sources
-        msg = 'Commit: not in sources - {0} - {1} do nothing'
-        logger.info(msg.format(repo, branch))
+        logger.info(f'Commit: not in sources - {repo} - {branch} do nothing')
         return json.dumps(
             {'message': 'Thanks! Commits done on a branch, nothing to do'},
         )
