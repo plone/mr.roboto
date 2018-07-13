@@ -33,8 +33,8 @@ class BuildoutTest(unittest.TestCase):
 
     def setUp(self):
         self.coredev_repo = Repo.init(mkdtemp())
-        PloneCoreBuildout.PLONE_COREDEV_LOCATION = 'file://{0}'.format(
-            self.coredev_repo.working_tree_dir,
+        PloneCoreBuildout.PLONE_COREDEV_LOCATION = (
+            f'file://{self.coredev_repo.working_tree_dir}'
         )
 
         self._commit(SOURCES, filename='sources.cfg')
@@ -74,9 +74,7 @@ class BuildoutTest(unittest.TestCase):
 
     def test_get_sources_and_checkouts(self):
         self.roboto.get(
-            '/update-sources-and-checkouts?token={0}'.format(
-                self.settings['api_key'],
-            ),
+            f'/update-sources-and-checkouts?token={self.settings["api_key"]}',
         )
 
         with open(self.settings['sources_file'], 'br') as sources:
