@@ -49,11 +49,11 @@ def parse_log_line(log_line):
         msg = groups[2]
         pull_request_log = PULL_REQUEST_LOG_MSG_RE.search(msg)
         if pull_request_log:
-            pull_request_groups = pull_request_log.groups()
-            text = '{0}#{1}'.format(*pull_request_groups)
+            data = pull_request_log.groups()
+            text = f'{data[0]}#{data[1]}'
             msg = msg.replace(
                 text,
-                PULL_REQUEST_URL.format(text, *pull_request_groups),
+                PULL_REQUEST_URL.format(text, *data),
             )
         else:
             commit_log = COMMIT_LOG_MSG_RE.search(msg)
@@ -71,7 +71,7 @@ def parse_log_line(log_line):
             'msg': msg.strip(),
         })
     else:
-        return '<pre>{0}</pre>'.format(log_line)
+        return f'<pre>{log_line}</pre>'
 
 
 @view_config(route_name='home', renderer='mr.roboto:templates/home.pt')
@@ -118,7 +118,7 @@ def sources(context, request):
         }
     output = {}
     for key, value in data.items():
-        new_key = '{0}/{1}'.format(key[0], key[1])
+        new_key = f'{key[0]}/{key[1]}'
         output[new_key] = value
     return output
 
