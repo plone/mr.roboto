@@ -97,19 +97,13 @@ class PloneCoreBuildout(object):
         self.core_version = core_version
         self.location = mkdtemp()
         self.clone()
-        self.sources = SourcesFile(
-            '{0}/sources.cfg'.format(self.location),
-        )
-        self.checkouts = CheckoutsFile(
-            '{0}/checkouts.cfg'.format(self.location),
-        )
+        self.sources = SourcesFile(f'{self.location}/sources.cfg')
+        self.checkouts = CheckoutsFile(f'{self.location}/checkouts.cfg')
 
     def clone(self):
         logger.info(
-            'Commit: cloning github repository {0}, branch={1}'.format(
-                self.location,
-                self.core_version,
-            ),
+            f'Commit: cloning github repository {self.location}, '
+            f'branch={self.core_version}',
         )
         git.Repo.clone_from(
             self.PLONE_COREDEV_LOCATION,
@@ -135,8 +129,10 @@ def get_sources_and_checkouts(request):
     actual_plone_versions = request.registry.settings['plone_versions']
 
     for plone_version in actual_plone_versions:
-        msg = 'Commit: checking sources and checkouts from plone {0}'
-        logger.info(msg.format(plone_version))
+        logger.info(
+            f'Commit: checking sources and checkouts '
+            f'from plone {plone_version}',
+        )
         buildout = PloneCoreBuildout(plone_version)
 
         for source in buildout.sources:

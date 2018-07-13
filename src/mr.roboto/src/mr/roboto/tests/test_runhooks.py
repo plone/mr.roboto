@@ -64,9 +64,7 @@ class RunHooksTest(unittest.TestCase):
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_no_repo(self, m1):
-        url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key'],
-        )
+        url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
         self.assertEqual(
             result.ubody,
@@ -80,9 +78,7 @@ class RunHooksTest(unittest.TestCase):
 
         m1.configure_mock(return_value=DummyGetRepos())
 
-        url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key'],
-        )
+        url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
@@ -112,9 +108,7 @@ class RunHooksTest(unittest.TestCase):
 
         m1.configure_mock(return_value=DummyGetRepos())
 
-        url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key'],
-        )
+        url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
@@ -125,9 +119,7 @@ class RunHooksTest(unittest.TestCase):
     def test_runhook_web_hook_wrong_url(self, m1):
         m1.configure_mock(return_value=DummyGetRepos())
 
-        url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key'],
-        )
+        url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
@@ -138,9 +130,7 @@ class RunHooksTest(unittest.TestCase):
     def test_runhook_web_hook_roboto_url(self, m1):
         m1.configure_mock(return_value=DummyGetRepos())
 
-        url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key'],
-        )
+        url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
@@ -153,9 +143,7 @@ class RunHooksTest(unittest.TestCase):
 
         m1.configure_mock(return_value=DummyGetRepos())
 
-        url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key'],
-        )
+        url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on Products.CMFPlone',
@@ -167,9 +155,7 @@ class RunHooksTest(unittest.TestCase):
         self.roboto.app.registry.settings['collective_repos'] = 'repo1, repo2'
         m1.configure_mock(return_value=DummyGetRepos())
 
-        url = '/run/githubcommithooks?token={0}'.format(
-            self.settings['api_key'],
-        )
+        url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
         self.assertIn(
             'github Creating hooks on repo1',

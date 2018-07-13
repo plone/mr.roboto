@@ -177,7 +177,7 @@ class RunCoreJobTest(unittest.TestCase):
         result = self.roboto.post(
             '/run/corecommit',
             headers={
-                'X-Hub_Signature': 'sha1={0}'.format(digest),
+                'X-Hub_Signature': f'sha1={digest}',
             },
             params=body,
         )
