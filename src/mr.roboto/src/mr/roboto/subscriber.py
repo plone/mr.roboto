@@ -471,9 +471,11 @@ class TriggerDependenciesJob(PullRequestSubscriber):
 
     def is_core_package(self):
         base_branch = self.pull_request['base']['ref']
-        key = f'{self.repo_full_name}/{base_branch}'
-        sources = self.event.request.registry.settings['sources_file']
-        return key in sources
+        return plone_versions_targeted(
+            self.repo_full_name,
+            base_branch,
+            self.event.request,
+        )
 
 
 @subscriber(MergedPullRequest)
