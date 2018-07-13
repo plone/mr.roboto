@@ -439,7 +439,7 @@ class TriggerDependenciesJob(PullRequestSubscriber):
 
     def run(self):
         """Trigger the dependencies jenkins job"""
-        target_branch = self.pull_request['base']['ref']
+        branch = self.pull_request['head']['ref']
 
         if self.repo_name == 'buildout.coredev':
             self.log('Do not run dependencies jenkins job on buildout.coredev')
@@ -452,7 +452,7 @@ class TriggerDependenciesJob(PullRequestSubscriber):
             f'{jenkins_url}/job/qa-pkg-dependencies/buildWithParameters',
             data={
                 'PACKAGE_NAME': self.repo_name,
-                'BRANCH': target_branch,
+                'BRANCH': branch,
             },
             auth=(
                 settings['jenkins_user_id'],
