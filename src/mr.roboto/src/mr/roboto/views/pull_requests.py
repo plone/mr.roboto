@@ -35,12 +35,7 @@ def handle_pull_request(request):
 
     action = payload['action']
     pull_request = payload['pull_request']
-    logger.info(
-        u'PR {0}: with action {1}'.format(
-            short_url,
-            action,
-        ),
-    )
+    logger.info(f'PR {short_url}: with action {action}')
     if action in ('opened', 'reopened'):
         request.registry.notify(
             NewPullRequest(pull_request, request),
@@ -54,10 +49,9 @@ def handle_pull_request(request):
             MergedPullRequest(pull_request, request),
         )
     else:
-        msg = 'PR {0}: action "{1}" (merged: {2}) not handled'.format(
-            short_url,
-            action,
-            pull_request['merged'],
+        msg = (
+            f'PR {short_url}: action "{action}" '
+            f'(merged: {pull_request["merged"]}) not handled',
         )
         logger.info(msg)
         return json.dumps({'message': msg})
