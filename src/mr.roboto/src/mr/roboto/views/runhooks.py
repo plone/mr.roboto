@@ -34,15 +34,15 @@ def create_github_post_commit_hooks_view(request):
     Hook = namedtuple('Hook', ['url', 'events'])
     roboto_hooks = [
         Hook(
-            '{0}/run/corecommit'.format(roboto_url),
+            f'{roboto_url}/run/corecommit',
             ['push'],
         ),
         Hook(
-            '{0}/run/pull-request'.format(roboto_url),
+            f'{roboto_url}/run/pull-request',
             ['pull_request'],
         ),
         Hook(
-            '{0}/github-webhook/'.format(jenkins_url),
+            f'{jenkins_url}/github-webhook/',
             ['*'],
         ),
     ]
@@ -80,15 +80,15 @@ def update_hooks_on_repo(repo=None, new_hooks=None, request=None):
             if hook_url.find('roboto/run/') != -1 or \
                     hook_url.find('github-webhook') != -1:
                 logger.info(
-                    'github Removing hook {0}'.format(str(hook.config)),
+                    f'github Removing hook {hook.config}',
                 )
                 if debug:
-                    logger.info('Debug removing hook {0}'.format(repo.name))
+                    logger.info(f'Debug removing hook {repo.name}')
                 else:
                     hook.delete()
 
     # Add new hooks
-    msg = 'github Creating hooks on {0}'.format(repo.name)
+    msg = f'github Creating hooks on {repo.name}'
     logger.info(msg)
     try:
         if debug:
@@ -101,6 +101,6 @@ def update_hooks_on_repo(repo=None, new_hooks=None, request=None):
                 }
                 repo.create_hook('web', config, hook.events, True)
     except GithubException:
-        logger.exception('Error creating hook on {0}'.format(repo.name))
+        logger.exception(f'Error creating hook on {repo.name}')
 
     return msg
