@@ -306,7 +306,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             msg = (
                 f'@{users} you need to sign the Plone Contributor '
                 f'Agreement in order to merge this pull request. \n\n'
-                f'Learn about the Plone Contributor Agreement: {self.cla_url}',
+                f'Learn about the Plone Contributor Agreement: {self.cla_url}'
             )
             last_commit.create_comment(body=msg)
 
@@ -322,7 +322,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f'pull request.\n\n'
                 f'Learn about the Plone Contributor Agreement: {self.cla_url} '
                 f'How to add more emails to your GitHub account: '
-                f'{self.github_help_setup_email_url} ',
+                f'{self.github_help_setup_email_url} '
             )
             last_commit.create_comment(body=msg)
 
