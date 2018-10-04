@@ -157,12 +157,7 @@ def run_function_core_tests(request):
     who = get_user(payload['pusher'])
 
     data = get_info(payload, repo, branch)
-    timestamp = data[0]
-    changeset = data[1]
-    changeset_long = data[2]
-    fake = data[3]
-    skip = data[4]
-    source_or_checkout = data[5]
+    timestamp, changeset, changeset_long, fake, skip, source_or_checkout = data
 
     if not fake and not skip:
         request.registry.notify(NewCoreDevPush(payload, request))
