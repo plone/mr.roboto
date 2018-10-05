@@ -398,9 +398,19 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         """Create waiting status for all pull request jobs that should be run
         before a pull request can be safely merged
         """
+        plone_versions = self._plone_versions_targeted()
+
+        # get the pull request last commit
+        last_commit = self.get_pull_request_last_commit()
+
+        for version in plone_versions:
+            self._create_commit_status(last_commit, version)
+            self.log(f'created pending status for plone {version}')
+
+    def _plone_versions_targeted(self):
         if self.repo_name in IGNORE_NO_TEST_NEEDED:
             self.log('skip adding test warnings, repo whitelisted')
-            return
+            return []
 
         target_branch = self.pull_request['base']['ref']
 
@@ -418,20 +428,17 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
 
         elif not plone_versions:
             self.log('does not target any Plone version')
-            return
+            return []
 
-        # get the pull request and last commit
-        last_commit = self.get_pull_request_last_commit()
+        return plone_versions
 
-        for version in plone_versions:
-
-            last_commit.create_status(
+    def _create_commit_status(self, commit, version):
+            commit.create_status(
                 u'pending',
                 target_url=self.jenkins_pr_job_url.format(version),
-                description='Please run the job, click here ----------->',
+                description='Please run the job, click here --->',
                 context=self.status_context.format(version),
             )
-            self.log(f'created pending status for plone {version}')
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
