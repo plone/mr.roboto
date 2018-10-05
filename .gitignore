@@ -17,3 +17,5 @@ local/
 .mr.developer.cfg
 *.log
 development.ini
+.plone.versioncheck.cache/
+.plone.versioncheck.tracked.json
