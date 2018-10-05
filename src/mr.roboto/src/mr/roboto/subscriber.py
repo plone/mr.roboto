@@ -398,9 +398,19 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         """Create waiting status for all pull request jobs that should be run
         before a pull request can be safely merged
         """
+        plone_versions = self._plone_versions_targeted()
+
+        # get the pull request last commit
+        last_commit = self.get_pull_request_last_commit()
+
+        for version in plone_versions:
+            self._create_commit_status(last_commit, version)
+            self.log(f'created pending status for plone {version}')
+
+    def _plone_versions_targeted(self):
         if self.repo_name in IGNORE_NO_TEST_NEEDED:
             self.log('skip adding test warnings, repo whitelisted')
-            return
+            return []
 
         target_branch = self.pull_request['base']['ref']
 
@@ -418,20 +428,52 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
 
         elif not plone_versions:
             self.log('does not target any Plone version')
+            return []
+
+        return plone_versions
+
+    def _create_commit_status(self, commit, version):
+            commit.create_status(
+                u'pending',
+                target_url=self.jenkins_pr_job_url.format(version),
+                description='Please run the job, click here --->',
+                context=self.status_context.format(version),
+            )
+
+
+@subscriber(NewPullRequest, UpdatedPullRequest)
+class WarnPy3TestsNeedToRun(WarnTestsNeedToRun):
+
+    def __init__(self, event):
+        super(WarnTestsNeedToRun, self).__init__(event)
+        self.jenkins_pr_job_url = \
+            'http://jenkins.plone.org/job/' \
+            'pull-request-5.2-{0}/build?delay=0sec'
+        self.status_context = 'Plone Jenkins CI - pull-request-5.2-{0}'
+
+    def run(self):
+        """Create waiting status for pull requests that target plone 5.2 on
+        python 3
+        """
+        plone_versions = self._plone_versions_targeted()
+
+        if '5.2' not in plone_versions:
+            self.log(
+                'does not target Plone 5.2, no py3 pull request job needed',
+            )
             return
+
+        py3_tracked_versions = \
+            self.event.request.registry.settings['py3_versions']
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
 
-        for version in plone_versions:
-
-            last_commit.create_status(
-                u'pending',
-                target_url=self.jenkins_pr_job_url.format(version),
-                description='Please run the job, click here ----------->',
-                context=self.status_context.format(version),
+        for py_version in py3_tracked_versions:
+            self._create_commit_status(last_commit, py_version)
+            self.log(
+                f'created pending status for plone 5.2 on python {py_version}',
             )
-            self.log(f'created pending status for plone {version}')
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
