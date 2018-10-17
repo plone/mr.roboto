@@ -450,7 +450,7 @@ class WarnPy3TestsNeedToRun(WarnTestsNeedToRun):
             'pull-request-5.2-{0}/build?delay=0sec'
         self.status_context = 'Plone Jenkins CI - pull-request-5.2-{0}'
 
-        super(PullRequestSubscriber, self).__init__(event)
+        super(WarnTestsNeedToRun, self).__init__(event)
 
     def run(self):
         """Create waiting status for pull requests that target plone 5.2 on
