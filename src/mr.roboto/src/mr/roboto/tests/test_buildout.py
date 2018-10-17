@@ -50,7 +50,7 @@ class BuildoutTest(unittest.TestCase):
 
         self.settings = {
             'plone_versions': '["5.1", "4.3", ]',
-            'python_versions': '["2.7", "3.6", ]',
+            'py3_versions': '["2.7", "3.6", ]',
             'roboto_url': 'http://jenkins.plone.org/roboto',
             'api_key': 'xyz1234mnop',
             'sources_file': sources_pickle,

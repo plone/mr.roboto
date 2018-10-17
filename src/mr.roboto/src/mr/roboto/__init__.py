@@ -38,8 +38,8 @@ def main(global_config, **settings):
     )
 
     # python versions
-    config.registry.settings['python_versions'] = ast.literal_eval(
-        settings['python_versions'],
+    config.registry.settings['py3_versions'] = ast.literal_eval(
+        settings['py3_versions'],
     )
 
     # roboto public url
