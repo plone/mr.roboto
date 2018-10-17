@@ -10,6 +10,7 @@ class ConfigurationTest(unittest.TestCase):
     def setUp(self):
         settings = {
             'plone_versions': '["4.3", "5.1"]',
+            'python_versions': '["2.7", "3.6", ]',
             'roboto_url': 'http://mr.roboto.plone.org',
             'api_key': '1234567890',
             'sources_file': 'sources.pickle',
@@ -26,6 +27,12 @@ class ConfigurationTest(unittest.TestCase):
         self.assertEqual(
             self.settings['plone_versions'],
             ['4.3', '5.1'],
+        )
+
+    def test_python_versions(self):
+        self.assertEqual(
+            self.settings['python_versions'],
+            ['2.7', '3.6'],
         )
 
     def test_roboto_url(self):
@@ -58,6 +65,7 @@ class ConfigurationTest(unittest.TestCase):
     def test_no_debug(self):
         settings = {
             'plone_versions': '["4.3", "5.1"]',
+            'python_versions': '["2.7", "3.6", ]',
             'roboto_url': 'x',
             'api_key': 'x',
             'sources_file': 'x',

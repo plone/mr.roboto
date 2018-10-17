@@ -37,6 +37,11 @@ def main(global_config, **settings):
         settings['plone_versions'],
     )
 
+    # python versions
+    config.registry.settings['python_versions'] = ast.literal_eval(
+        settings['python_versions'],
+    )
+
     # roboto public url
     config.registry.settings['roboto_url'] = settings['roboto_url']
 

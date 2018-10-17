@@ -14,6 +14,7 @@ class SimpleViewsTest(unittest.TestCase):
     def setUp(self):
         self.settings = {
             'plone_versions': '["4.3",]',
+            'python_versions': '["2.7", "3.6", ]',
             'roboto_url': 'http://jenkins.plone.org/roboto',
             'api_key': 'z',
             'sources_file': 'sources.pickle',
