@@ -183,7 +183,7 @@ class PullRequestSubscriber(object):
         return self._target_branch
 
     def run(self):
-        raise NotImplemented
+        raise NotImplementedError
 
     def log(self, msg, level='info'):
         if level == 'warn':
