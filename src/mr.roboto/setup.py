@@ -10,13 +10,7 @@ contributors_file = open('CONTRIBUTORS.rst').read()
 changes_file = open('CHANGES.rst').read()
 long_description = f'{readme_file}\n{contributors_file}\n{changes_file}\n'
 
-test_requires = [
-    'mock',
-    'pyramid_debugtoolbar',
-    'pytest',
-    'WebTest',
-    'testfixtures',
-]
+test_requires = ['mock', 'pyramid_debugtoolbar', 'pytest', 'WebTest', 'testfixtures']
 
 setup(
     name='mr.roboto',
@@ -25,9 +19,7 @@ setup(
     long_description=long_description,
     # Get more strings from
     # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-    classifiers=[
-        'Programming Language :: Python',
-    ],
+    classifiers=['Programming Language :: Python'],
     keywords='',
     author='Plone Foundation',
     author_email='',
@@ -49,9 +41,7 @@ setup(
         'setuptools',
         'unidiff',
     ],
-    extras_require={
-        'test': test_requires,
-    },
+    extras_require={'test': test_requires},
     tests_require=test_requires,
     test_suite='mr.roboto.tests',
     entry_points="""

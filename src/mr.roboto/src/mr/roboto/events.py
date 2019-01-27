@@ -18,7 +18,6 @@ class CommitAndMissingCheckout(object):
 
 
 class PullRequest(object):
-
     def __init__(self, pull_request, request):
         self.pull_request = pull_request
         self.request = request

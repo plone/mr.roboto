@@ -17,14 +17,7 @@ PAYLOAD = {
     'number': '34',
     'html_url': 'https://github.com/plone/mr.roboto/pull/34',
     'diff_url': 'https://github.com/plone/mr.roboto/pull/34.diff',
-    'base': {
-        'repo': {
-            'name': 'Products.CMFPlone',
-            'owner': {
-                'login': 'plone',
-            },
-        },
-    },
+    'base': {'repo': {'name': 'Products.CMFPlone', 'owner': {'login': 'plone'}}},
 }
 
 WHITELISTED_REPO_PAYLOAD = copy.deepcopy(PAYLOAD)
@@ -58,8 +51,7 @@ index 2a20bdc..57ce05f 100644
  setup(
 """
 
-DIFF_WITH_CHANGELOG_ON_HISTORY_txt = \
-    """diff --git a/src/mr.roboto/HISTORY.rst b/src/mr.roboto/HISTORY.rst
+DIFF_WITH_CHANGELOG_ON_HISTORY_txt = """diff --git a/src/mr.roboto/HISTORY.rst b/src/mr.roboto/HISTORY.rst
 index 2a20bdc..57ce05f 100644
 --- a/src/mr.roboto/HISTORY.rst
 +++ b/src/mr.roboto/HISTORY.rst
@@ -74,7 +66,6 @@ index 2a20bdc..57ce05f 100644
 
 
 class MockRequest(object):
-
     @property
     def registry(self):
         return self
@@ -88,7 +79,6 @@ class MockRequest(object):
 
 
 class MockDiff(object):
-
     def __init__(self, data):
         self.data = data.encode()
 
@@ -102,68 +92,47 @@ class MockDiff(object):
 
 
 class ChangeLogEntrySubscriberTest(unittest.TestCase):
-
     def test_repo_whitelisted(self):
         event = NewPullRequest(
-            pull_request=WHITELISTED_REPO_PAYLOAD,
-            request=MockRequest(),
+            pull_request=WHITELISTED_REPO_PAYLOAD, request=MockRequest()
         )
 
         with LogCapture() as captured_data:
             WarnNoChangelogEntry(event)
 
         self.assertIn(
-            'whitelisted for changelog entries',
-            captured_data.records[-1].msg,
+            'whitelisted for changelog entries', captured_data.records[-1].msg
         )
 
     @mock.patch('requests.get')
     def test_no_change_log_file(self, m1):
         m1.return_value = MockDiff(DIFF_NO_CHANGELOG)
 
-        event = NewPullRequest(
-            pull_request=PAYLOAD,
-            request=MockRequest(),
-        )
+        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
 
         with LogCapture() as captured_data:
             WarnNoChangelogEntry(event)
 
-        self.assertIn(
-            'changelog entry: error',
-            captured_data.records[-1].msg,
-        )
+        self.assertIn('changelog entry: error', captured_data.records[-1].msg)
 
     @mock.patch('requests.get')
     def test_with_change_log_file(self, m1):
         m1.return_value = MockDiff(DIFF_WITH_CHANGELOG)
 
-        event = NewPullRequest(
-            pull_request=PAYLOAD,
-            request=MockRequest(),
-        )
+        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
 
         with LogCapture() as captured_data:
             WarnNoChangelogEntry(event)
 
-        self.assertIn(
-            'changelog entry: success',
-            captured_data.records[-1].msg,
-        )
+        self.assertIn('changelog entry: success', captured_data.records[-1].msg)
 
     @mock.patch('requests.get')
     def test_with_change_log_file_history(self, m1):
         m1.return_value = MockDiff(DIFF_WITH_CHANGELOG_ON_HISTORY_txt)
 
-        event = NewPullRequest(
-            pull_request=PAYLOAD,
-            request=MockRequest(),
-        )
+        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
 
         with LogCapture() as captured_data:
             WarnNoChangelogEntry(event)
 
-        self.assertIn(
-            'changelog entry: success',
-            captured_data.records[-1].msg,
-        )
+        self.assertIn('changelog entry: success', captured_data.records[-1].msg)

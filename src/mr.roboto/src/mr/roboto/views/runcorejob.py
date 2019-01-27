@@ -46,12 +46,7 @@ def get_user(data):
 
 
 def commit_to_coredev(
-    request,
-    payload,
-    plone_version,
-    changeset,
-    changeset_long,
-    timestamp,
+    request, payload, plone_version, changeset, changeset_long, timestamp
 ):
     logger.info('Commit: LETS COMMIT ON COREDEV')
     gh = request.registry.settings['github']
@@ -61,23 +56,14 @@ def commit_to_coredev(
     latest_commit = repo.get_git_commit(head_ref.object.sha)
     base_tree = latest_commit.tree
     element = InputGitTreeElement(
-        path='last_commit.txt',
-        mode='100644',
-        type='blob',
-        content=changeset_long,
+        path='last_commit.txt', mode='100644', type='blob', content=changeset_long
     )
     new_tree = repo.create_git_tree([element], base_tree)
     new_user = InputGitAuthor(
-        payload['pusher']['name'],
-        payload['pusher']['email'],
-        timestamp,
+        payload['pusher']['name'], payload['pusher']['email'], timestamp
     )
     new_commit = repo.create_git_commit(
-        f'[fc] {changeset}',
-        new_tree,
-        [latest_commit],
-        new_user,
-        new_user,
+        f'[fc] {changeset}', new_tree, [latest_commit], new_user, new_user
     )
     head_ref.edit(sha=new_commit.sha, force=False)
 
@@ -169,9 +155,7 @@ def run_function_core_tests(request):
         if source_or_checkout:
             get_sources_and_checkouts(request)
 
-        return json.dumps(
-            {'message': 'Thanks! Commit to coredev, nothing to do'},
-        )
+        return json.dumps({'message': 'Thanks! Commit to coredev, nothing to do'})
 
     ##
     # It's not a commit to coredev repo
@@ -189,7 +173,7 @@ def run_function_core_tests(request):
         # Error repo not in sources
         logger.info(f'Commit: not in sources - {repo} - {branch} do nothing')
         return json.dumps(
-            {'message': 'Thanks! Commits done on a branch, nothing to do'},
+            {'message': 'Thanks! Commits done on a branch, nothing to do'}
         )
 
     ##
@@ -201,36 +185,17 @@ def run_function_core_tests(request):
         # at a later point when it's added, warn about it!!
         if repo_name not in checkouts[plone_version]:
             warn_repo_not_in_checkouts(
-                plone_version,
-                request,
-                who,
-                repo,
-                branch,
-                payload,
+                plone_version, request, who, repo, branch, payload
             )
 
         commit_on_plone_version(
-            plone_version,
-            request,
-            payload,
-            changeset,
-            changeset_long,
-            timestamp,
+            plone_version, request, payload, changeset, changeset_long, timestamp
         )
 
-    return json.dumps(
-        {'message': 'Thanks! Plone Jenkins CI will run tests'},
-    )
+    return json.dumps({'message': 'Thanks! Plone Jenkins CI will run tests'})
 
 
-def warn_repo_not_in_checkouts(
-    plone_version,
-    request,
-    who,
-    repo,
-    branch,
-    payload,
-):
+def warn_repo_not_in_checkouts(plone_version, request, who, repo, branch, payload):
     request.registry.notify(
         CommitAndMissingCheckout(
             who,
@@ -239,17 +204,12 @@ def warn_repo_not_in_checkouts(
             branch,
             plone_version,
             payload['pusher']['email'],  # duplicated, already on 'who'
-        ),
+        )
     )
 
 
 def commit_on_plone_version(
-    plone_version,
-    request,
-    payload,
-    changeset,
-    changeset_long,
-    timestamp,
+    plone_version, request, payload, changeset, changeset_long, timestamp
 ):
     # commit to the plone version branch. This way jenkins will trigger a
     # build and will get the latest changes from the repository that
@@ -258,17 +218,11 @@ def commit_on_plone_version(
     while attempts < 3:
         try:
             commit_to_coredev(
-                request,
-                payload,
-                plone_version,
-                changeset,
-                changeset_long,
-                timestamp,
+                request, payload, plone_version, changeset, changeset_long, timestamp
             )
         except GithubException:
             logger.warning(
-                'Got an exception while trying to commit, '
-                'give it another try',
+                'Got an exception while trying to commit, ' 'give it another try'
             )
             attempts += 1
             continue

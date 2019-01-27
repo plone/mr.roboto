@@ -23,18 +23,16 @@ PAYLOAD = {
         'repo': {
             'full_name': 'plone/buildout.coredev',
             'name': 'buildout.coredev',
-            'owner': {
-                'login': 'plone',
-            },
-        },
+            'owner': {'login': 'plone'},
+        }
     },
-    'user': {
-        'login': 'mr.bean',
-    },
+    'user': {'login': 'mr.bean'},
 }
 
 NO_PLONE_VERSION_PAYLOAD = copy.deepcopy(PAYLOAD)
-NO_PLONE_VERSION_PAYLOAD['html_url'] = 'https://github.com/plone/plone.uuid/pull/3'  # noqa
+NO_PLONE_VERSION_PAYLOAD[
+    'html_url'
+] = 'https://github.com/plone/plone.uuid/pull/3'  # noqa
 NO_PLONE_VERSION_PAYLOAD['base']['ref'] = 'my-upstream-branch'
 NO_PLONE_VERSION_PAYLOAD['base']['repo']['name'] = 'plone.uuid'
 NO_PLONE_VERSION_PAYLOAD['base']['repo']['full_name'] = 'plone/plone.uuid'
@@ -45,7 +43,6 @@ PLONE_VERSION_PAYLOAD['base']['ref'] = 'master'
 
 
 class FakeGithub(object):
-
     def get_organization(self, name):
         return self
 
@@ -119,12 +116,8 @@ class FakeGithub(object):
 
 
 class MockRequest(object):
-
     def __init__(self):
-        self._settings = {
-            'github': FakeGithub(),
-            'plone_versions': ['4.3', '5.1'],
-        }
+        self._settings = {'github': FakeGithub(), 'plone_versions': ['4.3', '5.1']}
 
     @property
     def registry(self):
@@ -156,15 +149,11 @@ class MockRequest(object):
 
 
 class AddToCheckoutsSubscriberTest(unittest.TestCase):
-
     def create_event(self, checkouts_data, sources_data, payload):
         request = MockRequest()
         request.set_checkouts(checkouts_data)
         request.set_sources(sources_data)
-        event = MergedPullRequest(
-            pull_request=payload,
-            request=request,
-        )
+        event = MergedPullRequest(pull_request=payload, request=request)
         return event
 
     def test_buildout_coredev_merge(self):
@@ -175,10 +164,7 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
 
         event.request.cleanup()
 
-        self.assertEqual(
-            len(captured_data.records),
-            0,
-        )
+        self.assertEqual(len(captured_data.records), 0)
 
     def test_not_targeting_any_plone_version(self):
         event = self.create_event({}, {}, payload=NO_PLONE_VERSION_PAYLOAD)
@@ -188,10 +174,7 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
 
         event.request.cleanup()
 
-        self.assertEqual(
-            len(captured_data.records),
-            1,
-        )
+        self.assertEqual(len(captured_data.records), 1)
 
         self.assertIn(
             'no plone coredev version tracks branch my-upstream-branch of '
@@ -200,123 +183,63 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
         )
 
     def test_in_checkouts(self):
-        checkouts = {
-            '5.1': ['plone.uuid'],
-        }
-        sources = {
-            ('plone/plone.uuid', 'master'): ['5.1'],
-        }
-        event = self.create_event(
-            checkouts,
-            sources,
-            payload=PLONE_VERSION_PAYLOAD,
-        )
+        checkouts = {'5.1': ['plone.uuid']}
+        sources = {('plone/plone.uuid', 'master'): ['5.1']}
+        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
 
         with LogCapture() as captured_data:
             UpdateCoredevCheckouts(event)
 
         event.request.cleanup()
 
-        self.assertEqual(
-            len(captured_data.records),
-            1,
-        )
+        self.assertEqual(len(captured_data.records), 1)
         self.assertIn(
-            'is already on checkouts.cfg of all plone versions that it '
-            'targets',
+            'is already on checkouts.cfg of all plone versions that it ' 'targets',
             captured_data.records[0].msg,
         )
 
     def test_in_multiple_checkouts(self):
-        checkouts = {
-            '5.0': ['plone.uuid'],
-            '5.1': ['plone.uuid'],
-        }
-        sources = {
-            ('plone/plone.uuid', 'master'): ['5.1', '5.0'],
-        }
-        event = self.create_event(
-            checkouts,
-            sources,
-            payload=PLONE_VERSION_PAYLOAD,
-        )
+        checkouts = {'5.0': ['plone.uuid'], '5.1': ['plone.uuid']}
+        sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
+        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
 
         with LogCapture() as captured_data:
             UpdateCoredevCheckouts(event)
 
         event.request.cleanup()
 
-        self.assertEqual(
-            len(captured_data.records),
-            1,
-        )
+        self.assertEqual(len(captured_data.records), 1)
         self.assertIn(
-            'is already on checkouts.cfg of all plone versions that it '
-            'targets',
+            'is already on checkouts.cfg of all plone versions that it ' 'targets',
             captured_data.records[0].msg,
         )
 
     def test_not_in_checkouts(self):
-        checkouts = {
-            '5.0': [],
-            '5.1': ['plone.uuid'],
-        }
-        sources = {
-            ('plone/plone.uuid', 'master'): ['5.1', '5.0'],
-        }
-        event = self.create_event(
-            checkouts,
-            sources,
-            payload=PLONE_VERSION_PAYLOAD,
-        )
+        checkouts = {'5.0': [], '5.1': ['plone.uuid']}
+        sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
+        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
 
         with LogCapture() as captured_data:
             UpdateCoredevCheckouts(event)
 
         event.request.cleanup()
 
-        self.assertEqual(
-            len(captured_data.records),
-            1,
-        )
+        self.assertEqual(len(captured_data.records), 1)
         self.assertIn(
-            'add to checkouts.cfg of buildout.coredev 5.0',
-            captured_data.records[0].msg,
+            'add to checkouts.cfg of buildout.coredev 5.0', captured_data.records[0].msg
         )
 
     def test_not_in_multiple_checkouts(self):
-        checkouts = {
-            '4.3': [],
-            '5.0': [],
-            '5.1': ['plone.uuid'],
-        }
-        sources = {
-            ('plone/plone.uuid', 'master'): ['5.1', '5.0', '4.3'],
-        }
-        event = self.create_event(
-            checkouts,
-            sources,
-            payload=PLONE_VERSION_PAYLOAD,
-        )
+        checkouts = {'4.3': [], '5.0': [], '5.1': ['plone.uuid']}
+        sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0', '4.3']}
+        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
 
         with LogCapture() as captured_data:
             UpdateCoredevCheckouts(event)
 
         event.request.cleanup()
 
-        self.assertEqual(
-            len(captured_data.records),
-            2,
-        )
-        messages = sorted([
-            m.msg
-            for m in captured_data.records
-        ])
-        self.assertIn(
-            'add to checkouts.cfg of buildout.coredev 4.3',
-            messages[0],
-        )
-        self.assertIn(
-            'add to checkouts.cfg of buildout.coredev 5.0',
-            messages[1],
-        )
+        self.assertEqual(len(captured_data.records), 2)
+        messages = sorted([m.msg for m in captured_data.records])
+        self.assertIn('add to checkouts.cfg of buildout.coredev 4.3', messages[0])
+        self.assertIn('add to checkouts.cfg of buildout.coredev 5.0', messages[1])

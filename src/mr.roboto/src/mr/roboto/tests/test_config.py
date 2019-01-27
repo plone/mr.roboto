@@ -6,7 +6,6 @@ import unittest
 
 
 class ConfigurationTest(unittest.TestCase):
-
     def setUp(self):
         settings = {
             'plone_versions': '["4.3", "5.1"]',
@@ -24,40 +23,22 @@ class ConfigurationTest(unittest.TestCase):
         self.settings = self.roboto.app.registry.settings
 
     def test_plone_versions(self):
-        self.assertEqual(
-            self.settings['plone_versions'],
-            ['4.3', '5.1'],
-        )
+        self.assertEqual(self.settings['plone_versions'], ['4.3', '5.1'])
 
     def test_py3_versions(self):
-        self.assertEqual(
-            self.settings['py3_versions'],
-            ['2.7', '3.6'],
-        )
+        self.assertEqual(self.settings['py3_versions'], ['2.7', '3.6'])
 
     def test_roboto_url(self):
-        self.assertEqual(
-            self.settings['roboto_url'],
-            'http://mr.roboto.plone.org',
-        )
+        self.assertEqual(self.settings['roboto_url'], 'http://mr.roboto.plone.org')
 
     def test_api_key(self):
-        self.assertEqual(
-            self.settings['api_key'],
-            '1234567890',
-        )
+        self.assertEqual(self.settings['api_key'], '1234567890')
 
     def test_sources_file(self):
-        self.assertEqual(
-            self.settings['sources_file'],
-            'sources.pickle',
-        )
+        self.assertEqual(self.settings['sources_file'], 'sources.pickle')
 
     def test_checkouts_file(self):
-        self.assertEqual(
-            self.settings['checkouts_file'],
-            'checkouts.pickle',
-        )
+        self.assertEqual(self.settings['checkouts_file'], 'checkouts.pickle')
 
     def test_debug(self):
         self.assertTrue(self.settings['debug'])

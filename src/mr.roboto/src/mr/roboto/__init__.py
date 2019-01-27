@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from chameleon import PageTemplateLoader
 from github import Github
-from pyramid.config import Configurator
 from mr.roboto.security import RequestWithAttributes
+from pyramid.config import Configurator
 
 import ast
 import logging
@@ -13,17 +13,12 @@ import os
 requests_logger = logging.getLogger('requests.packages.urllib3.connectionpool')
 requests_logger.setLevel(logging.ERROR)
 
-templates = PageTemplateLoader(
-    os.path.join(os.path.dirname(__file__), 'templates'),
-)
+templates = PageTemplateLoader(os.path.join(os.path.dirname(__file__), 'templates'))
 
 
 def main(global_config, **settings):
     """This function returns a Pyramid WSGI application"""
-    config = Configurator(
-        settings=settings,
-        request_factory=RequestWithAttributes,
-    )
+    config = Configurator(settings=settings, request_factory=RequestWithAttributes)
 
     # add webservice support
     config.include('cornice')
@@ -34,12 +29,12 @@ def main(global_config, **settings):
 
     # plone versions
     config.registry.settings['plone_versions'] = ast.literal_eval(
-        settings['plone_versions'],
+        settings['plone_versions']
     )
 
     # python versions
     config.registry.settings['py3_versions'] = ast.literal_eval(
-        settings['py3_versions'],
+        settings['py3_versions']
     )
 
     # roboto public url
@@ -51,15 +46,14 @@ def main(global_config, **settings):
     # Debug
     config.registry.settings['debug'] = False
     if 'debug' in settings:
-        config.registry.settings['debug'] = (settings['debug'] == 'True')
+        config.registry.settings['debug'] = settings['debug'] == 'True'
 
     config.registry.settings['sources_file'] = settings['sources_file']
     config.registry.settings['checkouts_file'] = settings['checkouts_file']
 
     # github object
     config.registry.settings['github'] = Github(
-        settings['github_user'],
-        settings['github_password'],
+        settings['github_user'], settings['github_password']
     )
 
     config.add_static_view('static', 'static', cache_max_age=3600)

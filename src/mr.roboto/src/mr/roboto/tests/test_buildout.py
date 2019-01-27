@@ -19,7 +19,9 @@ SOURCES = """
 Products.CMFPlone = git {0}.CMFPlone.git pushurl={1}.CMFPlone.git branch=master
 Products.CMFCore = git {0}.CMFCore.git pushurl={1}.CMFCore.git branch=2.2.x
 Products.CMFDiff = git {0}.CMFDiff.git
-""".format(git_source, ssh_source)
+""".format(
+    git_source, ssh_source
+)
 
 CHECKOUTS = """
 [buildout]
@@ -30,7 +32,6 @@ auto-checkout =
 
 
 class BuildoutTest(unittest.TestCase):
-
     def setUp(self):
         self.coredev_repo = Repo.init(mkdtemp())
         PloneCoreBuildout.PLONE_COREDEV_LOCATION = (
@@ -75,29 +76,17 @@ class BuildoutTest(unittest.TestCase):
 
     def test_get_sources_and_checkouts(self):
         self.roboto.get(
-            f'/update-sources-and-checkouts?token={self.settings["api_key"]}',
+            f'/update-sources-and-checkouts?token={self.settings["api_key"]}'
         )
 
         with open(self.settings['sources_file'], 'br') as sources:
             data = pickle.load(sources)
 
-        self.assertEqual(
-            data[('plone/Products.CMFPlone', 'master')],
-            ['5.1', '4.3'],
-        )
-        self.assertEqual(
-            data[('plone/Products.CMFCore', '2.2.x')],
-            ['5.1', '4.3'],
-        )
+        self.assertEqual(data[('plone/Products.CMFPlone', 'master')], ['5.1', '4.3'])
+        self.assertEqual(data[('plone/Products.CMFCore', '2.2.x')], ['5.1', '4.3'])
 
         with open(self.settings['checkouts_file'], 'br') as checkouts:
             data = pickle.load(checkouts)
 
-        self.assertEqual(
-            data['5.1'],
-            ['plone.app.contenttypes', 'Products.CMFPlone'],
-        )
-        self.assertEqual(
-            data['4.3'],
-            ['plone.app.contenttypes', 'Products.CMFPlone'],
-        )
+        self.assertEqual(data['5.1'], ['plone.app.contenttypes', 'Products.CMFPlone'])
+        self.assertEqual(data['4.3'], ['plone.app.contenttypes', 'Products.CMFPlone'])

@@ -26,9 +26,7 @@ import requests
 
 logger = logging.getLogger('mr.roboto')
 
-VALID_CHANGELOG_FILES = re.compile(
-    r'(CHANGES|HISTORY|CHANGELOG).(txt|rst|md)$',
-)
+VALID_CHANGELOG_FILES = re.compile(r'(CHANGES|HISTORY|CHANGELOG).(txt|rst|md)$')
 
 IGNORE_NO_CHANGELOG = (
     'documentation',
@@ -43,37 +41,22 @@ IGNORE_NO_CHANGELOG = (
     'training',
 )
 
-IGNORE_NO_AGREEMENT = (
-    'icalendar',
-    'planet.plone.org',
-    'documentation',
-    'training',
-)
+IGNORE_NO_AGREEMENT = ('icalendar', 'planet.plone.org', 'documentation', 'training')
 
-IGNORE_USER_NO_AGREEMENT = (
-    'web-flow',
-)
+IGNORE_USER_NO_AGREEMENT = ('web-flow',)
 
-IGNORE_NO_TEST_NEEDED = (
-    'plone.releaser',
-)
+IGNORE_NO_TEST_NEEDED = ('plone.releaser',)
 
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
         subject=f'POSSIBLE CHECKOUT ERROR {repo} {branch}',
         sender='Jenkins Job FAIL <jenkins@plone.org>',
-        recipients=[
-            'ramon.nb@gmail.com',
-            'tisto@plone.org',
-            email,
-        ],
+        recipients=['ramon.nb@gmail.com', 'tisto@plone.org', email],
         body=templates['error_commit_checkout.pt'](
-            who=who,
-            repo=repo,
-            branch=branch,
-            pv=pv),
-        )
+            who=who, repo=repo, branch=branch, pv=pv
+        ),
+    )
     mailer.send_immediately(msg, fail_silently=False)
 
 
@@ -122,19 +105,14 @@ def send_mail_on_missing_checkout(event):
     mailer = get_mailer(event.request)
     logger.info(
         f'Commit: send mail: coredev push without checkout of '
-        f'{event.repo} by {event.who}',
+        f'{event.repo} by {event.who}'
     )
     mail_missing_checkout(
-        mailer,
-        event.who,
-        event.repo,
-        event.branch,
-        event.pv,
-        event.email)
+        mailer, event.who, event.repo, event.branch, event.pv, event.email
+    )
 
 
 class PullRequestSubscriber(object):
-
     def __init__(self, event):
         self.event = event
         self._github = None
@@ -158,7 +136,7 @@ class PullRequestSubscriber(object):
     def short_url(self):
         if self._short_url is None:
             self._short_url = shorten_pull_request_url(
-                self.event.pull_request['html_url'],
+                self.event.pull_request['html_url']
             )
         return self._short_url
 
@@ -177,8 +155,7 @@ class PullRequestSubscriber(object):
     @property
     def repo_full_name(self):
         if self._repo_full_name is None:
-            self._repo_full_name = \
-                self.pull_request['base']['repo']['full_name']
+            self._repo_full_name = self.pull_request['base']['repo']['full_name']
         return self._repo_full_name
 
     @property
@@ -247,9 +224,7 @@ class PullRequestSubscriber(object):
                     login = commit_info[user]['login']
                 except TypeError:
                     self.log(f'commit does not have {user} user info')
-                    unknown.append(
-                        commit_info['commit']['author']['name'],
-                    )
+                    unknown.append(commit_info['commit']['author']['name'])
                     continue
 
                 if login in IGNORE_USER_NO_AGREEMENT:
@@ -270,7 +245,6 @@ class PullRequestSubscriber(object):
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class ContributorsAgreementSigned(PullRequestSubscriber):
-
     def __init__(self, event):
         self.cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
         self.github_help_setup_email_url = u'https://help.github.com/articles/adding-an-email-address-to-your-github-account/'  # noqa
@@ -337,7 +311,6 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnNoChangelogEntry(PullRequestSubscriber):
-
     def __init__(self, event):
         self.status_context = u'Changelog verifier'
 
@@ -357,8 +330,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
         diff_url = self.pull_request['diff_url']
         diff_data = requests.get(diff_url)
         patch_data = PatchSet(
-            diff_data.content.splitlines(),
-            encoding=diff_data.encoding,
+            diff_data.content.splitlines(), encoding=diff_data.encoding
         )
 
         for diff_file in patch_data:
@@ -386,10 +358,10 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnTestsNeedToRun(PullRequestSubscriber):
-
     def __init__(self, event):
-        self.jenkins_pr_job_url = \
+        self.jenkins_pr_job_url = (
             'http://jenkins.plone.org/job/pull-request-{0}/build?delay=0sec'
+        )
         self.status_context = 'Plone Jenkins CI - pull-request-{0}'
 
         super(WarnTestsNeedToRun, self).__init__(event)
@@ -415,16 +387,15 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         target_branch = self.pull_request['base']['ref']
 
         plone_versions = plone_versions_targeted(
-            self.repo_full_name,
-            target_branch,
-            self.event.request,
+            self.repo_full_name, target_branch, self.event.request
         )
 
-        tracked_versions = \
-            self.event.request.registry.settings['plone_versions']
-        if self.repo_full_name == 'plone/buildout.coredev' and \
-                target_branch in tracked_versions:
-            plone_versions = (target_branch, )
+        tracked_versions = self.event.request.registry.settings['plone_versions']
+        if (
+            self.repo_full_name == 'plone/buildout.coredev'
+            and target_branch in tracked_versions
+        ):
+            plone_versions = (target_branch,)
 
         elif not plone_versions:
             self.log('does not target any Plone version')
@@ -433,50 +404,43 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         return plone_versions
 
     def _create_commit_status(self, commit, version):
-            commit.create_status(
-                u'pending',
-                target_url=self.jenkins_pr_job_url.format(version),
-                description='Please run the job, click here --->',
-                context=self.status_context.format(version),
-            )
+        commit.create_status(
+            u'pending',
+            target_url=self.jenkins_pr_job_url.format(version),
+            description='Please run the job, click here --->',
+            context=self.status_context.format(version),
+        )
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnPy3TestsNeedToRun(WarnTestsNeedToRun):
-
     def run(self):
         """Create waiting status for pull requests that target plone 5.2 on
         python 3
         """
-        self.jenkins_pr_job_url = \
-            'http://jenkins.plone.org/job/' \
-            'pull-request-5.2-{0}/build?delay=0sec'
+        self.jenkins_pr_job_url = (
+            'http://jenkins.plone.org/job/' 'pull-request-5.2-{0}/build?delay=0sec'
+        )
         self.status_context = 'Plone Jenkins CI - pull-request-5.2-{0}'
 
         plone_versions = self._plone_versions_targeted()
 
         if '5.2' not in plone_versions:
-            self.log(
-                'does not target Plone 5.2, no py3 pull request job needed',
-            )
+            self.log('does not target Plone 5.2, no py3 pull request job needed')
             return
 
-        py3_tracked_versions = \
-            self.event.request.registry.settings['py3_versions']
+        py3_tracked_versions = self.event.request.registry.settings['py3_versions']
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
 
         for py_version in py3_tracked_versions:
             self._create_commit_status(last_commit, py_version)
-            self.log(
-                f'created pending status for plone 5.2 on python {py_version}',
-            )
+            self.log(f'created pending status for plone 5.2 on python {py_version}')
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class TriggerDependenciesJob(PullRequestSubscriber):
-
     def run(self):
         """Trigger the dependencies jenkins job"""
         branch = self.pull_request['head']['ref']
@@ -484,9 +448,7 @@ class TriggerDependenciesJob(PullRequestSubscriber):
         if not self.is_core_package():
             base_branch = self.pull_request['base']['ref']
             key = f'{self.repo_full_name}/{base_branch}'
-            self.log(
-                f'No dependencies jenkins job run on a non-core package {key}',
-            )
+            self.log(f'No dependencies jenkins job run on a non-core package {key}')
             return
 
         settings = self.event.request.registry.settings
@@ -494,33 +456,23 @@ class TriggerDependenciesJob(PullRequestSubscriber):
 
         requests.post(
             f'{jenkins_url}/job/qa-pkg-dependencies/buildWithParameters',
-            data={
-                'PACKAGE_NAME': self.repo_name,
-                'BRANCH': branch,
-            },
-            auth=(
-                settings['jenkins_user_id'],
-                settings['jenkins_user_token'],
-            ),
+            data={'PACKAGE_NAME': self.repo_name, 'BRANCH': branch},
+            auth=(settings['jenkins_user_id'], settings['jenkins_user_token']),
         )
 
         self.log(
-            f'Trigger dependencies jenkins job for '
-            f'pull request {self.short_url}',
+            f'Trigger dependencies jenkins job for ' f'pull request {self.short_url}'
         )
 
     def is_core_package(self):
         base_branch = self.pull_request['base']['ref']
         return plone_versions_targeted(
-            self.repo_full_name,
-            base_branch,
-            self.event.request,
+            self.repo_full_name, base_branch, self.event.request
         )
 
 
 @subscriber(MergedPullRequest)
 class UpdateCoredevCheckouts(PullRequestSubscriber):
-
     def run(self):
         """Add package that got a pull request merged into checkouts.cfg
 
@@ -533,19 +485,17 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             return
 
         plone_versions = plone_versions_targeted(
-            self.repo_full_name,
-            self.target_branch,
-            self.event.request,
+            self.repo_full_name, self.target_branch, self.event.request
         )
         if not plone_versions:
             self.log(
                 f'no plone coredev version tracks branch {self.target_branch} '
-                f'of {self.repo_name}, checkouts.cfg not updated',
+                f'of {self.repo_name}, checkouts.cfg not updated'
             )
             return
 
         checkouts = get_pickled_data(
-            self.event.request.registry.settings['checkouts_file'],
+            self.event.request.registry.settings['checkouts_file']
         )
         not_in_checkouts = [
             version
@@ -555,7 +505,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         if not not_in_checkouts:
             self.log(
                 f'is already on checkouts.cfg of all plone '
-                f'versions that it targets {plone_versions}',
+                f'versions that it targets {plone_versions}'
             )
             return
 
@@ -586,28 +536,19 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
                             level='warn',
                         )
                 else:
-                    self.log(
-                        f'add to checkouts.cfg of buildout.coredev {version}',
-                    )
+                    self.log(f'add to checkouts.cfg of buildout.coredev {version}')
                     break
 
     def make_commit(self, repo, version, user):
         filename = u'checkouts.cfg'
         head_ref = repo.get_git_ref(f'heads/{version}')
-        checkouts_cfg_file = repo.get_file_contents(
-            filename,
-            head_ref.object.sha,
-        )
+        checkouts_cfg_file = repo.get_file_contents(filename, head_ref.object.sha)
         line = f'    {self.repo_name}\n'
         checkouts_content = checkouts_cfg_file.decoded_content.decode()
         checkouts_new_data = checkouts_content + line
         latest_commit = repo.get_git_commit(head_ref.object.sha)
         base_tree = latest_commit.tree
-        mode = [
-            t.mode
-            for t in base_tree.tree
-            if t.path == filename
-            ]
+        mode = [t.mode for t in base_tree.tree if t.path == filename]
         if mode:
             mode = mode[0]
         else:
