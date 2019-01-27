@@ -22,9 +22,9 @@ LOG_LINE_RE = re.compile(
 
 PULL_REQUEST_LOG_MSG_RE = re.compile(
     r'PR\s+'
-    '(\S+)'  # repo/package.name.this
-    '#'
-    '(\d+)',  # pull request number
+    r'(\S+)'  # repo/package.name.this
+    r'#'
+    r'(\d+)',  # pull request number
 )
 
 COMMIT_LOG_MSG_RE = re.compile(

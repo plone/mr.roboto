@@ -15,7 +15,7 @@ import shutil
 logger = logging.getLogger('mr.roboto')
 
 PATH_RE = re.compile(
-    '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)',
+    r'(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)',
 )
 
 
