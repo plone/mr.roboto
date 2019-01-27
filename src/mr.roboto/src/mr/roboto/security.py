@@ -11,9 +11,7 @@ def validate_github(fn):
         if 'X-Hub_Signature' in request.headers:
             sha1_gh = request.headers['X-Hub_Signature']
             hmac_value = hmac.new(
-                request.registry.settings['api_key'].encode(),
-                request.body,
-                sha1,
+                request.registry.settings['api_key'].encode(), request.body, sha1
             )
             sha1_compute = hmac_value.hexdigest()
             if sha1_gh == f'sha1={sha1_compute}':
@@ -47,7 +45,6 @@ def validate_request_token(fn):
 
 
 class RequestWithAttributes(Request):
-
     @reify
     def token(self):
         if 'token' in self.GET:

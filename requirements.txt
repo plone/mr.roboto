@@ -2,3 +2,5 @@ meld3==1.0.2
 -e git://github.com/Supervisor/supervisor.git#egg=supervisor
 setuptools==40.4.3
 zc.buildout==2.12.2
+black==18.9b0
+isort==4.3.4

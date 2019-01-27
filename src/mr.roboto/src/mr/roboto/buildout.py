@@ -15,12 +15,11 @@ import shutil
 logger = logging.getLogger('mr.roboto')
 
 PATH_RE = re.compile(
-    '(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)',
+    r'(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)'
 )
 
 
 class Source(object):
-
     def __init__(self, protocol=None, url=None, push_url=None, branch=None):
         self.protocol = protocol
         self.url = url
@@ -55,7 +54,6 @@ class Source(object):
 
 
 class SourcesFile(UserDict):
-
     def __init__(self, file_location):
         self.file_location = file_location
 
@@ -76,7 +74,6 @@ class SourcesFile(UserDict):
 
 
 class CheckoutsFile(UserDict):
-
     def __init__(self, file_location):
         self.file_location = file_location
 
@@ -103,7 +100,7 @@ class PloneCoreBuildout(object):
     def clone(self):
         logger.info(
             f'Commit: cloning github repository {self.location}, '
-            f'branch={self.core_version}',
+            f'branch={self.core_version}'
         )
         git.Repo.clone_from(
             self.PLONE_COREDEV_LOCATION,
@@ -130,8 +127,7 @@ def get_sources_and_checkouts(request):
 
     for plone_version in actual_plone_versions:
         logger.info(
-            f'Commit: checking sources and checkouts '
-            f'from plone {plone_version}',
+            f'Commit: checking sources and checkouts ' f'from plone {plone_version}'
         )
         buildout = PloneCoreBuildout(plone_version)
 

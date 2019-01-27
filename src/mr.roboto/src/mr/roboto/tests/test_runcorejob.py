@@ -26,10 +26,10 @@ COREDEV_COMMIT_PAYLOAD = {
         {
             'id': '4f7caf77eb1384572f4d7d9a90a4888fbcbd68a8',
             'message': '[fc] Repository: plone.app.upgrade\nBranch: '
-                       'refs/heads/master\nDate: ',
+            'refs/heads/master\nDate: ',
             'timestamp': '2016-03-31T21:44:15+02:00',
             'url': 'https://github.com/plone/buildout.coredev/commit'
-                   '/4f7caf77eb1384572f4d7d9a90a4888fbcbd68a8',
+            '/4f7caf77eb1384572f4d7d9a90a4888fbcbd68a8',
             'author': {
                 'name': 'mister-roboto',
                 'email': 'mr.roboto@plone.org',
@@ -40,26 +40,17 @@ COREDEV_COMMIT_PAYLOAD = {
                 'email': 'mr.roboto@plone.org',
                 'username': 'mister-roboto',
             },
-            'added': [
-
-            ],
-            'removed': [
-
-            ],
-            'modified': [
-                'last_commit.txt',
-            ],
-        },
+            'added': [],
+            'removed': [],
+            'modified': ['last_commit.txt'],
+        }
     ],
     'repository': {
         'name': 'buildout.coredev',
         'full_name': 'plone/buildout.coredev',
         'organization': 'plone',
     },
-    'pusher': {
-        'name': 'mister-roboto',
-        'email': 'mr.roboto@plone.org',
-    },
+    'pusher': {'name': 'mister-roboto', 'email': 'mr.roboto@plone.org'},
 }
 
 PACKAGE_COMMIT_PAYLOAD = copy.deepcopy(COREDEV_COMMIT_PAYLOAD)
@@ -109,6 +100,7 @@ GET_INFO = 'mr.roboto.views.runcorejob.get_info_from_commit'
 def minimal_main(global_config, **settings):
     from github import Github
     from pyramid.config import Configurator
+
     config = Configurator(settings=settings)
     config.include('cornice')
 
@@ -116,15 +108,13 @@ def minimal_main(global_config, **settings):
     config.registry.settings['roboto_url'] = settings['roboto_url']
     config.registry.settings['api_key'] = settings['api_key']
     config.registry.settings['github'] = Github(
-        settings['github_user'],
-        settings['github_password'],
+        settings['github_user'], settings['github_password']
     )
     config.scan('mr.roboto.views.runcorejob')
     return config.make_wsgi_app()
 
 
 class RunCoreJobTest(unittest.TestCase):
-
     def setUp(self):
         self.settings = {
             'plone_versions': '["4.3",]',
@@ -161,14 +151,8 @@ class RunCoreJobTest(unittest.TestCase):
         self.roboto = TestApp(app)
 
     def prepare_data(self, payload):
-        body = urllib.parse.urlencode(
-            {'payload': json.dumps(payload)},
-        )
-        hmac_value = hmac.new(
-            self.settings['api_key'].encode(),
-            body.encode(),
-            sha1,
-        )
+        body = urllib.parse.urlencode({'payload': json.dumps(payload)})
+        hmac_value = hmac.new(self.settings['api_key'].encode(), body.encode(), sha1)
         digest = hmac_value.hexdigest()
         return digest, body
 
@@ -176,27 +160,19 @@ class RunCoreJobTest(unittest.TestCase):
         digest, body = self.prepare_data(payload)
         result = self.roboto.post(
             '/run/corecommit',
-            headers={
-                'X-Hub_Signature': f'sha1={digest}',
-            },
+            headers={'X-Hub_Signature': f'sha1={digest}'},
             params=body,
         )
         return result
 
     def test_no_validation(self):
         res = self.roboto.post('/run/corecommit')
-        self.assertIn(
-            'Token not active',
-            res.ubody,
-        )
+        self.assertIn('Token not active', res.ubody)
 
     def test_ping_answer(self):
         result = self.call_view({'ping': 'true'})
 
-        self.assertIn(
-            'pong',
-            result.ubody,
-        )
+        self.assertIn('pong', result.ubody)
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
     def test_commit_to_coredev(self, m1):
@@ -206,10 +182,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
-        self.assertIn(
-            'Thanks! Commit to coredev, nothing to do',
-            result.ubody,
-        )
+        self.assertIn('Thanks! Commit to coredev, nothing to do', result.ubody)
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_FAKE)
     def test_fake_commit_to_coredev(self, m1):
@@ -219,10 +192,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
-        self.assertIn(
-            'Thanks! Commit to coredev, nothing to do',
-            result.ubody,
-        )
+        self.assertIn('Thanks! Commit to coredev, nothing to do', result.ubody)
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
     def test_ci_skip_commit_to_coredev(self, m1):
@@ -232,10 +202,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
-        self.assertIn(
-            'Thanks! Commit to coredev, nothing to do',
-            result.ubody,
-        )
+        self.assertIn('Thanks! Commit to coredev, nothing to do', result.ubody)
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_SOURCES)
     @mock.patch('mr.roboto.views.runcorejob.get_sources_and_checkouts')
@@ -246,10 +213,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
         result = self.call_view(COREDEV_COMMIT_PAYLOAD)
 
-        self.assertIn(
-            'Thanks! Commit to coredev, nothing to do',
-            result.ubody,
-        )
+        self.assertIn('Thanks! Commit to coredev, nothing to do', result.ubody)
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA_CI_SKIP)
     def test_ci_skip_non_coredev_commit(self, m1):
@@ -259,10 +223,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
 
-        self.assertIn(
-            'Thanks! Skipping CI',
-            result.ubody,
-        )
+        self.assertIn('Thanks! Skipping CI', result.ubody)
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
     def test_branch_not_in_sources_commit(self, m1):
@@ -272,10 +233,7 @@ class RunCoreJobTest(unittest.TestCase):
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
 
-        self.assertIn(
-            'Thanks! Commits done on a branch, nothing to do',
-            result.ubody,
-        )
+        self.assertIn('Thanks! Commits done on a branch, nothing to do', result.ubody)
 
     @mock.patch(GET_INFO, return_value=SAMPLE_DATA)
     @mock.patch('mr.roboto.views.runcorejob.commit_to_coredev')
@@ -286,24 +244,16 @@ class RunCoreJobTest(unittest.TestCase):
         )
         result = self.call_view(PACKAGE_COMMIT_PAYLOAD)
 
-        self.assertIn(
-            'Thanks! Plone Jenkins CI will run tests',
-            result.ubody,
-        )
+        self.assertIn('Thanks! Plone Jenkins CI will run tests', result.ubody)
 
 
 class AuxiliaryFunctionsTest(unittest.TestCase):
-
     def test_get_user_none(self):
-        self.assertEqual(
-            get_user({'name': u'none'}),
-            'NoBody <nobody@plone.org>',
-        )
+        self.assertEqual(get_user({'name': u'none'}), 'NoBody <nobody@plone.org>')
 
     def test_get_user(self):
         self.assertEqual(
-            get_user({'name': u'jon', 'email': 'jon@plone.org'}),
-            'jon <jon@plone.org>',
+            get_user({'name': u'jon', 'email': 'jon@plone.org'}), 'jon <jon@plone.org>'
         )
 
     def test_load_data(self):
@@ -313,8 +263,5 @@ class AuxiliaryFunctionsTest(unittest.TestCase):
             with open(filename, 'bw') as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(data))
 
-        self.assertEqual(
-            get_pickled_data(filename),
-            data,
-        )
+        self.assertEqual(get_pickled_data(filename), data)
         os.remove(filename)

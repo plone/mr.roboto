@@ -37,17 +37,11 @@ def handle_pull_request(request):
     pull_request = payload['pull_request']
     logger.info(f'PR {short_url}: with action {action}')
     if action in ('opened', 'reopened'):
-        request.registry.notify(
-            NewPullRequest(pull_request, request),
-        )
+        request.registry.notify(NewPullRequest(pull_request, request))
     elif action == 'synchronize':
-        request.registry.notify(
-            UpdatedPullRequest(pull_request, request),
-        )
+        request.registry.notify(UpdatedPullRequest(pull_request, request))
     elif action == 'closed' and pull_request['merged']:
-        request.registry.notify(
-            MergedPullRequest(pull_request, request),
-        )
+        request.registry.notify(MergedPullRequest(pull_request, request))
     else:
         msg = (
             f'PR {short_url}: action "{action}" '

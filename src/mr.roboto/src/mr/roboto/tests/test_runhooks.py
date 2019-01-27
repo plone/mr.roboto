@@ -9,16 +9,13 @@ import unittest
 
 class DummyHook(object):
     name = 'web'
-    config = {
-        'url': 'http://jenkins.plone.org/roboto/run/corecommit',
-    }
+    config = {'url': 'http://jenkins.plone.org/roboto/run/corecommit'}
 
     def delete(self):
         return
 
 
 class DummyRepo(object):
-
     def __init__(self, name='Products.CMFPlone'):
         self.name = name
 
@@ -30,7 +27,6 @@ class DummyRepo(object):
 
 
 class DummyGetRepos(object):
-
     def get_repos(self):
         return [DummyRepo()]
 
@@ -39,7 +35,6 @@ class DummyGetRepos(object):
 
 
 class RunHooksTest(unittest.TestCase):
-
     def setUp(self):
         self.settings = {
             'plone_versions': '["4.3",]',
@@ -58,19 +53,13 @@ class RunHooksTest(unittest.TestCase):
 
     def test_runhook_security(self):
         result = self.roboto.get('/run/githubcommithooks')
-        self.assertIn(
-            'Token not active',
-            result.ubody,
-        )
+        self.assertIn('Token not active', result.ubody)
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_no_repo(self, m1):
         url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
-        self.assertEqual(
-            result.ubody,
-            '"[]"',
-        )
+        self.assertEqual(result.ubody, '"[]"')
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_no_web_hooks(self, m1):
@@ -81,18 +70,13 @@ class RunHooksTest(unittest.TestCase):
 
         url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
-        self.assertIn(
-            'github Creating hooks on Products.CMFPlone',
-            result.ubody,
-        )
+        self.assertIn('github Creating hooks on Products.CMFPlone', result.ubody)
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_exception(self, m1):
         class DummyHook(object):
             name = 'web'
-            config = {
-                'url': 'http://jenkins.plone.org/roboto/run/corecommit',
-            }
+            config = {'url': 'http://jenkins.plone.org/roboto/run/corecommit'}
 
         class DummyRepo(object):
             name = 'Products.CMFPlone'
@@ -111,10 +95,7 @@ class RunHooksTest(unittest.TestCase):
 
         url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
-        self.assertIn(
-            'github Creating hooks on Products.CMFPlone',
-            result.ubody,
-        )
+        self.assertIn('github Creating hooks on Products.CMFPlone', result.ubody)
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_web_hook_wrong_url(self, m1):
@@ -122,10 +103,7 @@ class RunHooksTest(unittest.TestCase):
 
         url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
-        self.assertIn(
-            'github Creating hooks on Products.CMFPlone',
-            result.ubody,
-        )
+        self.assertIn('github Creating hooks on Products.CMFPlone', result.ubody)
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_web_hook_roboto_url(self, m1):
@@ -133,10 +111,7 @@ class RunHooksTest(unittest.TestCase):
 
         url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
-        self.assertIn(
-            'github Creating hooks on Products.CMFPlone',
-            result.ubody,
-        )
+        self.assertIn('github Creating hooks on Products.CMFPlone', result.ubody)
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_debug(self, m1):
@@ -146,10 +121,7 @@ class RunHooksTest(unittest.TestCase):
 
         url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
-        self.assertIn(
-            'github Creating hooks on Products.CMFPlone',
-            result.ubody,
-        )
+        self.assertIn('github Creating hooks on Products.CMFPlone', result.ubody)
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_collective(self, m1):
@@ -158,11 +130,5 @@ class RunHooksTest(unittest.TestCase):
 
         url = f'/run/githubcommithooks?token={self.settings["api_key"]}'
         result = self.roboto.get(url)
-        self.assertIn(
-            'github Creating hooks on repo1',
-            result.ubody,
-        )
-        self.assertIn(
-            'github Creating hooks on repo2',
-            result.ubody,
-        )
+        self.assertIn('github Creating hooks on repo1', result.ubody)
+        self.assertIn('github Creating hooks on repo2', result.ubody)

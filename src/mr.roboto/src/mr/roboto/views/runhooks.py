@@ -33,18 +33,9 @@ def create_github_post_commit_hooks_view(request):
     # hooks URL
     Hook = namedtuple('Hook', ['url', 'events'])
     roboto_hooks = [
-        Hook(
-            f'{roboto_url}/run/corecommit',
-            ['push'],
-        ),
-        Hook(
-            f'{roboto_url}/run/pull-request',
-            ['pull_request'],
-        ),
-        Hook(
-            f'{jenkins_url}/github-webhook/',
-            ['*'],
-        ),
+        Hook(f'{roboto_url}/run/corecommit', ['push']),
+        Hook(f'{roboto_url}/run/pull-request', ['pull_request']),
+        Hook(f'{jenkins_url}/github-webhook/', ['*']),
     ]
 
     messages = []
@@ -57,14 +48,10 @@ def create_github_post_commit_hooks_view(request):
     collective = github.get_organization('collective')
     for repo_name in collective_repos:
         repo = collective.get_repo(repo_name.strip())
-        messages.append(
-            update_hooks_on_repo(repo, roboto_hooks, request),
-        )
+        messages.append(update_hooks_on_repo(repo, roboto_hooks, request))
 
     for repo in github.get_organization('plone').get_repos():
-        messages.append(
-            update_hooks_on_repo(repo, roboto_hooks, request),
-        )
+        messages.append(update_hooks_on_repo(repo, roboto_hooks, request))
 
     return json.dumps(messages)
 
@@ -77,11 +64,11 @@ def update_hooks_on_repo(repo=None, new_hooks=None, request=None):
     for hook in hooks:
         if hook.name == 'web':
             hook_url = hook.config['url']
-            if hook_url.find('roboto/run/') != -1 or \
-                    hook_url.find('github-webhook') != -1:
-                logger.info(
-                    f'github Removing hook {hook.config}',
-                )
+            if (
+                hook_url.find('roboto/run/') != -1
+                or hook_url.find('github-webhook') != -1
+            ):
+                logger.info(f'github Removing hook {hook.config}')
                 if debug:
                     logger.info(f'Debug removing hook {repo.name}')
                 else:
