@@ -6,7 +6,6 @@ from mr.roboto.security import validate_request_token
 from mr.roboto.utils import get_pickled_data
 from pyramid.view import view_config
 
-import json
 import os
 import pickle
 import re
@@ -121,7 +120,7 @@ def checkout(context, request):
 @validate_request_token
 def update_pickles(context, request):
     get_sources_and_checkouts(request)
-    return json.dumps({'message': 'updated!'})
+    return {'message': 'updated!'}
 
 
 @view_config(
