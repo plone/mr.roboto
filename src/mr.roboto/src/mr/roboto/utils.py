@@ -4,6 +4,10 @@ import re
 import requests
 
 
+COMMENT_URL_RE = re.compile(
+    r'https://github.com/(.+/.+)/pull/(\d+)#commitcomment-(\d+)'
+)
+
 PULL_REQUEST_URL_RE = re.compile(r'https://github.com/(.+/.+)/pull/(\d+)')
 
 
@@ -31,6 +35,21 @@ def shorten_pull_request_url(url):
     if re_result:
         groups = re_result.groups()
         return f'{groups[0]}#{groups[1]}'
+    return url
+
+
+def shorten_comment_url(url):
+    """Turn https://github.com/plone/plone.api/pull/402#commitcomment-29038192
+    into
+    plone.api#402-29038192
+
+    This way log messages can be easier to parse visually.
+
+    Fallback to returning the full URL if the shortening does not work.
+    """
+    re_result = COMMENT_URL_RE.match(url)
+    if re_result:
+        return '{0}#{1}-{2}'.format(*re_result.groups())
     return url
 
 

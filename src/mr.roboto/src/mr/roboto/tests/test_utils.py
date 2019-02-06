@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from mr.roboto.utils import get_info_from_commit
+from mr.roboto.utils import shorten_comment_url
 from mr.roboto.utils import shorten_pull_request_url
 
 import mock
@@ -39,6 +40,18 @@ class TestShortenPRUrls(unittest.TestCase):
     def test_fallback(self):
         url = 'https://github.com/plone/random/url'
         self.assertEqual(shorten_pull_request_url(url), url)
+
+
+class TestShortenCommentUrls(unittest.TestCase):
+    def test_shorten_url(self):
+        url = 'https://github.com/plone/plone.app.registry/pull/402#commitcomment-29038192'
+        self.assertEqual(
+            shorten_comment_url(url), 'plone/plone.app.registry#402-29038192'
+        )
+
+    def test_fallback(self):
+        url = 'https://github.com/plone/random/url'
+        self.assertEqual(shorten_comment_url(url), url)
 
 
 class TestGetInfoFromCommitTest(unittest.TestCase):
