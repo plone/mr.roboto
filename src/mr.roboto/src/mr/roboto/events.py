@@ -33,3 +33,10 @@ class UpdatedPullRequest(PullRequest):
 
 class MergedPullRequest(PullRequest):
     pass
+
+
+class CommentOnPullRequest(object):
+    def __init__(self, comment, pull_request, request):
+        self.comment = comment
+        self.pull_request = pull_request
+        self.request = request
