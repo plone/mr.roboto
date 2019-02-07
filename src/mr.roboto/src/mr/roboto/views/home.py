@@ -19,9 +19,9 @@ LOG_LINE_RE = re.compile(
     r'(.+)'  # message
 )
 
-PULL_REQUEST_LOG_MSG_RE = re.compile(
-    r'PR\s+' r'(\S+)' r'#' r'(\d+)'  # repo/package.name.this  # pull request number
-)
+PULL_REQUEST_LOG_MSG_RE = re.compile(r'PR\s+(\S+)#(\d+)')
+
+COMMENT_LOG_MSG_RE = re.compile(r'COMMENT\s+(\S+)#(\d+)-(\d+)')
 
 COMMIT_LOG_MSG_RE = re.compile(
     r'\s+(\S+)'  # repo/package.name
@@ -31,6 +31,7 @@ COMMIT_LOG_MSG_RE = re.compile(
 
 PULL_REQUEST_URL = '<a href="https://github.com/{1}/pull/{2}">{0}</a>'
 COMMIT_URL = '<a href="https://github.com/{0}/commit/{1}">{1}</a>'
+COMMENT_URL = '<a href="https://github.com/{1}/pull/{2}#issuecomment-{3}">{0}</a>'
 
 LOG_LINE = """<p><span class="timestamp">{timestamp}</span>
 <span class="{LEVEL}">{level}</span>
@@ -44,10 +45,15 @@ def parse_log_line(log_line):
         groups = line_parsed.groups()
         msg = groups[2]
         pull_request_log = PULL_REQUEST_LOG_MSG_RE.search(msg)
+        comment_log = COMMENT_LOG_MSG_RE.search(msg)
         if pull_request_log:
             data = pull_request_log.groups()
             text = f'{data[0]}#{data[1]}'
             msg = msg.replace(text, PULL_REQUEST_URL.format(text, *data))
+        elif comment_log:
+            data = comment_log.groups()
+            text = f'{data[0]}#{data[1]}-{data[2]}'
+            msg = msg.replace(text, COMMENT_URL.format(text, *data))
         else:
             commit_log = COMMIT_LOG_MSG_RE.search(msg)
             if commit_log:

@@ -186,3 +186,19 @@ class SimpleViewsTest(unittest.TestCase):
             'with action closed</span>',
             msg,
         )
+
+    def test_parse_log_line_format_comment(self):
+        msg = parse_log_line(
+            '2019-02-07 12:36 INFO  [mr.roboto][waitress] '
+            'COMMENT plone/plone.app.discussion#147-461384382: '
+            'with action created on pull request plone/plone.app.discussion#147'
+        )
+
+        self.assertIn("""<span class="timestamp">2019-02-07 12:36</span>""", msg)
+        self.assertIn("""<span class="info">INFO</span>""", msg)
+        self.assertIn(
+            '<span class="message">COMMENT <a '
+            'href="https://github.com/plone/plone.app.discussion/pull/147#issuecomment-461384382">'
+            'plone/plone.app.discussion#147-461384382</a>: with action created',
+            msg,
+        )
