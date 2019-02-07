@@ -18,7 +18,6 @@ from mr.roboto.utils import shorten_pull_request_url
 from pyramid.events import subscriber
 from pyramid_mailer import get_mailer
 from pyramid_mailer.message import Message
-from requests.auth import HTTPBasicAuth
 from requests.exceptions import RequestException
 from unidiff import PatchSet
 
@@ -634,22 +633,23 @@ class TriggerPullRequestJenkinsJobs(object):
 
     def _trigger_jobs(self, plone_versions):
         settings = self.event.request.registry.settings
-        jenkins_user = settings['jenkins_user_id']
-        jenkins_token = settings['jenkins_user_token']
         py3_versions = settings['py3_versions']
-        auth = HTTPBasicAuth(jenkins_user, jenkins_token)
-        pull_request_url = self.event.pull_request['html_url']
 
         for version in plone_versions:
-            self._create_job(version, auth, pull_request_url)
+            self._create_job(version)
             if version == '5.2':
                 for python in py3_versions:
-                    self._create_job(f'{version}-{python}', auth, pull_request_url)
+                    self._create_job(f'{version}-{python}')
 
-    def _create_job(self, version, auth, pull_request_url):
+    def _create_job(self, version):
+        settings = self.event.request.registry.settings
+        jenkins_user = settings['jenkins_user_id']
+        jenkins_token = settings['jenkins_user_token']
+        pull_request_url = self.event.pull_request['html_url']
+
         requests.post(
             f'https://jenkins.plone.org/job/pull-request-{version}/buildWithParameters',
-            auth=auth,
+            auth=(jenkins_user, jenkins_token),
             data={'PULL_REQUEST_URL': pull_request_url},
         )
         self.log(f'Triggered jenkins job for PR {version}.')
