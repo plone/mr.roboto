@@ -110,7 +110,7 @@ class RunCoreJobTest(unittest.TestCase):
         self.assertEqual(len(captured_data.records), 2)
 
         self.assertIn(
-            'PR plone/mr.roboto#1: action "unknown" (merged: False) ' 'not handled',
+            'PR plone/mr.roboto#1: action "unknown" (merged: False) not handled',
             captured_data.records[-1].msg,
         )
 
@@ -121,7 +121,7 @@ class RunCoreJobTest(unittest.TestCase):
         self.assertEqual(len(captured_data.records), 2)
 
         self.assertIn(
-            'PR plone/mr.roboto#1: action "closed" (merged: False) ' 'not handled',
+            'PR plone/mr.roboto#1: action "closed" (merged: False) not handled',
             captured_data.records[-1].msg,
         )
 

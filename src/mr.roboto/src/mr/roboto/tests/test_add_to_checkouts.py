@@ -194,7 +194,7 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
 
         self.assertEqual(len(captured_data.records), 1)
         self.assertIn(
-            'is already on checkouts.cfg of all plone versions that it ' 'targets',
+            'is already on checkouts.cfg of all plone versions that it targets',
             captured_data.records[0].msg,
         )
 
@@ -210,7 +210,7 @@ class AddToCheckoutsSubscriberTest(unittest.TestCase):
 
         self.assertEqual(len(captured_data.records), 1)
         self.assertIn(
-            'is already on checkouts.cfg of all plone versions that it ' 'targets',
+            'is already on checkouts.cfg of all plone versions that it targets',
             captured_data.records[0].msg,
         )
 

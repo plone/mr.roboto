@@ -163,7 +163,7 @@ class SimpleViewsTest(unittest.TestCase):
 
     def test_parse_log_line_format_commit_no_link(self):
         msg = parse_log_line(
-            '2013-12-12 22:34 INFO [mr.roboto][lala] ' 'Commit: LETS COMMIT ON COREDEV'
+            '2013-12-12 22:34 INFO [mr.roboto][lala] Commit: LETS COMMIT ON COREDEV'
         )
 
         self.assertIn("""<span class="timestamp">2013-12-12 22:34</span>""", msg)

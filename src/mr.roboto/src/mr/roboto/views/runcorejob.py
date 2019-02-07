@@ -222,7 +222,7 @@ def commit_on_plone_version(
             )
         except GithubException:
             logger.warning(
-                'Got an exception while trying to commit, ' 'give it another try'
+                'Got an exception while trying to commit, give it another try'
             )
             attempts += 1
             continue

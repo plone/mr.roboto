@@ -422,7 +422,7 @@ class WarnPy3TestsNeedToRun(WarnTestsNeedToRun):
         python 3
         """
         self.jenkins_pr_job_url = (
-            'http://jenkins.plone.org/job/' 'pull-request-5.2-{0}/build?delay=0sec'
+            'http://jenkins.plone.org/job/pull-request-5.2-{0}/build?delay=0sec'
         )
         self.status_context = 'Plone Jenkins CI - pull-request-5.2-{0}'
 
