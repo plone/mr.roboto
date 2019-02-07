@@ -604,7 +604,7 @@ class TriggerPullRequestJenkinsJobs(object):
             self.log('skip triggering jenkins jobs, repo is whitelisted')
             return False
 
-        return '@jenkins-plone-org run jobs' in self.event.comment['body']
+        return '@jenkins-plone-org please run jobs' in self.event.comment['body']
 
     def _which_plone_versions(self):
         response = requests.get(self.event.pull_request['url'])

@@ -67,10 +67,10 @@ COREDEV_PR_COMMENT_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
 COREDEV_PR_COMMENT_PAYLOAD['issue']['pull_request']['url'] = 'https://buildout.coredev'
 
 TRIGGER_PY3_JOBS_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
-TRIGGER_PY3_JOBS_PAYLOAD['comment']['body'] = '@jenkins-plone-org run jobs'
+TRIGGER_PY3_JOBS_PAYLOAD['comment']['body'] = '@jenkins-plone-org please run jobs'
 
 TRIGGER_NO_PY3_JOBS_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
-TRIGGER_NO_PY3_JOBS_PAYLOAD['comment']['body'] = '@jenkins-plone-org run jobs'
+TRIGGER_NO_PY3_JOBS_PAYLOAD['comment']['body'] = '@jenkins-plone-org please run jobs'
 TRIGGER_NO_PY3_JOBS_PAYLOAD['issue']['pull_request'][
     'url'
 ] = 'https://github.com/plone/plone.api/pull/1'
