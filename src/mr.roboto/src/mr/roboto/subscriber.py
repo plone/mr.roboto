@@ -650,6 +650,6 @@ class TriggerPullRequestJenkinsJobs(object):
         requests.post(
             f'https://jenkins.plone.org/job/pull-request-{version}/buildWithParameters',
             auth=auth,
-            params={'PULL_REQUEST_URL': pull_request_url},
+            data={'PULL_REQUEST_URL': pull_request_url},
         )
         self.log(f'Triggered jenkins job for PR {version}.')
