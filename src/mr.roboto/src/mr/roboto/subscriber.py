@@ -667,3 +667,27 @@ class TriggerPullRequestJenkinsJobs(object):
             data={'PULL_REQUEST_URL': pull_request_url},
         )
         self.log(f'Triggered jenkins job for PR {version}.')
+
+
+@subscriber(NewPullRequest)
+class ExplainHowToTriggerJenkinsJobs(PullRequestSubscriber):
+    def run(self):
+        if self.repo_name in IGNORE_NO_TEST_NEEDED:
+            return
+
+        user = self.pull_request['user']['login']
+        msg = (
+            f'@{user} thanks for creating this Pull Request and help improve Plone!\n\n'
+            'To ensure that these changes do not break other parts of Plone, '
+            'the Plone test suite matrix needs to pass.\n\n'
+            'Whenever you feel that the pull request is ready to be tested, '
+            'either start all jenkins jobs pull requests by yourself, '
+            'or simply add a comment in this pull request stating:\n\n'
+            '```\n'
+            '@jenkins-plone-org please run jobs\n'
+            '```\n\n'
+            'With this simple comment all the jobs will be started automatically.\n\n'
+            'Happy hacking!'
+        )
+        issue = self.g_issue()
+        issue.create_comment(body=msg)
