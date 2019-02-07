@@ -71,7 +71,9 @@ TRIGGER_PY3_JOBS_PAYLOAD['comment']['body'] = '@jenkins-plone-org run jobs'
 
 TRIGGER_NO_PY3_JOBS_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
 TRIGGER_NO_PY3_JOBS_PAYLOAD['comment']['body'] = '@jenkins-plone-org run jobs'
-TRIGGER_NO_PY3_JOBS_PAYLOAD['issue']['pull_request']['url'] = 'https://github.com/plone/plone.api/pull/1'
+TRIGGER_NO_PY3_JOBS_PAYLOAD['issue']['pull_request'][
+    'url'
+] = 'https://github.com/plone/plone.api/pull/1'
 
 
 def minimal_main(global_config, **settings):
@@ -140,13 +142,11 @@ def mocked_requests_get(*args, **kwargs):
         )
     elif args[0] == 'https://github.com/plone/mr.roboto/pull/1':
         return MockResponse(
-            {'base': {'ref': 'master', 'repo': {'full_name': 'plone/mr.roboto'}}},
-            200,
+            {'base': {'ref': 'master', 'repo': {'full_name': 'plone/mr.roboto'}}}, 200
         )
     elif args[0] == 'https://github.com/plone/plone.api/pull/1':
         return MockResponse(
-            {'base': {'ref': 'master', 'repo': {'full_name': 'plone/plone.api'}}},
-            200,
+            {'base': {'ref': 'master', 'repo': {'full_name': 'plone/plone.api'}}}, 200
         )
 
     return MockResponse(None, 404)
@@ -298,9 +298,15 @@ class TriggerPullRequestJenkinsJobsTests(Base):
         with LogCapture() as captured_data:
             self._subscriber(TRIGGER_PY3_JOBS_PAYLOAD, sources)
 
-        self.assertIn('Triggered jenkins job for PR 5.2-3.7.', captured_data.records[-1].msg)
-        self.assertIn('Triggered jenkins job for PR 5.2-3.6.', captured_data.records[-2].msg)
-        self.assertIn('Triggered jenkins job for PR 5.2.', captured_data.records[-3].msg)
+        self.assertIn(
+            'Triggered jenkins job for PR 5.2-3.7.', captured_data.records[-1].msg
+        )
+        self.assertIn(
+            'Triggered jenkins job for PR 5.2-3.6.', captured_data.records[-2].msg
+        )
+        self.assertIn(
+            'Triggered jenkins job for PR 5.2.', captured_data.records[-3].msg
+        )
 
     @mock.patch('requests.get', side_effect=mocked_requests_get)
     @mock.patch('requests.post')
