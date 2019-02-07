@@ -123,6 +123,7 @@ class PullRequestSubscriber(object):
         self._repo_name = None
         self._repo_full_name = None
         self._g_pull = None
+        self._g_issue = None
         self._commits_url = None
         self._target_branch = None
 
@@ -171,6 +172,18 @@ class PullRequestSubscriber(object):
             g_repo = g_org.get_repo(self.repo_name)
             self._g_pull = g_repo.get_pull(pull_number)
         return self._g_pull
+
+    @property
+    def g_issue(self):
+        """Get pygithub's issue for the current pull request"""
+        if self._g_issue is None:
+            org = self.pull_request['base']['repo']['owner']['login']
+            pull_number = int(self.pull_request['number'])
+
+            g_org = self.github.get_organization(org)
+            g_repo = g_org.get_repo(self.repo_name)
+            self._g_issue = g_repo.get_issue(pull_number)
+        return self._g_issue
 
     @property
     def commits_url(self):
@@ -268,6 +281,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
+        issue = self.g_issue()
 
         status = u'success'
         status_message = u'All users have signed it'
@@ -284,7 +298,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f'Agreement in order to merge this pull request. \n\n'
                 f'Learn about the Plone Contributor Agreement: {self.cla_url}'
             )
-            last_commit.create_comment(body=msg)
+            issue.create_comment(body=msg)
 
         if unknown:
             # add a message mentioning all unknown users,
@@ -300,7 +314,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f'How to add more emails to your GitHub account: '
                 f'{self.github_help_setup_email_url} '
             )
-            last_commit.create_comment(body=msg)
+            issue.create_comment(body=msg)
 
         last_commit.create_status(
             status,
