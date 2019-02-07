@@ -35,6 +35,7 @@ def create_github_post_commit_hooks_view(request):
     roboto_hooks = [
         Hook(f'{roboto_url}/run/corecommit', ['push']),
         Hook(f'{roboto_url}/run/pull-request', ['pull_request']),
+        Hook(f'{roboto_url}/run/comment', ['issue_comment']),
         Hook(f'{jenkins_url}/github-webhook/', ['*']),
     ]
 
