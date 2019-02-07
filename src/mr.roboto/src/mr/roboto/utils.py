@@ -4,9 +4,7 @@ import re
 import requests
 
 
-COMMENT_URL_RE = re.compile(
-    r'https://github.com/(.+/.+)/pull/(\d+)#commitcomment-(\d+)'
-)
+COMMENT_URL_RE = re.compile(r'https://github.com/(.+)/pull/(\d+)#issuecomment-(\d+)')
 
 PULL_REQUEST_URL_RE = re.compile(r'https://github.com/(.+/.+)/pull/(\d+)')
 

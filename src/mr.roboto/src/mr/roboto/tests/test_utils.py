@@ -44,7 +44,7 @@ class TestShortenPRUrls(unittest.TestCase):
 
 class TestShortenCommentUrls(unittest.TestCase):
     def test_shorten_url(self):
-        url = 'https://github.com/plone/plone.app.registry/pull/402#commitcomment-29038192'
+        url = 'https://github.com/plone/plone.app.registry/pull/402#issuecomment-29038192'
         self.assertEqual(
             shorten_comment_url(url), 'plone/plone.app.registry#402-29038192'
         )
@@ -52,6 +52,12 @@ class TestShortenCommentUrls(unittest.TestCase):
     def test_fallback(self):
         url = 'https://github.com/plone/random/url'
         self.assertEqual(shorten_comment_url(url), url)
+
+    def test_another_url(self):
+        url = 'https://github.com/plone/plone.app.discussion/pull/147#issuecomment-461373454'
+        self.assertEqual(
+            shorten_comment_url(url), 'plone/plone.app.discussion#147-461373454'
+        )
 
 
 class TestGetInfoFromCommitTest(unittest.TestCase):

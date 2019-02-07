@@ -24,7 +24,7 @@ Each payload is adapted later on to test all corner cases.
 COMMENT_PAYLOAD = {
     'action': 'created',
     'comment': {
-        'html_url': 'https://github.com/plone/plone.api/pull/42#commitcomment-290382',
+        'html_url': 'https://github.com/plone/plone.api/pull/42#issuecomment-290382',
         'user': {'login': 'my-name'},
         'body': 'Some random comment here',
     },
@@ -55,7 +55,7 @@ EDITED_COMMENT_PAYLOAD['action'] = 'edit'
 WHITELISTED_PKG_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
 WHITELISTED_PKG_PAYLOAD['comment'][
     'html_url'
-] = 'https://github.com/plone/plone.releaser/pull/42#commitcomment-290382'
+] = 'https://github.com/plone/plone.releaser/pull/42#issuecomment-290382'
 WHITELISTED_PKG_PAYLOAD['issue']['pull_request'][
     'html_url'
 ] = 'https://github.com/plone/plone.releaser/pull/1'
