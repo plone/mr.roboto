@@ -281,7 +281,6 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
-        issue = self.g_issue()
 
         status = u'success'
         status_message = u'All users have signed it'
@@ -298,7 +297,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f'Agreement in order to merge this pull request. \n\n'
                 f'Learn about the Plone Contributor Agreement: {self.cla_url}'
             )
-            issue.create_comment(body=msg)
+            self.g_issue.create_comment(body=msg)
 
         if unknown:
             # add a message mentioning all unknown users,
@@ -314,7 +313,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f'How to add more emails to your GitHub account: '
                 f'{self.github_help_setup_email_url} '
             )
-            issue.create_comment(body=msg)
+            self.g_issue.create_comment(body=msg)
 
         last_commit.create_status(
             status,
@@ -689,5 +688,4 @@ class ExplainHowToTriggerJenkinsJobs(PullRequestSubscriber):
             'With this simple comment all the jobs will be started automatically.\n\n'
             'Happy hacking!'
         )
-        issue = self.g_issue()
-        issue.create_comment(body=msg)
+        self.g_issue.create_comment(body=msg)
