@@ -44,7 +44,9 @@ class TestShortenPRUrls(unittest.TestCase):
 
 class TestShortenCommentUrls(unittest.TestCase):
     def test_shorten_url(self):
-        url = 'https://github.com/plone/plone.app.registry/pull/402#issuecomment-29038192'
+        url = (
+            'https://github.com/plone/plone.app.registry/pull/402#issuecomment-29038192'
+        )
         self.assertEqual(
             shorten_comment_url(url), 'plone/plone.app.registry#402-29038192'
         )
