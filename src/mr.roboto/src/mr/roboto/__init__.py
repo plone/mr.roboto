@@ -37,6 +37,11 @@ def main(global_config, **settings):
         settings['py3_versions']
     )
 
+    # github users
+    config.registry.settings['github_users'] = ast.literal_eval(
+        settings['github_users']
+    )
+
     # roboto public url
     config.registry.settings['roboto_url'] = settings['roboto_url']
 
