@@ -671,7 +671,12 @@ class TriggerPullRequestJenkinsJobs(object):
 @subscriber(NewPullRequest)
 class ExplainHowToTriggerJenkinsJobs(PullRequestSubscriber):
     def run(self):
-        if self.repo_name in IGNORE_NO_TEST_NEEDED:
+        plone_versions = plone_versions_targeted(
+            self.repo_full_name,
+            self.target_branch,
+            self.event.request,
+        )
+        if not plone_versions:
             return
 
         user = self.pull_request['user']['login']
