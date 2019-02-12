@@ -56,9 +56,12 @@ class Source(object):
 class SourcesFile(UserDict):
     def __init__(self, file_location):
         self.file_location = file_location
+        self._data = None
 
     @property
     def data(self):
+        if self._data:
+            return self._data
         config = ConfigParser(interpolation=ExtendedInterpolation())
         config.optionxform = str
         with open(self.file_location) as f:
@@ -67,7 +70,8 @@ class SourcesFile(UserDict):
         for name, value in config['sources'].items():
             source = Source().create_from_string(value)
             sources_dict[name] = source
-        return sources_dict
+        self._data = sources_dict
+        return self._data
 
     def __iter__(self):
         return self.data.__iter__()
@@ -76,15 +80,19 @@ class SourcesFile(UserDict):
 class CheckoutsFile(UserDict):
     def __init__(self, file_location):
         self.file_location = file_location
+        self._data = None
 
     @property
     def data(self):
+        if self._data:
+            return self._data
         config = ConfigParser(interpolation=ExtendedInterpolation())
         with open(self.file_location) as f:
             config.read_file(f)
         checkouts = config.get('buildout', 'auto-checkout')
         checkout_list = checkouts.split('\n')
-        return checkout_list
+        self._data = checkout_list
+        return self._data
 
 
 class PloneCoreBuildout(object):
