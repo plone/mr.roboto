@@ -91,7 +91,10 @@ def minimal_main(global_config, **settings):
     config.registry.settings['roboto_url'] = settings['roboto_url']
     config.registry.settings['api_key'] = settings['api_key']
     config.registry.settings['jenkins_user_id'] = settings['jenkins_user_id']
-    config.registry.settings['github_users'] = (settings['jenkins_user_id'], 'mister-roboto')
+    config.registry.settings['github_users'] = (
+        settings['jenkins_user_id'],
+        'mister-roboto',
+    )
     config.registry.settings['jenkins_user_token'] = settings['jenkins_user_token']
     config.registry.settings['github'] = Github(
         settings['github_user'], settings['github_password']
@@ -231,9 +234,7 @@ class HandleCommentTests(Base):
             result = self.call_view(MR_ROBOTO_USER_PAYLOAD)
 
         self.assertIn('Comment on PR ', result.ubody)
-        self.assertIn(
-            f' ignored as is from mister-roboto. No action.', result.ubody
-        )
+        self.assertIn(f' ignored as is from mister-roboto. No action.', result.ubody)
 
         logger_record = captured_data.records[-1].msg
         self.assertIn('COMMENT ', logger_record)

@@ -39,6 +39,7 @@ class RunHooksTest(unittest.TestCase):
         self.settings = {
             'plone_versions': '["4.3",]',
             'py3_versions': '["2.7", "3.6", ]',
+            'github_users': '["mister-roboto", "jenkins-plone-org", ]',
             'roboto_url': 'http://jenkins.plone.org/roboto',
             'api_key': 'xyz1234mnop',
             'sources_file': 'sources_pickle',
