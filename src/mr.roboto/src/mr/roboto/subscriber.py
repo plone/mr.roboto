@@ -672,9 +672,7 @@ class TriggerPullRequestJenkinsJobs(object):
 class ExplainHowToTriggerJenkinsJobs(PullRequestSubscriber):
     def run(self):
         plone_versions = plone_versions_targeted(
-            self.repo_full_name,
-            self.target_branch,
-            self.event.request,
+            self.repo_full_name, self.target_branch, self.event.request
         )
         if not plone_versions:
             return

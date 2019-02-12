@@ -10,6 +10,7 @@ class ConfigurationTest(unittest.TestCase):
         settings = {
             'plone_versions': '["4.3", "5.1"]',
             'py3_versions': '["2.7", "3.6", ]',
+            'github_users': '["mister-roboto", "jenkins-plone-org", ]',
             'roboto_url': 'http://mr.roboto.plone.org',
             'api_key': '1234567890',
             'sources_file': 'sources.pickle',
@@ -27,6 +28,11 @@ class ConfigurationTest(unittest.TestCase):
 
     def test_py3_versions(self):
         self.assertEqual(self.settings['py3_versions'], ['2.7', '3.6'])
+
+    def test_github_users(self):
+        self.assertEqual(
+            self.settings['github_users'], ['mister-roboto', 'jenkins-plone-org']
+        )
 
     def test_roboto_url(self):
         self.assertEqual(self.settings['roboto_url'], 'http://mr.roboto.plone.org')
@@ -47,6 +53,7 @@ class ConfigurationTest(unittest.TestCase):
         settings = {
             'plone_versions': '["4.3", "5.1"]',
             'py3_versions': '["2.7", "3.6", ]',
+            'github_users': '["mister-roboto", "jenkins-plone-org", ]',
             'roboto_url': 'x',
             'api_key': 'x',
             'sources_file': 'x',

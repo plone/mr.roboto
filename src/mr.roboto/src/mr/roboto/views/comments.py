@@ -42,13 +42,13 @@ def handle_comment(request):
     comment_short_url = shorten_comment_url(comment_payload['html_url'])
     comment_user_id = comment_payload['user']['login']
 
-    jenkins_user_id = request.registry.settings['jenkins_user_id']
-    if comment_user_id == jenkins_user_id:
+    github_users = request.registry.settings['github_users']
+    if comment_user_id in github_users:
 
         logger.info(
-            f'COMMENT {comment_short_url}: IGNORED as it is from {jenkins_user_id}'
+            f'COMMENT {comment_short_url}: IGNORED as it is from {comment_user_id}'
         )
-        return f'Comment on PR {comment_short_url} ignored as is from {jenkins_user_id}. No action.'
+        return f'Comment on PR {comment_short_url} ignored as is from {comment_user_id}. No action.'
 
     pull_request_payload = payload['issue']['pull_request']
     pull_request_short_url = shorten_pull_request_url(pull_request_payload['html_url'])
