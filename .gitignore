@@ -19,3 +19,4 @@ local/
 development.ini
 .plone.versioncheck.cache/
 .plone.versioncheck.tracked.json
+lib64
