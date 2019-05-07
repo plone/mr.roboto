@@ -54,6 +54,9 @@ def create_github_post_commit_hooks_view(request):
     for repo in github.get_organization('plone').get_repos():
         messages.append(update_hooks_on_repo(repo, roboto_hooks, request))
 
+    for repo in github.get_organization('zopefoundation').get_repos():
+        messages.append(update_hooks_on_repo(repo, roboto_hooks, request))
+
     return json.dumps(messages)
 
 
