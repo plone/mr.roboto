@@ -121,6 +121,7 @@ class PullRequestSubscriber(object):
         self._short_url = None
         self._pull_request = None
         self._repo_name = None
+        self._organization = None
         self._repo_full_name = None
         self._g_pull = None
         self._g_issue = None
@@ -154,6 +155,12 @@ class PullRequestSubscriber(object):
         if self._repo_name is None:
             self._repo_name = self.pull_request['base']['repo']['name']
         return self._repo_name
+
+    @property
+    def organization(self):
+        if self._organization is None:
+            self._organization = self.pull_request['base']['repo']['owner']['login']
+        return self._organization
 
     @property
     def repo_full_name(self):
@@ -228,11 +235,16 @@ class PullRequestSubscriber(object):
 
         return json_data
 
-    def check_membership(self, json_data):
-        plone_org = self.github.get_organization('plone')
+    def check_membership(self, json_data, org):
         unknown = []
         members = []
         not_foundation = []
+        if org in {'plone', 'collective'}:
+            source = self.github.get_organization('plone')
+        elif org == 'zopefoundation':
+            source = self.github.get_organization('zopefoundation').get_team('contributors')
+        else:
+            return [], [commit_info['commit']['author']['name'] for commit_info in json_data]
         for commit_info in json_data:
             for user in ('committer', 'author'):
                 try:
@@ -250,7 +262,7 @@ class PullRequestSubscriber(object):
                     continue
 
                 g_user = self.github.get_user(login)
-                if plone_org.has_in_members(g_user):
+                if source.has_in_members(g_user):
                     members.append(login)
                 else:
                     not_foundation.append(login)
@@ -277,7 +289,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
         if not json_data:
             return
 
-        not_foundation, unknown = self.check_membership(json_data)
+        not_foundation, unknown = self.check_membership(json_data, org=self.organization)
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()

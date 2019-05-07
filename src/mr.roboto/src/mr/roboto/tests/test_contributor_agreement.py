@@ -22,6 +22,8 @@ COLLECTIVE_PAYLOAD = copy.deepcopy(PAYLOAD)
 COLLECTIVE_PAYLOAD['base']['repo']['owner']['login'] = 'collective'
 WHITELISTED_PAYLOAD = copy.deepcopy(PAYLOAD)
 WHITELISTED_PAYLOAD['base']['repo']['name'] = 'icalendar'
+ZOPE_PAYLOAD = copy.deepcopy(PAYLOAD)
+ZOPE_PAYLOAD['base']['repo']['owner']['login'] = 'zopefoundation'
 
 
 class MockRequest(object):
@@ -157,6 +159,36 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase):
         request.settings = settings
 
         event = NewPullRequest(pull_request=PAYLOAD, request=request)
+
+        with LogCapture() as captured_data:
+            ContributorsAgreementSigned(event)
+
+        self.assertEqual(len(captured_data.records), 1)
+        self.assertIn(
+            'Contributors Agreement report: error', captured_data.records[0].msg
+        )
+
+    @mock.patch('requests.get')
+    def test_no_zope_agreement(self, m1):
+        from mr.roboto.events import NewPullRequest
+
+        class FakeCommitsData(object):
+            def json(self):
+                return [{'committer': {'login': 'user'}, 'author': {'login': 'user'}}]
+
+        m1.return_value = FakeCommitsData()
+
+        mock_obj = mock.MagicMock()
+        # Not in the contributor team
+        mock_obj.get_organization.return_value.has_in_members.return_value = True
+        # In the organization
+        mock_obj.get_organization.return_value.get_team.return_value.has_in_members.return_value = False
+        settings = {'github': mock_obj}
+
+        request = MockRequest()
+        request.settings = settings
+
+        event = NewPullRequest(pull_request=ZOPE_PAYLOAD, request=request)
 
         with LogCapture() as captured_data:
             ContributorsAgreementSigned(event)
