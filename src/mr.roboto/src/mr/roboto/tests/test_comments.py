@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
-from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
 from mr.roboto.events import CommentOnPullRequest
+from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
 from webtest import TestApp
