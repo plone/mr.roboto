@@ -1,7 +1,7 @@
 language: python
 
 python:
-  - '3.6'
+  - '3.7'
 
 cache:
   directories:
@@ -14,7 +14,7 @@ install:
 
 script:
   - isort `find src/mr.roboto/ -name "*.py"`
-  - black -S --py36 src/mr.roboto/
+  - black -S --target-version py37 src/mr.roboto/
   - bin/code-analysis
   - bin/pytest --cov=src/mr.roboto --cov-report term-missing src/mr.roboto/
 
