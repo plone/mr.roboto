@@ -454,38 +454,6 @@ class WarnPy3TestsNeedToRun(WarnTestsNeedToRun):
             self.log(f'created pending status for plone 5.2 on python {py_version}')
 
 
-@subscriber(NewPullRequest, UpdatedPullRequest)
-class TriggerDependenciesJob(PullRequestSubscriber):
-    def run(self):
-        """Trigger the dependencies jenkins job"""
-        branch = self.pull_request['head']['ref']
-
-        if not self.is_core_package():
-            base_branch = self.pull_request['base']['ref']
-            key = f'{self.repo_full_name}/{base_branch}'
-            self.log(f'No dependencies jenkins job run on a non-core package {key}')
-            return
-
-        settings = self.event.request.registry.settings
-        jenkins_url = settings['jenkins_url']
-
-        requests.post(
-            f'{jenkins_url}/job/qa-pkg-dependencies/buildWithParameters',
-            data={'PACKAGE_NAME': self.repo_name, 'BRANCH': branch},
-            auth=(settings['jenkins_user_id'], settings['jenkins_user_token']),
-        )
-
-        self.log(
-            f'Trigger dependencies jenkins job for ' f'pull request {self.short_url}'
-        )
-
-    def is_core_package(self):
-        base_branch = self.pull_request['base']['ref']
-        return plone_versions_targeted(
-            self.repo_full_name, base_branch, self.event.request
-        )
-
-
 @subscriber(MergedPullRequest)
 class UpdateCoredevCheckouts(PullRequestSubscriber):
     def run(self):
