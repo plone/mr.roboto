@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from mr.roboto import main
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import unittest
 
@@ -19,7 +19,7 @@ class ConfigurationTest(unittest.TestCase):
             'debug': 'True',
         }
         app = main({}, **settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
         self.settings = self.roboto.app.registry.settings
 
     def test_plone_versions(self):
@@ -60,6 +60,6 @@ class ConfigurationTest(unittest.TestCase):
             'github_token': 'x',
         }
         app = main({}, **settings)
-        roboto = TestApp(app)
+        roboto = BaseApp(app)
         settings = roboto.app.registry.settings
         self.assertFalse(settings['debug'])

@@ -3,7 +3,7 @@ from hashlib import sha1
 from mr.roboto.views.runcorejob import get_pickled_data
 from mr.roboto.views.runcorejob import get_user
 from tempfile import NamedTemporaryFile
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import copy
 import hmac
@@ -123,7 +123,7 @@ class RunCoreJobTest(unittest.TestCase):
             'github_token': 'x',
         }
         app = minimal_main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def tearDown(self):
         if os.path.exists(self.settings['checkouts_file']):
@@ -145,7 +145,7 @@ class RunCoreJobTest(unittest.TestCase):
         self.settings['sources_file'] = sources_pickle
         self.settings['checkouts_file'] = checkouts_pickle
         app = minimal_main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def prepare_data(self, payload):
         body = urllib.parse.urlencode({'payload': json.dumps(payload)})

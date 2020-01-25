@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from mr.roboto import main
 from mr.roboto.views.home import parse_log_line
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import mock
 import os
@@ -22,7 +22,7 @@ class SimpleViewsTest(unittest.TestCase):
             'github_token': 'x',
         }
         app = main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def clean_file(self, filename):
         try:

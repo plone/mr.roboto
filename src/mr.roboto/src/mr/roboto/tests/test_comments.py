@@ -4,13 +4,12 @@ from mr.roboto.events import CommentOnPullRequest
 from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import copy
 import hmac
 import json
 import mock
-import os
 import pickle
 import unittest
 import urllib
@@ -114,10 +113,6 @@ class MockRequest(object):
     def settings(self):
         return self._settings
 
-    @settings.setter
-    def settings(self, data):
-        self._settings = data
-
     def set_sources(self, data):
         with NamedTemporaryFile(delete=False) as tmp_file:
             sources_pickle = tmp_file.name
@@ -125,10 +120,6 @@ class MockRequest(object):
                 tmp_file_writer.write(pickle.dumps(data))
 
         self._settings['sources_file'] = sources_pickle
-
-    def cleanup_sources(self):
-        if os.path.exists(self._settings['sources_file']):
-            os.remove(self._settings['sources_file'])
 
 
 def mocked_requests_get(*args, **kwargs):
@@ -171,7 +162,7 @@ class Base(unittest.TestCase):
             'jenkins_user_token': 'some-random-token',
         }
         app = minimal_main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def prepare_data(self, payload):
         body = urllib.parse.urlencode({'payload': json.dumps(payload)})
