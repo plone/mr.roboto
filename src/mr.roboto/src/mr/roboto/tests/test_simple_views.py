@@ -19,8 +19,7 @@ class SimpleViewsTest(unittest.TestCase):
             'api_key': 'z',
             'sources_file': 'sources.pickle',
             'checkouts_file': 'checkouts.pickle',
-            'github_user': 'x',
-            'github_password': 'x',
+            'github_token': 'x',
         }
         app = main({}, **self.settings)
         self.roboto = TestApp(app)

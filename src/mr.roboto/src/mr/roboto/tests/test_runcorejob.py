@@ -107,9 +107,7 @@ def minimal_main(global_config, **settings):
     config.registry.settings['plone_versions'] = settings['plone_versions']
     config.registry.settings['roboto_url'] = settings['roboto_url']
     config.registry.settings['api_key'] = settings['api_key']
-    config.registry.settings['github'] = Github(
-        settings['github_user'], settings['github_password']
-    )
+    config.registry.settings['github'] = Github(settings['github_token'])
     config.scan('mr.roboto.views.runcorejob')
     return config.make_wsgi_app()
 
@@ -122,8 +120,7 @@ class RunCoreJobTest(unittest.TestCase):
             'api_key': 'xyz1234mnop',
             'sources_file': 'sources_pickle',
             'checkouts_file': 'checkouts_pickle',
-            'github_user': 'x',
-            'github_password': 'x',
+            'github_token': 'x',
         }
         app = minimal_main({}, **self.settings)
         self.roboto = TestApp(app)
