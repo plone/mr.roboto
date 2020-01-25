@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
 from testfixtures import LogCapture
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import copy
 import hmac
@@ -64,7 +64,7 @@ class RunCoreJobTest(unittest.TestCase):
             'github_token': 'x',
         }
         app = minimal_main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def prepare_data(self, payload):
         body = urllib.parse.urlencode({'payload': json.dumps(payload)})

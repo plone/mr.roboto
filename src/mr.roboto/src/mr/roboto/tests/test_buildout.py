@@ -4,7 +4,7 @@ from mr.roboto import main
 from mr.roboto.buildout import PloneCoreBuildout
 from tempfile import mkdtemp
 from tempfile import NamedTemporaryFile
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import os
 import pickle
@@ -60,7 +60,7 @@ class BuildoutTest(unittest.TestCase):
             'github_token': 'x',
         }
         app = main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def tearDown(self):
         shutil.rmtree(self.coredev_repo.working_tree_dir)

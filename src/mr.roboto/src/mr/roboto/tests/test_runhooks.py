@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from github.GithubException import GithubException
 from mr.roboto import main
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import mock
 import unittest
@@ -49,7 +49,7 @@ class RunHooksTest(unittest.TestCase):
             'jenkins_url': 'https://jenkins.plone.org',
         }
         app = main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def test_runhook_security(self):
         result = self.roboto.get('/run/githubcommithooks')

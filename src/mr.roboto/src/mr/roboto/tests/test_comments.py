@@ -4,7 +4,7 @@ from mr.roboto.events import CommentOnPullRequest
 from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
-from webtest import TestApp
+from webtest import TestApp as BaseApp
 
 import copy
 import hmac
@@ -162,7 +162,7 @@ class Base(unittest.TestCase):
             'jenkins_user_token': 'some-random-token',
         }
         app = minimal_main({}, **self.settings)
-        self.roboto = TestApp(app)
+        self.roboto = BaseApp(app)
 
     def prepare_data(self, payload):
         body = urllib.parse.urlencode({'payload': json.dumps(payload)})
