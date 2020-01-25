@@ -57,8 +57,7 @@ class BuildoutTest(unittest.TestCase):
             'api_key': 'xyz1234mnop',
             'sources_file': sources_pickle,
             'checkouts_file': checkouts_pickle,
-            'github_user': 'x',
-            'github_password': 'x',
+            'github_token': 'x',
         }
         app = main({}, **self.settings)
         self.roboto = TestApp(app)

@@ -15,8 +15,7 @@ class ConfigurationTest(unittest.TestCase):
             'api_key': '1234567890',
             'sources_file': 'sources.pickle',
             'checkouts_file': 'checkouts.pickle',
-            'github_user': 'gh_user',
-            'github_password': 'secret',
+            'github_token': 'secret',
             'debug': 'True',
         }
         app = main({}, **settings)
@@ -58,8 +57,7 @@ class ConfigurationTest(unittest.TestCase):
             'api_key': 'x',
             'sources_file': 'x',
             'checkouts_file': 'x',
-            'github_user': 'x',
-            'github_password': 'x',
+            'github_token': 'x',
         }
         app = main({}, **settings)
         roboto = TestApp(app)

@@ -17,8 +17,7 @@ checkouts_file = checkouts.pickle
 
 roboto_url = http://localhost:6543
 
-github_user = X
-github_password = X
+github_token = X
 
 collective_repos = collective.elephantvocabulary,icalendar,Products.DateRecurringIndex
 

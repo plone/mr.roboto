@@ -96,9 +96,7 @@ def minimal_main(global_config, **settings):
         'mister-roboto',
     )
     config.registry.settings['jenkins_user_token'] = settings['jenkins_user_token']
-    config.registry.settings['github'] = Github(
-        settings['github_user'], settings['github_password']
-    )
+    config.registry.settings['github'] = Github(settings['github_token'])
     config.scan('mr.roboto.views.comments')
     config.end()
     return config.make_wsgi_app()
@@ -168,8 +166,7 @@ class Base(unittest.TestCase):
             'api_key': 'xyz1234mnop',
             'sources_file': 'sources_pickle',
             'checkouts_file': 'checkouts_pickle',
-            'github_user': 'x',
-            'github_password': 'x',
+            'github_token': 'x',
             'jenkins_user_id': 'jenkins-plone-org',
             'jenkins_user_token': 'some-random-token',
         }

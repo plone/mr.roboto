@@ -57,9 +57,7 @@ def main(global_config, **settings):
     config.registry.settings['checkouts_file'] = settings['checkouts_file']
 
     # github object
-    config.registry.settings['github'] = Github(
-        settings['github_user'], settings['github_password']
-    )
+    config.registry.settings['github'] = Github(settings['github_token'])
 
     config.add_static_view('static', 'static', cache_max_age=3600)
 
