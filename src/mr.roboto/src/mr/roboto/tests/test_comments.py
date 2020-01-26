@@ -153,6 +153,7 @@ class Base(unittest.TestCase):
         self.settings = {
             'plone_versions': ['5.1', '5.2'],
             'py3_versions': ['3.6', '3.7'],
+            'plone_py3_versions': '["5.2", ]',
             'roboto_url': 'http://jenkins.plone.org/roboto',
             'api_key': 'xyz1234mnop',
             'sources_file': 'sources_pickle',
