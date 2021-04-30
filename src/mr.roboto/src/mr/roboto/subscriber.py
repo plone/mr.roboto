@@ -385,12 +385,18 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         """Create waiting status for all pull request jobs that should be run
         before a pull request can be safely merged
         """
+        # This may return ["5.2", "6.0"].
         plone_versions = self._plone_versions_targeted()
+        # This WarnTestsNeedToRun check is for Python 2 only.
+        # The plone_versions setting in production.ini should contain only 2.7
+        plone_py2_versions = self.event.request.registry.settings['plone_versions']
 
         # get the pull request last commit
         last_commit = self.get_pull_request_last_commit()
 
         for version in plone_versions:
+            if version not in plone_py2_versions:
+                continue
             self._create_commit_status(last_commit, version)
             self.log(f'created pending status for plone {version}')
 
