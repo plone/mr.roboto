@@ -2,6 +2,7 @@
 from hashlib import sha1
 from mr.roboto.events import CommentOnPullRequest
 from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
+from mr.roboto.tests import minimal_main
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
 from webtest import TestApp as BaseApp
@@ -78,29 +79,6 @@ TRIGGER_NO_PY3_JOBS_PAYLOAD['issue']['pull_request'][
 ] = 'https://github.com/plone/plone.api/pull/1'
 
 
-def minimal_main(global_config, **settings):
-    from github import Github
-    from pyramid.config import Configurator
-
-    config = Configurator(settings=settings)
-    config.include('cornice')
-
-    config.registry.settings['plone_versions'] = settings['plone_versions']
-    config.registry.settings['py3_versions'] = settings['py3_versions']
-    config.registry.settings['roboto_url'] = settings['roboto_url']
-    config.registry.settings['api_key'] = settings['api_key']
-    config.registry.settings['jenkins_user_id'] = settings['jenkins_user_id']
-    config.registry.settings['github_users'] = (
-        settings['jenkins_user_id'],
-        'mister-roboto',
-    )
-    config.registry.settings['jenkins_user_token'] = settings['jenkins_user_token']
-    config.registry.settings['github'] = Github(settings['github_token'])
-    config.scan('mr.roboto.views.comments')
-    config.end()
-    return config.make_wsgi_app()
-
-
 class MockRequest(object):
     def __init__(self, settings):
         self._settings = settings
@@ -140,30 +118,16 @@ def mocked_requests_get(*args, **kwargs):
         return MockResponse(
             {'base': {'ref': 'master', 'repo': {'full_name': 'plone/mr.roboto'}}}, 200
         )
-    elif args[0] == 'https://github.com/plone/plone.api/pull/1':
-        return MockResponse(
-            {'base': {'ref': 'master', 'repo': {'full_name': 'plone/plone.api'}}}, 200
-        )
 
     return MockResponse(None, 404)
 
 
 class Base(unittest.TestCase):
     def setUp(self):
-        self.settings = {
-            'plone_versions': ['5.1', '5.2'],
-            'py3_versions': ['3.6', '3.7'],
-            'plone_py3_versions': '["5.2", ]',
-            'roboto_url': 'http://jenkins.plone.org/roboto',
-            'api_key': 'xyz1234mnop',
-            'sources_file': 'sources_pickle',
-            'checkouts_file': 'checkouts_pickle',
-            'github_token': 'x',
-            'jenkins_user_id': 'jenkins-plone-org',
-            'jenkins_user_token': 'some-random-token',
-        }
-        app = minimal_main({}, **self.settings)
+        settings = {}
+        app = minimal_main(settings, 'mr.roboto.views.comments')
         self.roboto = BaseApp(app)
+        self.settings = app.registry.settings
 
     def prepare_data(self, payload):
         body = urllib.parse.urlencode({'payload': json.dumps(payload)})
@@ -306,21 +270,8 @@ class TriggerPullRequestJenkinsJobsTests(Base):
             self._subscriber(TRIGGER_PY3_JOBS_PAYLOAD, sources)
 
         self.assertIn(
-            'Triggered jenkins job for PR 5.2-3.7.', captured_data.records[-1].msg
+            'Triggered jenkins job for PR 5.2-3.6.', captured_data.records[-1].msg
         )
         self.assertIn(
-            'Triggered jenkins job for PR 5.2-3.6.', captured_data.records[-2].msg
+            'Triggered jenkins job for PR 5.2-2.7.', captured_data.records[-2].msg
         )
-        self.assertIn(
-            'Triggered jenkins job for PR 5.2.', captured_data.records[-3].msg
-        )
-
-    @mock.patch('requests.get', side_effect=mocked_requests_get)
-    @mock.patch('requests.post')
-    def test_trigger_no_py3_jobs(self, mock_get, mock_post):
-        sources = {('plone/plone.api', 'master'): ['5.1']}
-        with LogCapture() as captured_data:
-            self._subscriber(TRIGGER_NO_PY3_JOBS_PAYLOAD, sources)
-
-        self.assertEqual(len(captured_data.records), 1)
-        self.assertIn('Triggered jenkins job for PR 5.1.', captured_data.records[0].msg)

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
+from mr.roboto.tests import minimal_main
 from testfixtures import LogCapture
 from webtest import TestApp as BaseApp
 
@@ -37,34 +38,12 @@ CLOSED_AND_MERGED_PR_ACTION_PAYLOAD['action'] = 'closed'
 CLOSED_AND_MERGED_PR_ACTION_PAYLOAD['pull_request']['merged'] = True
 
 
-def minimal_main(global_config, **settings):
-    from github import Github
-    from pyramid.config import Configurator
-
-    config = Configurator(settings=settings)
-    config.include('cornice')
-
-    config.registry.settings['plone_versions'] = settings['plone_versions']
-    config.registry.settings['roboto_url'] = settings['roboto_url']
-    config.registry.settings['api_key'] = settings['api_key']
-    config.registry.settings['github'] = Github(settings['github_token'])
-    config.scan('mr.roboto.views.pull_requests')
-    config.end()
-    return config.make_wsgi_app()
-
-
 class RunCoreJobTest(unittest.TestCase):
     def setUp(self):
-        self.settings = {
-            'plone_versions': ['4.3'],
-            'roboto_url': 'http://jenkins.plone.org/roboto',
-            'api_key': 'xyz1234mnop',
-            'sources_file': 'sources_pickle',
-            'checkouts_file': 'checkouts_pickle',
-            'github_token': 'x',
-        }
-        app = minimal_main({}, **self.settings)
+        settings = {}
+        app = minimal_main(settings, 'mr.roboto.views.pull_requests')
         self.roboto = BaseApp(app)
+        self.settings = app.registry.settings
 
     def prepare_data(self, payload):
         body = urllib.parse.urlencode({'payload': json.dumps(payload)})

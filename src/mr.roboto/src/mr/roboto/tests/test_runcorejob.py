@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha1
+from mr.roboto.tests import minimal_main
 from mr.roboto.views.runcorejob import get_pickled_data
 from mr.roboto.views.runcorejob import get_user
 from tempfile import NamedTemporaryFile
@@ -97,33 +98,12 @@ SAMPLE_DATA_SOURCES = {
 GET_INFO = 'mr.roboto.views.runcorejob.get_info_from_commit'
 
 
-def minimal_main(global_config, **settings):
-    from github import Github
-    from pyramid.config import Configurator
-
-    config = Configurator(settings=settings)
-    config.include('cornice')
-
-    config.registry.settings['plone_versions'] = settings['plone_versions']
-    config.registry.settings['roboto_url'] = settings['roboto_url']
-    config.registry.settings['api_key'] = settings['api_key']
-    config.registry.settings['github'] = Github(settings['github_token'])
-    config.scan('mr.roboto.views.runcorejob')
-    return config.make_wsgi_app()
-
-
 class RunCoreJobTest(unittest.TestCase):
     def setUp(self):
-        self.settings = {
-            'plone_versions': '["4.3",]',
-            'roboto_url': 'http://jenkins.plone.org/roboto',
-            'api_key': 'xyz1234mnop',
-            'sources_file': 'sources_pickle',
-            'checkouts_file': 'checkouts_pickle',
-            'github_token': 'x',
-        }
-        app = minimal_main({}, **self.settings)
+        settings = {}
+        app = minimal_main(settings, 'mr.roboto.views.runcorejob')
         self.roboto = BaseApp(app)
+        self.settings = app.registry.settings
 
     def tearDown(self):
         if os.path.exists(self.settings['checkouts_file']):
@@ -142,10 +122,13 @@ class RunCoreJobTest(unittest.TestCase):
             with open(checkouts_pickle, 'bw') as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(checkouts_data))
 
-        self.settings['sources_file'] = sources_pickle
-        self.settings['checkouts_file'] = checkouts_pickle
-        app = minimal_main({}, **self.settings)
+        settings = {
+            'sources_file': sources_pickle,
+            'checkouts_file': checkouts_pickle,
+        }
+        app = minimal_main(settings, 'mr.roboto.views.runcorejob')
         self.roboto = BaseApp(app)
+        self.settings = app.registry.settings
 
     def prepare_data(self, payload):
         body = urllib.parse.urlencode({'payload': json.dumps(payload)})

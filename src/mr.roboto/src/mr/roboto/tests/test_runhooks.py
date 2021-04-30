@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from github.GithubException import GithubException
 from mr.roboto import main
+from mr.roboto.tests import default_settings
 from webtest import TestApp as BaseApp
 
 import mock
@@ -36,21 +37,10 @@ class DummyGetRepos(object):
 
 class RunHooksTest(unittest.TestCase):
     def setUp(self):
-        self.settings = {
-            'plone_versions': '["4.3",]',
-            'py3_versions': '["2.7", "3.6", ]',
-            'plone_py3_versions': '["5.2", ]',
-            'github_users': '["mister-roboto", "jenkins-plone-org", ]',
-            'roboto_url': 'http://jenkins.plone.org/roboto',
-            'api_key': 'xyz1234mnop',
-            'sources_file': 'sources_pickle',
-            'checkouts_file': 'checkouts_pickle',
-            'github_token': 'x',
-            'collective_repos': '',
-            'jenkins_url': 'https://jenkins.plone.org',
-        }
-        app = main({}, **self.settings)
+        override_settings = {'debug': 'False'}
+        app = main({}, **default_settings(parsed=False, override_settings=override_settings))
         self.roboto = BaseApp(app)
+        self.settings = app.registry.settings
 
     def test_runhook_security(self):
         result = self.roboto.get('/run/githubcommithooks')

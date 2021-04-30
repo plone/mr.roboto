@@ -2,8 +2,8 @@
 from git import Repo
 from mr.roboto import main
 from mr.roboto.buildout import PloneCoreBuildout
+from mr.roboto.tests import default_settings
 from tempfile import mkdtemp
-from tempfile import NamedTemporaryFile
 from webtest import TestApp as BaseApp
 
 import os
@@ -40,28 +40,13 @@ class BuildoutTest(unittest.TestCase):
 
         self._commit(SOURCES, filename='sources.cfg')
         self._commit(CHECKOUTS, filename='checkouts.cfg')
-        self.coredev_repo.create_head('4.3')
-        self.coredev_repo.create_head('5.1')
 
-        with NamedTemporaryFile(delete=False) as tmp_file:
-            sources_pickle = tmp_file.name
-
-        with NamedTemporaryFile(delete=False) as tmp_file:
-            checkouts_pickle = tmp_file.name
-
-        self.settings = {
-            'plone_versions': '["5.1", "4.3", ]',
-            'py3_versions': '["2.7", "3.6", ]',
-            'plone_py3_versions': '["5.2", ]',
-            'github_users': '["mister-roboto", "jenkins-plone-org", ]',
-            'roboto_url': 'http://jenkins.plone.org/roboto',
-            'api_key': 'xyz1234mnop',
-            'sources_file': sources_pickle,
-            'checkouts_file': checkouts_pickle,
-            'github_token': 'x',
-        }
-        app = main({}, **self.settings)
+        app = main({}, **default_settings(parsed=False))
         self.roboto = BaseApp(app)
+        self.settings = app.registry.settings
+
+        for plone in self.settings['plone_versions']:
+            self.coredev_repo.create_head(plone)
 
     def tearDown(self):
         shutil.rmtree(self.coredev_repo.working_tree_dir)
@@ -83,11 +68,11 @@ class BuildoutTest(unittest.TestCase):
         with open(self.settings['sources_file'], 'br') as sources:
             data = pickle.load(sources)
 
-        self.assertEqual(data[('plone/Products.CMFPlone', 'master')], ['5.1', '4.3'])
-        self.assertEqual(data[('plone/Products.CMFCore', '2.2.x')], ['5.1', '4.3'])
+        self.assertEqual(data[('plone/Products.CMFPlone', 'master')], ['5.2', '6.0'])
+        self.assertEqual(data[('plone/Products.CMFCore', '2.2.x')], ['5.2', '6.0'])
 
         with open(self.settings['checkouts_file'], 'br') as checkouts:
             data = pickle.load(checkouts)
 
-        self.assertEqual(data['5.1'], ['plone.app.contenttypes', 'Products.CMFPlone'])
-        self.assertEqual(data['4.3'], ['plone.app.contenttypes', 'Products.CMFPlone'])
+        self.assertEqual(data['5.2'], ['plone.app.contenttypes', 'Products.CMFPlone'])
+        self.assertEqual(data['6.0'], ['plone.app.contenttypes', 'Products.CMFPlone'])
