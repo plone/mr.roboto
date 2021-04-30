@@ -32,14 +32,9 @@ def main(global_config, **settings):
         settings['plone_versions']
     )
 
-    # plone versions that need py3 support
-    config.registry.settings['plone_py3_versions'] = ast.literal_eval(
-        settings['plone_py3_versions']
-    )
-
-    # python versions
-    config.registry.settings['py3_versions'] = ast.literal_eval(
-        settings['py3_versions']
+    # dictionary the list of python versions (value) per plone version (key)
+    config.registry.settings['py_versions'] = ast.literal_eval(
+        settings['py_versions']
     )
 
     # github users

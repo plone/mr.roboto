@@ -385,20 +385,16 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         """Create waiting status for all pull request jobs that should be run
         before a pull request can be safely merged
         """
-        # This may return ["5.2", "6.0"].
         plone_versions = self._plone_versions_targeted()
-        # This WarnTestsNeedToRun check is for Python 2 only.
-        # The plone_versions setting in production.ini should contain only 2.7
-        plone_py2_versions = self.event.request.registry.settings['plone_versions']
+        python_versions = self.event.request.registry.settings['py_versions']
 
         # get the pull request last commit
         last_commit = self.get_pull_request_last_commit()
 
-        for version in plone_versions:
-            if version not in plone_py2_versions:
-                continue
-            self._create_commit_status(last_commit, version)
-            self.log(f'created pending status for plone {version}')
+        for plone_version in plone_versions:
+            for py_version in python_versions[plone_version]:
+                self._create_commit_status(last_commit, plone_version, py_version)
+                self.log(f'created pending status for plone {plone_version} on python {py_version}')
 
     def _plone_versions_targeted(self):
         if self.repo_name in IGNORE_NO_TEST_NEEDED:
@@ -423,38 +419,6 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
             return []
 
         return plone_versions
-
-    def _create_commit_status(self, commit, version):
-        commit.create_status(
-            u'pending',
-            target_url=self.jenkins_pr_job_url.format(version),
-            description='Please run the job, click here --->',
-            context=self.status_context.format(version),
-        )
-
-
-@subscriber(NewPullRequest, UpdatedPullRequest)
-class WarnPy3TestsNeedToRun(WarnTestsNeedToRun):
-    def run(self):
-        """Create waiting status for pull requests that target a plone version
-        that targets python 3.
-        """
-        plone_py3_versions = self.event.request.registry.settings['plone_py3_versions']
-        plone_versions = self._plone_versions_targeted()
-
-        if not set(plone_py3_versions).intersection(plone_versions):
-            self.log('does not target a Plone version that targets Python 3, no py3 pull request job needed')
-            return
-
-        py3_tracked_versions = self.event.request.registry.settings['py3_versions']
-
-        # get the pull request and last commit
-        last_commit = self.get_pull_request_last_commit()
-
-        for plone_version in plone_py3_versions:
-            for py_version in py3_tracked_versions:
-                self._create_commit_status(last_commit, plone_version, py_version)
-                self.log(f'created pending status for plone {plone_version} on python {py_version}')
 
     def _create_commit_status(self, commit, plone_version, python_version):
         combination = f'{plone_version}-{python_version}'
@@ -626,14 +590,11 @@ class TriggerPullRequestJenkinsJobs(object):
 
     def _trigger_jobs(self, plone_versions):
         settings = self.event.request.registry.settings
-        py3_versions = settings['py3_versions']
-        plone_py3_versions = settings['plone_py3_versions']
+        python_versions = settings['py_versions']
 
-        for version in plone_versions:
-            self._create_job(version)
-            if version in plone_py3_versions:
-                for python in py3_versions:
-                    self._create_job(f'{version}-{python}')
+        for plone in plone_versions:
+            for python in python_versions[plone]:
+                self._create_job(f'{plone}-{python}')
 
     def _create_job(self, version):
         settings = self.event.request.registry.settings
