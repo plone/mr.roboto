@@ -531,7 +531,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
     def make_commit(self, repo, version, user):
         filename = u'checkouts.cfg'
         head_ref = repo.get_git_ref(f'heads/{version}')
-        checkouts_cfg_file = repo.get_file_contents(filename, head_ref.object.sha)
+        checkouts_cfg_file = repo.get_contents(filename, head_ref.object.sha)
         line = f'    {self.repo_name}\n'
         checkouts_content = checkouts_cfg_file.decoded_content.decode()
         checkouts_new_data = checkouts_content + line
