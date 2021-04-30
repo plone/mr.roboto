@@ -64,7 +64,7 @@ class FakeGithub(object):
 
         return HEAD()
 
-    def get_file_contents(self, name, sha):
+    def get_contents(self, name, sha):
         return self
 
     @property
