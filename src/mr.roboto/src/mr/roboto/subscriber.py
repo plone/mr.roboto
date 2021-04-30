@@ -351,7 +351,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
         for diff_file in patch_data:
             if VALID_CHANGELOG_FILES.search(diff_file.path):
                 break
-            if diff_file.path.startswith('news/'):
+            if 'news/' in diff_file.path:
                 # towncrier news snippet
                 break
         else:
