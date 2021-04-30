@@ -198,10 +198,10 @@ class PullRequestSubscriber(object):
         return self._target_branch
 
     def run(self):
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def log(self, msg, level='info'):
-        if level == 'warn':
+        if level == 'warn':  # pragma: no cover
             logger.warning(f'PR {self.short_url}: {msg}')
             return
         logger.info(f'PR {self.short_url}: {msg}')
@@ -522,7 +522,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             while attempts < 5:
                 try:
                     self.make_commit(repo, version, user)
-                except GithubException:
+                except GithubException:  # pragma: no cover
                     attempts += 1
                     if attempts == 5:
                         self.log(
@@ -544,7 +544,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         latest_commit = repo.get_git_commit(head_ref.object.sha)
         base_tree = latest_commit.tree
         mode = [t.mode for t in base_tree.tree if t.path == filename]
-        if mode:
+        if mode:  # pragma: no cover
             mode = mode[0]
         else:
             mode = '100644'

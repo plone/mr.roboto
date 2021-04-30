@@ -50,7 +50,7 @@ class Source(object):
             match = PATH_RE.match(self.url)
             if match:
                 return match.groupdict()['path']
-        return None
+        return None  # pragma: no cover
 
 
 class SourcesFile(UserDict):
@@ -85,7 +85,7 @@ class CheckoutsFile(UserDict):
     @property
     def data(self):
         if self._data:
-            return self._data
+            return self._data  # pragma: no cover
         config = ConfigParser(interpolation=ExtendedInterpolation())
         with open(self.file_location) as f:
             config.read_file(f)
@@ -148,7 +148,7 @@ def get_sources_and_checkouts(request):
                 else:
                     sources_dict[key].append(plone_version)
             else:
-                logger.warning(f'Package {source} does not have a valid URL')
+                logger.warning(f'Package {source} does not have a valid URL')  # pragma: no cover
 
         checkouts_dict[plone_version] = []
         for checkout in buildout.checkouts.data:
