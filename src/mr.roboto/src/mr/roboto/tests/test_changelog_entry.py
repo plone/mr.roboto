@@ -51,6 +51,20 @@ index 2a20bdc..57ce05f 100644
  setup(
 """
 
+DIFF_WITH_NEWS_ENTRY = """
+diff --git a/src/mr.roboto/CHANGES.rst b/src/mr.roboto/news/1.bugfix
+index 2a20bdc..57ce05f 100644
+--- a/src/mr.roboto/news/1.bugfix
++++ b/src/mr.roboto/news/1.bugfix
+@@ -16,6 +16,7 @@
+     'pyramid_debugtoolbar',
+     'pytest',
+     'WebTest',
++    'testfixtures',
+ ]
+ setup(
+"""
+
 DIFF_WITH_CHANGELOG_ON_HISTORY_txt = """diff --git a/src/mr.roboto/HISTORY.rst b/src/mr.roboto/HISTORY.rst
 index 2a20bdc..57ce05f 100644
 --- a/src/mr.roboto/HISTORY.rst
@@ -118,6 +132,17 @@ class ChangeLogEntrySubscriberTest(unittest.TestCase):
     @mock.patch('requests.get')
     def test_with_change_log_file(self, m1):
         m1.return_value = MockDiff(DIFF_WITH_CHANGELOG)
+
+        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
+
+        with LogCapture() as captured_data:
+            WarnNoChangelogEntry(event)
+
+        self.assertIn('changelog entry: success', captured_data.records[-1].msg)
+
+    @mock.patch('requests.get')
+    def test_with_news_entry(self, m1):
+        m1.return_value = MockDiff(DIFF_WITH_NEWS_ENTRY)
 
         event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
 

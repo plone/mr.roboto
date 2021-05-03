@@ -33,7 +33,7 @@ class GMT1(datetime.tzinfo):
     def dst(self, dt):
         return datetime.timedelta(0)
 
-    def tzname(self, dt):
+    def tzname(self, dt):  # pragma: no cover
         return 'Europe/Catalunya'
 
 
@@ -220,7 +220,7 @@ def commit_on_plone_version(
             commit_to_coredev(
                 request, payload, plone_version, changeset, changeset_long, timestamp
             )
-        except GithubException:
+        except GithubException:  # pragma: no cover
             logger.warning(
                 'Got an exception while trying to commit, give it another try'
             )

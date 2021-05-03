@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from mr.roboto import main
 from mr.roboto.views.home import parse_log_line
+from mr.roboto.tests import default_settings
 from webtest import TestApp as BaseApp
 
 import mock
@@ -11,19 +12,9 @@ import unittest
 
 class SimpleViewsTest(unittest.TestCase):
     def setUp(self):
-        self.settings = {
-            'plone_versions': '["4.3",]',
-            'py3_versions': '["2.7", "3.6", ]',
-            'plone_py3_versions': '["5.2", ]',
-            'github_users': '["mister-roboto", "jenkins-plone-org", ]',
-            'roboto_url': 'http://jenkins.plone.org/roboto',
-            'api_key': 'z',
-            'sources_file': 'sources.pickle',
-            'checkouts_file': 'checkouts.pickle',
-            'github_token': 'x',
-        }
-        app = main({}, **self.settings)
+        app = main({}, **default_settings(parsed=False))
         self.roboto = BaseApp(app)
+        self.settings = app.registry.settings
 
     def clean_file(self, filename):
         try:

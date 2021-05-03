@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from mr.roboto.subscriber import WarnTestsNeedToRun
+from mr.roboto.tests import default_settings
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
 
@@ -30,7 +31,7 @@ PAYLOAD = {
 
 COREDEV_PAYLOAD = copy.deepcopy(PAYLOAD)
 COREDEV_PAYLOAD['html_url'] = 'https://github.com/plone/buildout.coredev/pull/3'  # noqa
-COREDEV_PAYLOAD['base']['ref'] = '4.3'
+COREDEV_PAYLOAD['base']['ref'] = '6.0'
 COREDEV_PAYLOAD['base']['repo']['name'] = 'buildout.coredev'
 COREDEV_PAYLOAD['base']['repo']['full_name'] = 'plone/buildout.coredev'
 
@@ -45,7 +46,7 @@ WHITELISTED_REPO['base']['repo']['name'] = 'plone.releaser'
 
 class MockRequest(object):
     def __init__(self):
-        self._settings = {'github': mock.MagicMock(), 'plone_versions': ['4.3', '5.1']}
+        self._settings = default_settings(github=mock.MagicMock())
 
     @property
     def registry(self):
@@ -92,20 +93,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         self.assertIn('does not target any Plone version', captured_data.records[0].msg)
 
     def test_target_one_plone_version(self):
-        event = self.create_event({('plone/mr.roboto', 'master'): ['5.1']})
-
-        with LogCapture() as captured_data:
-            WarnTestsNeedToRun(event)
-
-        event.request.cleanup_sources()
-
-        self.assertEqual(len(captured_data.records), 1)
-        self.assertIn(
-            'created pending status for plone 5.1', captured_data.records[0].msg
-        )
-
-    def test_target_multiple_plone_versions(self):
-        event = self.create_event({('plone/mr.roboto', 'master'): ['5.1', '4.3']})
+        event = self.create_event({('plone/mr.roboto', 'master'): ['5.2']})
 
         with LogCapture() as captured_data:
             WarnTestsNeedToRun(event)
@@ -113,12 +101,34 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         event.request.cleanup_sources()
 
         self.assertEqual(len(captured_data.records), 2)
+        self.assertIn(
+            'created pending status for plone 5.2 on python 2.7',
+            captured_data.records[0].msg
+        )
+        self.assertIn(
+            'created pending status for plone 5.2 on python 3.6',
+            captured_data.records[1].msg
+        )
+
+    def test_target_multiple_plone_versions(self):
+        event = self.create_event({('plone/mr.roboto', 'master'): ['5.2', '6.0']})
+
+        with LogCapture() as captured_data:
+            WarnTestsNeedToRun(event)
+
+        event.request.cleanup_sources()
+
+        self.assertEqual(len(captured_data.records), 4)
 
         messages = sorted([m.msg for m in captured_data.records])
 
-        self.assertIn('created pending status for plone 4.3', messages[0])
-
-        self.assertIn('created pending status for plone 5.1', messages[1])
+        pairs = (('5.2', '2.7'), ('5.2', '3.6'), ('6.0', '3.8'), ('6.0', '3.9'))
+        for pair, msg in zip(pairs, messages):
+            plone, python = pair
+            self.assertIn(
+                f'created pending status for plone {plone} on python {python}',
+                msg
+            )
 
     def test_buildout_coredev_not_targeting_plone_release(self):
         event = self.create_event({}, payload=COREDEV_RANDOM_BRANCH_PAYLOAD)
@@ -143,10 +153,13 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         event.request.cleanup_sources()
 
-        self.assertEqual(len(captured_data.records), 1)
+        self.assertEqual(len(captured_data.records), 2)
 
         self.assertIn(
-            'created pending status for plone 4.3', captured_data.records[0].msg
+            'for plone 6.0 on python 3.8', captured_data.records[0].msg
+        )
+        self.assertIn(
+            'for plone 6.0 on python 3.9', captured_data.records[1].msg
         )
 
     def test_whitelisted(self):
