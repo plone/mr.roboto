@@ -28,20 +28,22 @@ class Source(object):
         self.branch = branch
 
     def create_from_string(self, source_string):
-        protocol, url, extra_1, extra_2, extra_3 = (
-            lambda a, b, c=None, d=None, e=None: (a, b, c, d, e)
-        )(*source_string.split())
-        for param in [extra_1, extra_2, extra_3]:
+        source_parts = source_string.split()
+        self.protocol = source_parts[0]
+        self.url = source_parts[1]
+        for param in source_parts[2:]:
             if param is not None:
                 key, value = param.split('=')
                 setattr(self, key, value)
-        self.protocol = protocol
-        self.url = url
         if self.pushurl is not None:
+            # I doubt this is needed, should be handled already with
+            # param.split above.
             self.pushurl = self.pushurl.split('=')[-1]
         if self.branch is None:
             self.branch = 'master'
         else:
+            # I doubt this is needed, should be handled already with
+            # param.split above.
             self.branch = self.branch.split('=')[-1]
         return self
 
