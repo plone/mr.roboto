@@ -7,6 +7,7 @@ from tempfile import mkdtemp
 
 import git
 import logging
+import os
 import pickle
 import re
 import shutil
@@ -66,6 +67,9 @@ class SourcesFile(UserDict):
         config.optionxform = str
         with open(self.file_location) as f:
             config.read_file(f)
+        # Insert buildout:directory, as workaround for
+        # https://github.com/plone/mr.roboto/issues/82
+        config["buildout"]["directory"] = os.getcwd()
         sources_dict = OrderedDict()
         for name, value in config['sources'].items():
             source = Source().create_from_string(value)
