@@ -612,7 +612,14 @@ class TriggerPullRequestJenkinsJobs(object):
 
 @subscriber(NewPullRequest)
 class ExplainHowToTriggerJenkinsJobs(PullRequestSubscriber):
+    """
+    The comment automatically added to new Plone project PRs.
+    """
+
     def run(self):
+        """
+        Add the comment when a new Plone project PR is created.
+        """
         plone_versions = plone_versions_targeted(
             self.repo_full_name, self.target_branch, self.event.request
         )
