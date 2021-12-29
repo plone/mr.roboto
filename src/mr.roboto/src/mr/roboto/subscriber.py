@@ -628,16 +628,25 @@ class ExplainHowToTriggerJenkinsJobs(PullRequestSubscriber):
 
         user = self.pull_request['user']['login']
         msg = (
-            f'@{user} thanks for creating this Pull Request and help improve Plone!\n\n'
-            'To ensure that these changes do not break other parts of Plone, '
-            'the Plone test suite matrix needs to pass.\n\n'
-            'Whenever you feel that the pull request is ready to be tested, '
-            'either start all jenkins jobs pull requests by yourself, '
-            'or simply add a comment in this pull request stating:\n\n'
+            f'@{user} thanks for creating this Pull Request and helping to improve '
+            'Plone!\n'
+            '\n'
+            'TL;DR: Finish pushing changes, pass all other checks, '
+            'then paste a comment:\n'
             '```\n'
             '@jenkins-plone-org please run jobs\n'
-            '```\n\n'
-            'With this simple comment all the jobs will be started automatically.\n\n'
+            '```\n'
+            '\n'
+            'To ensure that these changes do not break other parts of Plone, the Plone '
+            'test suite matrix needs to pass, but it takes 30-60 min.  '
+            'Other CI checks are usually much faster and the Plone Jenkins resources '
+            'are limited, so when done pushing changes and all other checks pass '
+            'either [start all Jenkins PR jobs yourself]'
+            '(https://jenkinsploneorg.readthedocs.io/en/latest/'
+            'run-pull-request-jobs.html#run-a-pull-request-job), '
+            'or simply add the comment above in this PR to start all the jobs '
+            'automatically.\n'
+            '\n'
             'Happy hacking!'
         )
         self.g_issue.create_comment(body=msg)
