@@ -34,7 +34,8 @@ class Source(object):
         for param in source_parts[2:]:
             if param is not None:
                 key, value = param.split('=')
-                setattr(self, key, value)
+                if key != 'path':
+                    setattr(self, key, value)
         if self.pushurl is not None:
             # I doubt this is needed, should be handled already with
             # param.split above.
