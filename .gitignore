@@ -1,3 +1,6 @@
+# Python artifacts
+/.venv
+
 bin
 eggs
 .eggs
@@ -20,3 +23,6 @@ development.ini
 .plone.versioncheck.cache/
 .plone.versioncheck.tracked.json
 lib64
+
+# Variable, checkout-local data
+/var
