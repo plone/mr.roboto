@@ -49,6 +49,8 @@ IGNORE_USER_NO_AGREEMENT = ('web-flow',)
 
 IGNORE_NO_TEST_NEEDED = ('plone.releaser',)
 
+IGNORE_NO_AUTO_CHECKOUT = ('documentation',)
+
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
@@ -443,6 +445,9 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         if self.repo_full_name == 'plone/buildout.coredev':
             return
 
+        if self.repo_name in IGNORE_NO_AUTO_CHECKOUT:
+            return
+        
         plone_versions = plone_versions_targeted(
             self.repo_full_name, self.target_branch, self.event.request
         )
