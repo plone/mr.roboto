@@ -45,7 +45,7 @@ IGNORE_NO_CHANGELOG = (
 
 IGNORE_NO_AGREEMENT = ('icalendar', 'planet.plone.org', 'documentation', 'training')
 
-IGNORE_USER_NO_AGREEMENT = ('web-flow',)
+IGNORE_USER_NO_AGREEMENT = ('web-flow', 'dependabot',)
 
 IGNORE_NO_TEST_NEEDED = ('plone.releaser',)
 
