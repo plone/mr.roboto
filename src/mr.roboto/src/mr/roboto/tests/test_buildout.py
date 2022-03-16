@@ -12,7 +12,7 @@ import shutil
 import unittest
 
 
-git_source = 'git://github.com/plone/Products'
+git_source = 'https://github.com/plone/Products'
 ssh_source = 'git@github.com:plone/Products'
 SOURCES = """
 [sources]

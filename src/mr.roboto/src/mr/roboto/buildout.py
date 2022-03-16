@@ -106,7 +106,7 @@ class CheckoutsFile(UserDict):
 
 
 class PloneCoreBuildout(object):
-    PLONE_COREDEV_LOCATION = 'git://github.com/plone/buildout.coredev.git'
+    PLONE_COREDEV_LOCATION = 'https://github.com/plone/buildout.coredev.git'
 
     def __init__(self, core_version=None):
         self.core_version = core_version
