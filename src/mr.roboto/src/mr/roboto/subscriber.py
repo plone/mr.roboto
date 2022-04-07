@@ -393,6 +393,10 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         """Create waiting status for all pull request jobs that should be run
         before a pull request can be safely merged
         """
+        if self.repo_name in IGNORE_NO_JENKINS:
+            self.log(f'Not adding pending Jenkins checks: {self.repo_name} ignored.')
+            return
+
         plone_versions = self._plone_versions_targeted()
         python_versions = self.event.request.registry.settings['py_versions']
 
