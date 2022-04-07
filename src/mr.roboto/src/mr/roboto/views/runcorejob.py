@@ -8,6 +8,7 @@ from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import NewCoreDevPush
 from mr.roboto.security import validate_github
+from mr.roboto.subscribers import IGNORE_NO_JENKINS
 from mr.roboto.utils import get_info_from_commit
 from mr.roboto.utils import get_pickled_data
 from mr.roboto.utils import plone_versions_targeted
@@ -157,8 +158,22 @@ def run_function_core_tests(request):
 
         return json.dumps({'message': 'Thanks! Commit to coredev, nothing to do'})
 
+    # If it is a push to a package we ignore,
+    # update sources and checkouts and quit
+    if repo_name in IGNORE_NO_JENKINS:
+        logger.info('Commit: repo in IGNORE_NO_JENKINS - do nothing')
+        if source_or_checkout:
+            get_sources_and_checkouts(request)
+
+        return json.dumps(
+            {
+                'message':
+                'Thanks! Commit to package that is not tested on Jenkins, nothing to do',
+            }
+        )
+
     ##
-    # It's not a commit to coredev repo
+    # It's not a commit to coredev or an ignored repo
     ##
 
     # if it's a skip commit, log and done
