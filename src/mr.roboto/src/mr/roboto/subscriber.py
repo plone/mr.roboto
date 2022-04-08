@@ -62,7 +62,9 @@ def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
         subject=f'POSSIBLE CHECKOUT ERROR {repo} {branch}',
         sender='Jenkins Job FAIL <jenkins@plone.org>',
-        recipients=['ramon.nb@gmail.com', 'tisto@plone.org', email],
+        # If you would love to receive *all* such emails,
+        # feel free to add your email address in this list. :-)
+        recipients=[email],
         body=templates['error_commit_checkout.pt'](
             who=who, repo=repo, branch=branch, pv=pv
         ),
