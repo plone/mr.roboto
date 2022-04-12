@@ -52,7 +52,7 @@ class SubscribersTest(unittest.TestCase):
         self.assertEqual(mail.sender, 'Jenkins Job FAIL <jenkins@plone.org>')
         self.assertEqual(
             mail.recipients,
-            ['ramon.nb@gmail.com', 'tisto@plone.org', 'roboto@plone.org'],
+            ['roboto@plone.org'],
         )
 
     def test_to_cvs_ignore(self):
