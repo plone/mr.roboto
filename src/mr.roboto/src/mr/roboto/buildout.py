@@ -79,6 +79,8 @@ class SourcesFile(UserDict):
         sources_dict = OrderedDict()
         for name, value in config['sources'].items():
             source = Source().create_from_string(value)
+            if getattr(source, "egg", "true").lower() == "false":
+                continue
             sources_dict[name] = source
         self._data = sources_dict
         return self._data
