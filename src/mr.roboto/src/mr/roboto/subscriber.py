@@ -32,6 +32,7 @@ VALID_CHANGELOG_FILES = re.compile(r'(CHANGES|HISTORY|CHANGELOG).(txt|rst|md)$')
 
 IGNORE_NO_CHANGELOG = (
     'documentation',
+    'mockup',
     'mr.roboto',
     'jenkins.plone.org',
     'plone.jenkins_node',
