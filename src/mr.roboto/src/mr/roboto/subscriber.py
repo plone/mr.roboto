@@ -42,6 +42,7 @@ IGNORE_NO_CHANGELOG = (
     'ploneorg.theme',
     'planet.plone.org',
     'training',
+    'plone-backend',
 )
 
 IGNORE_NO_AGREEMENT = ('icalendar', 'planet.plone.org', 'documentation', 'training')
