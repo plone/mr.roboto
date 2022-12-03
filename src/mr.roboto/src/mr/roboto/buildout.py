@@ -72,14 +72,14 @@ class SourcesFile(UserDict):
             config.read_file(f)
         # Insert buildout:directory, as workaround for
         # https://github.com/plone/mr.roboto/issues/82
-        config["buildout"]["directory"] = os.getcwd()
+        config['buildout']['directory'] = os.getcwd()
         # Same now for buildout:docs-directory, as workaround for
         # https://github.com/plone/mr.roboto/issues/89
-        config["buildout"]["docs-directory"] = os.path.join(os.getcwd(), "docs")
+        config['buildout']['docs-directory'] = os.path.join(os.getcwd(), 'docs')
         sources_dict = OrderedDict()
         for name, value in config['sources'].items():
             source = Source().create_from_string(value)
-            if getattr(source, "egg", "true").lower() == "false":
+            if getattr(source, 'egg', 'true').lower() == 'false':
                 continue
             sources_dict[name] = source
         self._data = sources_dict
