@@ -102,11 +102,11 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         self.assertEqual(len(captured_data.records), 2)
         self.assertIn(
             'created pending status for plone 5.2 on python 2.7',
-            captured_data.records[0].msg
+            captured_data.records[0].msg,
         )
         self.assertIn(
             'created pending status for plone 5.2 on python 3.6',
-            captured_data.records[1].msg
+            captured_data.records[1].msg,
         )
 
     def test_target_multiple_plone_versions(self):
@@ -125,8 +125,7 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
         for pair, msg in zip(pairs, messages):
             plone, python = pair
             self.assertIn(
-                f'created pending status for plone {plone} on python {python}',
-                msg
+                f'created pending status for plone {plone} on python {python}', msg
             )
 
     def test_buildout_coredev_not_targeting_plone_release(self):
@@ -154,12 +153,8 @@ class WarnPullRequestSubscriberTest(unittest.TestCase):
 
         self.assertEqual(len(captured_data.records), 2)
 
-        self.assertIn(
-            'for plone 6.0 on python 3.8', captured_data.records[0].msg
-        )
-        self.assertIn(
-            'for plone 6.0 on python 3.9', captured_data.records[1].msg
-        )
+        self.assertIn('for plone 6.0 on python 3.8', captured_data.records[0].msg)
+        self.assertIn('for plone 6.0 on python 3.9', captured_data.records[1].msg)
 
     def test_whitelisted(self):
         event = self.create_event({}, payload=WHITELISTED_REPO)

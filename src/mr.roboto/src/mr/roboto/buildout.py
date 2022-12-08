@@ -158,8 +158,8 @@ def get_sources_and_checkouts(request):
                     sources_dict[key] = [plone_version]
                 else:
                     sources_dict[key].append(plone_version)
-            else:
-                logger.warning(f'Package {source} does not have a valid URL')  # pragma: no cover
+            else:  # pragma: no cover
+                logger.warning(f'Package {source} does not have a valid URL')
 
         checkouts_dict[plone_version] = []
         for checkout in buildout.checkouts.data:

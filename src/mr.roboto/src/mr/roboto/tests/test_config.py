@@ -15,7 +15,9 @@ class ConfigurationTest(unittest.TestCase):
         self.assertEqual(self.settings['plone_versions'], ['5.2', '6.0'])
 
     def test_python_versions(self):
-        self.assertEqual(self.settings['py_versions'], {'5.2': ['2.7', '3.6'], '6.0': ['3.8', '3.9', ]})
+        self.assertEqual(
+            self.settings['py_versions'], {'5.2': ['2.7', '3.6'], '6.0': ['3.8', '3.9']}
+        )
 
     def test_github_users(self):
         self.assertEqual(

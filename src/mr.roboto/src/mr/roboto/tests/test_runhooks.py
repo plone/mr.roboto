@@ -37,7 +37,9 @@ class DummyGetRepos:
 class RunHooksTest(unittest.TestCase):
     def setUp(self):
         override_settings = {'debug': 'False'}
-        app = main({}, **default_settings(parsed=False, override_settings=override_settings))
+        app = main(
+            {}, **default_settings(parsed=False, override_settings=override_settings)
+        )
         self.roboto = BaseApp(app)
         self.settings = app.registry.settings
 

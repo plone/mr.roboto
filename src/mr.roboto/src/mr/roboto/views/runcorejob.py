@@ -69,7 +69,7 @@ def commit_to_coredev(
 
 
 def get_info(payload, repo, branch):
-    """ gather information about the commits
+    """gather information about the commits
 
     There are three special cases:
 
@@ -166,8 +166,7 @@ def run_function_core_tests(request):
 
         return json.dumps(
             {
-                'message':
-                'Thanks! Commit to package that is not tested on Jenkins, nothing to do',
+                'message': 'Thanks! Commit to package that is not tested on Jenkins, nothing to do',
             }
         )
 

@@ -46,7 +46,10 @@ IGNORE_NO_CHANGELOG = (
 
 IGNORE_NO_AGREEMENT = ('icalendar', 'planet.plone.org', 'documentation', 'training')
 
-IGNORE_USER_NO_AGREEMENT = ('web-flow', 'dependabot',)
+IGNORE_USER_NO_AGREEMENT = (
+    'web-flow',
+    'dependabot',
+)
 
 IGNORE_NO_TEST_NEEDED = ('plone.releaser',)
 
@@ -409,7 +412,9 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         for plone_version in plone_versions:
             for py_version in python_versions[plone_version]:
                 self._create_commit_status(last_commit, plone_version, py_version)
-                self.log(f'created pending status for plone {plone_version} on python {py_version}')
+                self.log(
+                    f'created pending status for plone {plone_version} on python {py_version}'
+                )
 
     def _plone_versions_targeted(self):
         if self.repo_name in IGNORE_NO_TEST_NEEDED:
