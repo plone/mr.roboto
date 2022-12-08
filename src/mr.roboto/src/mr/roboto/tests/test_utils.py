@@ -81,10 +81,12 @@ class TestGetInfoFromCommitTest(unittest.TestCase):
         mock_get.content = mock.Mock(return_value='diff data')
         commit_data = COMMIT
         commit_data['message'] = (
-            'Höla què tal\n' 'Files changed:\nM CHÄNGES.rst\nM setup.py'
+            'Höla què tal\n' 'Files changed:\nM CHÄANGES.rst\nM setup.py'
         )
         data = get_info_from_commit(commit_data)
         self.assertEqual(data['short_commit_msg'], 'Hla qu tal')
         self.assertTrue(
-            data['full_commit_msg'].endswith('Files changed:\nM CHNGES.rst\nM setup.py')
+            data['full_commit_msg'].endswith(
+                'Files changed:\nM CHANGES.rst\nM setup.py'
+            )
         )

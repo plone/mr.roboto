@@ -63,7 +63,7 @@ WHITELISTED_PKG_PAYLOAD['issue']['pull_request'][
 ] = 'https://github.com/plone/plone.releaser/pull/1'
 
 CAN_NOT_GET_PR_INFO_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
-CAN_NOT_GET_PR_INFO_PAYLOAD['issue']['pull_request']['url'] = 'https://unkown.pr'
+CAN_NOT_GET_PR_INFO_PAYLOAD['issue']['pull_request']['url'] = 'https://unknown.pr'
 
 COREDEV_PR_COMMENT_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
 COREDEV_PR_COMMENT_PAYLOAD['issue']['pull_request']['url'] = 'https://buildout.coredev'
