@@ -1,8 +1,8 @@
 from mr.roboto.subscriber import mail_missing_checkout
 from mr.roboto.subscriber import mail_to_cvs
+from unittest import mock
 
 import copy
-from unittest import mock
 import unittest
 
 

@@ -2,9 +2,9 @@ from mr.roboto.subscriber import WarnTestsNeedToRun
 from mr.roboto.tests import default_settings
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
+from unittest import mock
 
 import copy
-from unittest import mock
 import os
 import pickle
 import unittest

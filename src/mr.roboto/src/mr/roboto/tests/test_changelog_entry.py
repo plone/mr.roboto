@@ -1,9 +1,9 @@
 from mr.roboto.events import NewPullRequest
 from mr.roboto.subscriber import WarnNoChangelogEntry
 from testfixtures import LogCapture
+from unittest import mock
 
 import copy
-from unittest import mock
 import unittest
 
 

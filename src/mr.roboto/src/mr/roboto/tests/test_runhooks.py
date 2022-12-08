@@ -1,9 +1,9 @@
 from github.GithubException import GithubException
 from mr.roboto import main
 from mr.roboto.tests import default_settings
+from unittest import mock
 from webtest import TestApp as BaseApp
 
-from unittest import mock
 import unittest
 
 

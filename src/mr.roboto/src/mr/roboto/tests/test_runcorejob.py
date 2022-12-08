@@ -3,12 +3,12 @@ from mr.roboto.tests import minimal_main
 from mr.roboto.views.runcorejob import get_pickled_data
 from mr.roboto.views.runcorejob import get_user
 from tempfile import NamedTemporaryFile
+from unittest import mock
 from webtest import TestApp as BaseApp
 
 import copy
 import hmac
 import json
-from unittest import mock
 import os
 import pickle
 import unittest

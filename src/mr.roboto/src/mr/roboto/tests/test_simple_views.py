@@ -1,9 +1,9 @@
 from mr.roboto import main
-from mr.roboto.views.home import parse_log_line
 from mr.roboto.tests import default_settings
+from mr.roboto.views.home import parse_log_line
+from unittest import mock
 from webtest import TestApp as BaseApp
 
-from unittest import mock
 import os
 import pickle
 import unittest

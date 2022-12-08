@@ -2,9 +2,9 @@ from mr.roboto.events import MergedPullRequest
 from mr.roboto.subscriber import UpdateCoredevCheckouts
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
+from unittest import mock
 
 import copy
-from unittest import mock
 import os
 import pickle
 import unittest

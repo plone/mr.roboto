@@ -1,8 +1,8 @@
 from mr.roboto.utils import get_info_from_commit
 from mr.roboto.utils import shorten_comment_url
 from mr.roboto.utils import shorten_pull_request_url
-
 from unittest import mock
+
 import unittest
 
 

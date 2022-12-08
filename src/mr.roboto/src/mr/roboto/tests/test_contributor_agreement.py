@@ -1,8 +1,8 @@
 from mr.roboto.subscriber import ContributorsAgreementSigned
 from testfixtures import LogCapture
+from unittest import mock
 
 import copy
-from unittest import mock
 import unittest
 
 

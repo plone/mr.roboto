@@ -4,12 +4,12 @@ from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
 from mr.roboto.tests import minimal_main
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
+from unittest import mock
 from webtest import TestApp as BaseApp
 
 import copy
 import hmac
 import json
-from unittest import mock
 import pickle
 import unittest
 import urllib
