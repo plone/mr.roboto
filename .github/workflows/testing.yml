@@ -1,0 +1,44 @@
+name: Testing
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  test:
+    name: Testing on
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements-lint.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
+      - name: pip version
+        run: pip --version
+      - name: Install dependencies
+        run: python -m pip install -r requirements-lint.txt
+      # formatters
+      - name: Run pyupgrade
+        run: pyupgrade --py39-plus `find src -name *.py`
+      - name: Run isort
+        run: isort --check-only `find src -name *.py`
+      - name: Run black
+        run: black -t py39 --check --skip-string-normalization `find src -name *.py`
+      # linters
+      - name: Lint with codespell
+        run: codespell *.rst `find src -name *.py`
+      - name: Lint with flake8
+        run: flake8 `find src -name *.py`
