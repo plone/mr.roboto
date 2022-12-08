@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from hashlib import sha1
 from mr.roboto.tests import minimal_main
 from testfixtures import LogCapture

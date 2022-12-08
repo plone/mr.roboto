@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from cornice import Service
 from github import InputGitAuthor
 from github import InputGitTreeElement
@@ -39,7 +38,7 @@ class GMT1(datetime.tzinfo):
 
 
 def get_user(data):
-    if data['name'] == u'none':
+    if data['name'] == 'none':
         who = 'NoBody <nobody@plone.org>'
     else:
         who = f'{data["name"]} <{data["email"]}>'

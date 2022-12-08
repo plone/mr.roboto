@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from mr.roboto.subscriber import ContributorsAgreementSigned
 from testfixtures import LogCapture
 
 import copy
-import mock
+from unittest import mock
 import unittest
 
 
@@ -24,7 +23,7 @@ WHITELISTED_PAYLOAD = copy.deepcopy(PAYLOAD)
 WHITELISTED_PAYLOAD['base']['repo']['name'] = 'icalendar'
 
 
-class MockRequest(object):
+class MockRequest:
     def __init__(self):
         self._settings = {'github': mock.MagicMock()}
 
@@ -63,7 +62,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase):
     def test_error_parsing_commits_data(self, m1):
         from mr.roboto.events import NewPullRequest
 
-        class FakeCommitsData(object):
+        class FakeCommitsData:
             def json(self):
                 raise ValueError()
 
@@ -83,7 +82,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase):
     def test_error_no_author_on_commit(self, m1):
         from mr.roboto.events import NewPullRequest
 
-        class FakeCommitsData(object):
+        class FakeCommitsData:
             def json(self):
                 return [
                     {
@@ -106,13 +105,13 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase):
     def test_error_no_author_on_commit_no_duplicates(self, m1):
         from mr.roboto.events import NewPullRequest
 
-        class FakeCommitsData(object):
+        class FakeCommitsData:
             def json(self):
                 return [
                     {
                         'committer': {'login': 'user'},
                         'author': None,
-                        'commit': {'author': {'name': u'My näme'}},
+                        'commit': {'author': {'name': 'My näme'}},
                     },
                     {
                         'committer': {'login': 'user'},
@@ -141,7 +140,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase):
     def test_no_foundation_member(self, m1):
         from mr.roboto.events import NewPullRequest
 
-        class FakeCommitsData(object):
+        class FakeCommitsData:
             def json(self):
                 return [{'committer': {'login': 'user'}, 'author': {'login': 'user'}}]
 
@@ -170,7 +169,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase):
     def test_no_plone_org_also_works(self, m1):
         from mr.roboto.events import NewPullRequest
 
-        class FakeCommitsData(object):
+        class FakeCommitsData:
             def json(self):
                 return [
                     {
@@ -195,7 +194,7 @@ class ContributorsAgreementSubscriberTest(unittest.TestCase):
     def test_ignore_witelisted_users(self, m1):
         from mr.roboto.events import NewPullRequest
 
-        class FakeCommitsData(object):
+        class FakeCommitsData:
             def json(self):
                 return [
                     {'committer': {'login': 'web-flow'}, 'author': {'login': 'user'}}

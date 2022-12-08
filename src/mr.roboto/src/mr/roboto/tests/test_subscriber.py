@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from mr.roboto.subscriber import mail_missing_checkout
 from mr.roboto.subscriber import mail_to_cvs
 
 import copy
-import mock
+from unittest import mock
 import unittest
 
 

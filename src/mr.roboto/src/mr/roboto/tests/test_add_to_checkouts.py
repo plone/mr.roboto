@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from mr.roboto.events import MergedPullRequest
 from mr.roboto.subscriber import UpdateCoredevCheckouts
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
 
 import copy
-import mock
+from unittest import mock
 import os
 import pickle
 import unittest
@@ -42,7 +41,7 @@ PLONE_VERSION_PAYLOAD = copy.deepcopy(NO_PLONE_VERSION_PAYLOAD)
 PLONE_VERSION_PAYLOAD['base']['ref'] = 'master'
 
 
-class FakeGithub(object):
+class FakeGithub:
     def get_organization(self, name):
         return self
 
@@ -50,7 +49,7 @@ class FakeGithub(object):
         return self
 
     def get_git_ref(self, name):
-        class HEAD(object):
+        class HEAD:
             @property
             def object(self):
                 return self
@@ -115,7 +114,7 @@ class FakeGithub(object):
         return 'hi@dummy.com'
 
 
-class MockRequest(object):
+class MockRequest:
     def __init__(self):
         self._settings = {'github': FakeGithub(), 'plone_versions': ['4.3', '5.1']}
 

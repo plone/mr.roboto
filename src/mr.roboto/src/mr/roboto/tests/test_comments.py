@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from hashlib import sha1
 from mr.roboto.events import CommentOnPullRequest
 from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
@@ -10,7 +9,7 @@ from webtest import TestApp as BaseApp
 import copy
 import hmac
 import json
-import mock
+from unittest import mock
 import pickle
 import unittest
 import urllib
@@ -79,7 +78,7 @@ TRIGGER_NO_PY3_JOBS_PAYLOAD['issue']['pull_request'][
 ] = 'https://github.com/plone/plone.api/pull/1'
 
 
-class MockRequest(object):
+class MockRequest:
     def __init__(self, settings):
         self._settings = settings
 

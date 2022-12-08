@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 from collections import UserDict
 from configparser import ConfigParser
@@ -20,7 +19,7 @@ PATH_RE = re.compile(
 )
 
 
-class Source(object):
+class Source:
     def __init__(self, protocol=None, url=None, push_url=None, branch=None):
         self.protocol = protocol
         self.url = url
@@ -107,7 +106,7 @@ class CheckoutsFile(UserDict):
         return self._data
 
 
-class PloneCoreBuildout(object):
+class PloneCoreBuildout:
     PLONE_COREDEV_LOCATION = 'https://github.com/plone/buildout.coredev.git'
 
     def __init__(self, core_version=None):

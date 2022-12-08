@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from cornice import Service
 from mr.roboto.events import CommentOnPullRequest
 from mr.roboto.security import validate_github
@@ -53,7 +52,7 @@ def handle_comment(request):
     pull_request_payload = payload['issue']['pull_request']
     pull_request_short_url = shorten_pull_request_url(pull_request_payload['html_url'])
     logger.info(
-        u'COMMENT {0}: with action {1} on pull request {2}'.format(
+        'COMMENT {}: with action {} on pull request {}'.format(
             comment_short_url, action, pull_request_short_url
         )
     )

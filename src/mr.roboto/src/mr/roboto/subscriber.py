@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from datetime import datetime
 from github import GithubException
 from github import InputGitAuthor
@@ -126,7 +125,7 @@ def send_mail_on_missing_checkout(event):
     )
 
 
-class PullRequestSubscriber(object):
+class PullRequestSubscriber:
     def __init__(self, event):
         self.event = event
         self._github = None
@@ -274,10 +273,10 @@ class PullRequestSubscriber(object):
 class ContributorsAgreementSigned(PullRequestSubscriber):
     def __init__(self, event):
         self.cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
-        self.github_help_setup_email_url = u'https://help.github.com/articles/adding-an-email-address-to-your-github-account/'  # noqa
-        self.status_context = u'Plone Contributors Agreement verifier'
+        self.github_help_setup_email_url = 'https://help.github.com/articles/adding-an-email-address-to-your-github-account/'  # noqa
+        self.status_context = 'Plone Contributors Agreement verifier'
 
-        super(ContributorsAgreementSigned, self).__init__(event)
+        super().__init__(event)
 
     def run(self):
         """Check if all users involved in a pull request have signed the CLA"""
@@ -294,11 +293,11 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
 
-        status = u'success'
-        status_message = u'All users have signed it'
+        status = 'success'
+        status_message = 'All users have signed it'
         if not_foundation or unknown:
-            status = u'error'
-            status_message = u'Some users need to sign it'
+            status = 'error'
+            status_message = 'Some users need to sign it'
 
         if not_foundation:
             # add a message mentioning all users that have not signed the
@@ -339,9 +338,9 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnNoChangelogEntry(PullRequestSubscriber):
     def __init__(self, event):
-        self.status_context = u'Changelog verifier'
+        self.status_context = 'Changelog verifier'
 
-        super(WarnNoChangelogEntry, self).__init__(event)
+        super().__init__(event)
 
     def run(self):
         """If the pull request does not add a changelog entry, warn about it"""
@@ -349,8 +348,8 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
             self.log('whitelisted for changelog entries')
             return
 
-        status = u'success'
-        description = u'Entry found'
+        status = 'success'
+        description = 'Entry found'
         roboto_url = self.event.request.registry.settings['roboto_url']
 
         # check if the pull request modifies the changelog file
@@ -367,8 +366,8 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
                 # towncrier news snippet
                 break
         else:
-            status = u'error'
-            description = u'No entry found!'
+            status = 'error'
+            description = 'No entry found!'
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
@@ -391,7 +390,7 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         )
         self.status_context = 'Plone Jenkins CI - pull-request-{0}'
 
-        super(WarnTestsNeedToRun, self).__init__(event)
+        super().__init__(event)
 
     def run(self):
         """Create waiting status for all pull request jobs that should be run
@@ -439,7 +438,7 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
     def _create_commit_status(self, commit, plone_version, python_version):
         combination = f'{plone_version}-{python_version}'
         commit.create_status(
-            u'pending',
+            'pending',
             target_url=f'https://jenkins.plone.org/job/pull-request-{combination}/build?delay=0sec',
             description='Please run the job, click here --->',
             context=f'Plone Jenkins CI - pull-request-{combination}',
@@ -518,7 +517,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
                     break
 
     def make_commit(self, repo, version, user):
-        filename = u'checkouts.cfg'
+        filename = 'checkouts.cfg'
         head_ref = repo.get_git_ref(f'heads/{version}')
         checkouts_cfg_file = repo.get_contents(filename, head_ref.object.sha)
         line = f'    {self.repo_name}\n'
@@ -551,7 +550,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
 
 
 @subscriber(CommentOnPullRequest)
-class TriggerPullRequestJenkinsJobs(object):
+class TriggerPullRequestJenkinsJobs:
     def __init__(self, event):
         self.event = event
 

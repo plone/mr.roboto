@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from mr.roboto.subscriber import WarnTestsNeedToRun
 from mr.roboto.tests import default_settings
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
 
 import copy
-import mock
+from unittest import mock
 import os
 import pickle
 import unittest
@@ -44,7 +43,7 @@ WHITELISTED_REPO['base']['repo']['full_name'] = 'plone/plone.releaser'
 WHITELISTED_REPO['base']['repo']['name'] = 'plone.releaser'
 
 
-class MockRequest(object):
+class MockRequest:
     def __init__(self):
         self._settings = default_settings(github=mock.MagicMock())
 

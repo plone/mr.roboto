@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import defaultdict
 from collections import deque
 from mr.roboto.buildout import get_sources_and_checkouts
@@ -102,7 +101,7 @@ def sources(context, request):
     try:
         with open(sources_file, 'br') as f:
             data = pickle.load(f)
-    except IOError:
+    except OSError:
         return {'success': False, 'message': 'File not found'}
     output = {}
     for key, value in data.items():
@@ -117,7 +116,7 @@ def checkout(context, request):
     try:
         with open(checkouts_file, 'br') as checkouts:
             data = pickle.load(checkouts)
-    except IOError:
+    except OSError:
         return {'success': False, 'message': 'File not found'}
     return data
 

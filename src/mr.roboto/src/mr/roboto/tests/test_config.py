@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from mr.roboto import main
 from mr.roboto.tests import default_settings
 from webtest import TestApp as BaseApp

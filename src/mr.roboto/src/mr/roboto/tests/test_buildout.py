@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from git import Repo
 from mr.roboto import main
 from mr.roboto.buildout import PloneCoreBuildout

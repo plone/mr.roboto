@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 from mr.roboto import main
 from mr.roboto.views.home import parse_log_line
 from mr.roboto.tests import default_settings
 from webtest import TestApp as BaseApp
 
-import mock
+from unittest import mock
 import os
 import pickle
 import unittest
