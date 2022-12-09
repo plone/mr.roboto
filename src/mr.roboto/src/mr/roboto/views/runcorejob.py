@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from cornice import Service
 from github import InputGitAuthor
 from github import InputGitTreeElement
@@ -39,7 +38,7 @@ class GMT1(datetime.tzinfo):
 
 
 def get_user(data):
-    if data['name'] == u'none':
+    if data['name'] == 'none':
         who = 'NoBody <nobody@plone.org>'
     else:
         who = f'{data["name"]} <{data["email"]}>'
@@ -70,7 +69,7 @@ def commit_to_coredev(
 
 
 def get_info(payload, repo, branch):
-    """ gather information about the commits
+    """gather information about the commits
 
     There are three special cases:
 
@@ -167,8 +166,7 @@ def run_function_core_tests(request):
 
         return json.dumps(
             {
-                'message':
-                'Thanks! Commit to package that is not tested on Jenkins, nothing to do',
+                'message': 'Thanks! Commit to package that is not tested on Jenkins, nothing to do',
             }
         )
 

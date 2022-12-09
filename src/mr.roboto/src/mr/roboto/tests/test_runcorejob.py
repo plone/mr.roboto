@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
 from hashlib import sha1
 from mr.roboto.tests import minimal_main
 from mr.roboto.views.runcorejob import get_pickled_data
 from mr.roboto.views.runcorejob import get_user
 from tempfile import NamedTemporaryFile
+from unittest import mock
 from webtest import TestApp as BaseApp
 
 import copy
 import hmac
 import json
-import mock
 import os
 import pickle
 import unittest
@@ -229,11 +228,11 @@ class RunCoreJobTest(unittest.TestCase):
 
 class AuxiliaryFunctionsTest(unittest.TestCase):
     def test_get_user_none(self):
-        self.assertEqual(get_user({'name': u'none'}), 'NoBody <nobody@plone.org>')
+        self.assertEqual(get_user({'name': 'none'}), 'NoBody <nobody@plone.org>')
 
     def test_get_user(self):
         self.assertEqual(
-            get_user({'name': u'jon', 'email': 'jon@plone.org'}), 'jon <jon@plone.org>'
+            get_user({'name': 'jon', 'email': 'jon@plone.org'}), 'jon <jon@plone.org>'
         )
 
     def test_load_data(self):

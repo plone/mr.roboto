@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from collections import namedtuple
 from cornice import Service
 from github.GithubException import GithubException

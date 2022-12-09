@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
 from hashlib import sha1
 from mr.roboto.events import CommentOnPullRequest
 from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
 from mr.roboto.tests import minimal_main
 from tempfile import NamedTemporaryFile
 from testfixtures import LogCapture
+from unittest import mock
 from webtest import TestApp as BaseApp
 
 import copy
 import hmac
 import json
-import mock
 import pickle
 import unittest
 import urllib
@@ -64,7 +63,7 @@ WHITELISTED_PKG_PAYLOAD['issue']['pull_request'][
 ] = 'https://github.com/plone/plone.releaser/pull/1'
 
 CAN_NOT_GET_PR_INFO_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
-CAN_NOT_GET_PR_INFO_PAYLOAD['issue']['pull_request']['url'] = 'https://unkown.pr'
+CAN_NOT_GET_PR_INFO_PAYLOAD['issue']['pull_request']['url'] = 'https://unknown.pr'
 
 COREDEV_PR_COMMENT_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
 COREDEV_PR_COMMENT_PAYLOAD['issue']['pull_request']['url'] = 'https://buildout.coredev'
@@ -79,7 +78,7 @@ TRIGGER_NO_PY3_JOBS_PAYLOAD['issue']['pull_request'][
 ] = 'https://github.com/plone/plone.api/pull/1'
 
 
-class MockRequest(object):
+class MockRequest:
     def __init__(self, settings):
         self._settings = settings
 
@@ -174,9 +173,7 @@ class HandleCommentTests(Base):
             result = self.call_view(JENKINS_USER_PAYLOAD)
 
         self.assertIn('Comment on PR ', result.ubody)
-        self.assertIn(
-            f' ignored as is from jenkins-plone-org. No action.', result.ubody
-        )
+        self.assertIn(' ignored as is from jenkins-plone-org. No action.', result.ubody)
 
         logger_record = captured_data.records[-1].msg
         self.assertIn('COMMENT ', logger_record)
@@ -187,7 +184,7 @@ class HandleCommentTests(Base):
             result = self.call_view(MR_ROBOTO_USER_PAYLOAD)
 
         self.assertIn('Comment on PR ', result.ubody)
-        self.assertIn(f' ignored as is from mister-roboto. No action.', result.ubody)
+        self.assertIn(' ignored as is from mister-roboto. No action.', result.ubody)
 
         logger_record = captured_data.records[-1].msg
         self.assertIn('COMMENT ', logger_record)

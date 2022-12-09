@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 from collections import UserDict
 from configparser import ConfigParser
@@ -20,7 +19,7 @@ PATH_RE = re.compile(
 )
 
 
-class Source(object):
+class Source:
     def __init__(self, protocol=None, url=None, push_url=None, branch=None):
         self.protocol = protocol
         self.url = url
@@ -107,7 +106,7 @@ class CheckoutsFile(UserDict):
         return self._data
 
 
-class PloneCoreBuildout(object):
+class PloneCoreBuildout:
     PLONE_COREDEV_LOCATION = 'https://github.com/plone/buildout.coredev.git'
 
     def __init__(self, core_version=None):
@@ -159,8 +158,8 @@ def get_sources_and_checkouts(request):
                     sources_dict[key] = [plone_version]
                 else:
                     sources_dict[key].append(plone_version)
-            else:
-                logger.warning(f'Package {source} does not have a valid URL')  # pragma: no cover
+            else:  # pragma: no cover
+                logger.warning(f'Package {source} does not have a valid URL')
 
         checkouts_dict[plone_version] = []
         for checkout in buildout.checkouts.data:

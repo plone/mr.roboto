@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pickle
 import re
 import requests
@@ -47,7 +46,7 @@ def shorten_comment_url(url):
     """
     re_result = COMMENT_URL_RE.match(url)
     if re_result:
-        return '{0}#{1}-{2}'.format(*re_result.groups())
+        return '{}#{}-{}'.format(*re_result.groups())
     return url
 
 

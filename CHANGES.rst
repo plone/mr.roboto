@@ -1,4 +1,6 @@
 Changelog
 =========
 
-*Add here your changes*.
+
+- Add GHA to lint our code.
+  [gforcada]

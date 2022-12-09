@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-
-
-class NewCoreDevPush(object):
+class NewCoreDevPush:
     def __init__(self, payload, request):
         self.payload = payload
         self.request = request
 
 
-class CommitAndMissingCheckout(object):
+class CommitAndMissingCheckout:
     def __init__(self, who, request, repo, branch, pv, email):
         self.who = who
         self.request = request
@@ -17,7 +14,7 @@ class CommitAndMissingCheckout(object):
         self.email = email
 
 
-class PullRequest(object):
+class PullRequest:
     def __init__(self, pull_request, request):
         self.pull_request = pull_request
         self.request = request
@@ -35,7 +32,7 @@ class MergedPullRequest(PullRequest):
     pass
 
 
-class CommentOnPullRequest(object):
+class CommentOnPullRequest:
     def __init__(self, comment, pull_request, request):
         self.comment = comment
         self.pull_request = pull_request

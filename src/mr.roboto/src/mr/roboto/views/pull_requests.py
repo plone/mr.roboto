@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from cornice import Service
 from mr.roboto.events import MergedPullRequest
 from mr.roboto.events import NewPullRequest

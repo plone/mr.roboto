@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from mr.roboto.subscriber import mail_missing_checkout
 from mr.roboto.subscriber import mail_to_cvs
+from unittest import mock
 
 import copy
-import mock
 import unittest
 
 
@@ -56,7 +55,7 @@ class SubscribersTest(unittest.TestCase):
         )
 
     def test_to_cvs_ignore(self):
-        payload = {'commits': [x for x in range(0, 50)]}
+        payload = {'commits': list(range(0, 50))}
 
         self.assertIsNone(mail_to_cvs(payload, ''))
 

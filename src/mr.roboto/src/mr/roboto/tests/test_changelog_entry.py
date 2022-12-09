@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 from mr.roboto.events import NewPullRequest
 from mr.roboto.subscriber import WarnNoChangelogEntry
 from testfixtures import LogCapture
+from unittest import mock
 
 import copy
-import mock
 import unittest
 
 
@@ -79,7 +78,7 @@ index 2a20bdc..57ce05f 100644
 """
 
 
-class MockRequest(object):
+class MockRequest:
     @property
     def registry(self):
         return self
@@ -92,7 +91,7 @@ class MockRequest(object):
         }
 
 
-class MockDiff(object):
+class MockDiff:
     def __init__(self, data):
         self.data = data.encode()
 

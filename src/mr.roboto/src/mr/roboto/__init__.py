@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from chameleon import PageTemplateLoader
 from github import Github
 from mr.roboto.security import RequestWithAttributes
@@ -33,9 +32,7 @@ def main(global_config, **settings):
     )
 
     # dictionary the list of python versions (value) per plone version (key)
-    config.registry.settings['py_versions'] = ast.literal_eval(
-        settings['py_versions']
-    )
+    config.registry.settings['py_versions'] = ast.literal_eval(settings['py_versions'])
 
     # github users
     config.registry.settings['github_users'] = ast.literal_eval(

@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-
-
 def default_settings(github=None, parsed=True, override_settings=None):
     plone = ['5.2', '6.0']
-    python = {'5.2': ['2.7', '3.6', ], '6.0': ['3.8', '3.9']}
-    github_users = ['mister-roboto', 'jenkins-plone-org', ]
+    python = {
+        '5.2': ['2.7', '3.6'],
+        '6.0': ['3.8', '3.9'],
+    }
+    github_users = ['mister-roboto', 'jenkins-plone-org']
     if not parsed:
         plone = str(plone)
         python = str(python)

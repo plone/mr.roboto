@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
 from github.GithubException import GithubException
 from mr.roboto import main
 from mr.roboto.tests import default_settings
+from unittest import mock
 from webtest import TestApp as BaseApp
 
-import mock
 import unittest
 
 
-class DummyHook(object):
+class DummyHook:
     name = 'web'
     config = {'url': 'http://jenkins.plone.org/roboto/run/corecommit'}
 
@@ -16,7 +15,7 @@ class DummyHook(object):
         return
 
 
-class DummyRepo(object):
+class DummyRepo:
     def __init__(self, name='Products.CMFPlone'):
         self.name = name
 
@@ -27,7 +26,7 @@ class DummyRepo(object):
         return
 
 
-class DummyGetRepos(object):
+class DummyGetRepos:
     def get_repos(self):
         return [DummyRepo()]
 
@@ -38,7 +37,9 @@ class DummyGetRepos(object):
 class RunHooksTest(unittest.TestCase):
     def setUp(self):
         override_settings = {'debug': 'False'}
-        app = main({}, **default_settings(parsed=False, override_settings=override_settings))
+        app = main(
+            {}, **default_settings(parsed=False, override_settings=override_settings)
+        )
         self.roboto = BaseApp(app)
         self.settings = app.registry.settings
 
@@ -54,7 +55,7 @@ class RunHooksTest(unittest.TestCase):
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_no_web_hooks(self, m1):
-        class DummyHook(object):
+        class DummyHook:
             name = 'not-web'
 
         m1.configure_mock(return_value=DummyGetRepos())
@@ -65,11 +66,11 @@ class RunHooksTest(unittest.TestCase):
 
     @mock.patch('github.MainClass.Github.get_organization')
     def test_runhook_exception(self, m1):
-        class DummyHook(object):
+        class DummyHook:
             name = 'web'
             config = {'url': 'http://jenkins.plone.org/roboto/run/corecommit'}
 
-        class DummyRepo(object):
+        class DummyRepo:
             name = 'Products.CMFPlone'
 
             def get_hooks(self):
@@ -78,7 +79,7 @@ class RunHooksTest(unittest.TestCase):
             def create_hook(self, *args, **kwargs):
                 raise GithubException('one', 'two')
 
-        class DummyGetRepos(object):
+        class DummyGetRepos:
             def get_repos(self):
                 return [DummyRepo()]
 
