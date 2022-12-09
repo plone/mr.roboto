@@ -55,7 +55,7 @@ class SubscribersTest(unittest.TestCase):
         )
 
     def test_to_cvs_ignore(self):
-        payload = {'commits': [x for x in range(0, 50)]}
+        payload = {'commits': list(range(0, 50))}
 
         self.assertIsNone(mail_to_cvs(payload, ''))
 

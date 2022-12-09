@@ -173,9 +173,7 @@ class HandleCommentTests(Base):
             result = self.call_view(JENKINS_USER_PAYLOAD)
 
         self.assertIn('Comment on PR ', result.ubody)
-        self.assertIn(
-            f' ignored as is from jenkins-plone-org. No action.', result.ubody
-        )
+        self.assertIn(' ignored as is from jenkins-plone-org. No action.', result.ubody)
 
         logger_record = captured_data.records[-1].msg
         self.assertIn('COMMENT ', logger_record)
@@ -186,7 +184,7 @@ class HandleCommentTests(Base):
             result = self.call_view(MR_ROBOTO_USER_PAYLOAD)
 
         self.assertIn('Comment on PR ', result.ubody)
-        self.assertIn(f' ignored as is from mister-roboto. No action.', result.ubody)
+        self.assertIn(' ignored as is from mister-roboto. No action.', result.ubody)
 
         logger_record = captured_data.records[-1].msg
         self.assertIn('COMMENT ', logger_record)
