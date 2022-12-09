@@ -38,7 +38,5 @@ jobs:
       - name: Run black
         run: black -t py39 --check --skip-string-normalization `find src -name *.py`
       # linters
-      - name: Lint with codespell
-        run: codespell *.rst `find src -name *.py`
       - name: Lint with flake8
         run: flake8 `find src -name *.py`
