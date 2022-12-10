@@ -29,7 +29,7 @@ def handle_pull_request(request):
     # bail out early if it's just a github check
     payload = json.loads(request.POST['payload'])
     if 'action' not in payload:
-        return json.dumps({'message': 'No action, nothing can be done'})
+        return {'message': 'No action, nothing can be done'}
     short_url = shorten_pull_request_url(payload['pull_request']['html_url'])
 
     action = payload['action']
@@ -42,12 +42,8 @@ def handle_pull_request(request):
     elif action == 'closed' and pull_request['merged']:
         request.registry.notify(MergedPullRequest(pull_request, request))
     else:
-        msg = (
-            f'PR {short_url}: action "{action}" '
-            f'(merged: {pull_request["merged"]}) not handled'
-        )
+        msg = f'PR {short_url}: action "{action}" (merged: {pull_request["merged"]}) not handled'
         logger.info(msg)
-        return json.dumps({'message': msg})
+        return {'message': msg}
 
-    msg = 'Thanks! Handlers already took care of this pull request'
-    return json.dumps({'message': msg})
+    return {'message': 'Thanks! Handlers already took care of this pull request'}

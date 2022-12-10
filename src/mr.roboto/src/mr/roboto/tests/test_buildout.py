@@ -13,14 +13,14 @@ import unittest
 
 git_source = 'https://github.com/plone/Products'
 ssh_source = 'git@github.com:plone/Products'
-SOURCES = """
+SOURCES = f"""
+[buildout]
+
 [sources]
-Products.CMFPlone = git {0}.CMFPlone.git pushurl={1}.CMFPlone.git branch=master
-Products.CMFCore = git {0}.CMFCore.git pushurl={1}.CMFCore.git branch=2.2.x
-Products.CMFDiff = git {0}.CMFDiff.git
-""".format(
-    git_source, ssh_source
-)
+Products.CMFPlone = git {git_source}.CMFPlone.git pushurl={ssh_source}.CMFPlone.git branch=master
+Products.CMFCore = git {git_source}.CMFCore.git pushurl={ssh_source}.CMFCore.git branch=2.2.x
+Products.CMFDiff = git {git_source}.CMFDiff.git
+"""
 
 CHECKOUTS = """
 [buildout]

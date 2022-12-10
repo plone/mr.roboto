@@ -1,10 +1,10 @@
 from mr.roboto.events import NewPullRequest
 from mr.roboto.subscriber import WarnNoChangelogEntry
-from testfixtures import LogCapture
 from unittest import mock
+from unittest.mock import patch
 
 import copy
-import unittest
+import logging
 
 
 """
@@ -27,7 +27,7 @@ diff --git a/src/mr.roboto/setup.py b/src/mr.roboto/setup.py
 index 2a20bdc..57ce05f 100644
 --- a/src/mr.roboto/setup.py
 +++ b/src/mr.roboto/setup.py
-@@ -16,6 +16,7 @@
+@@ -16,5 +16,6 @@
      'pyramid_debugtoolbar',
      'pytest',
      'WebTest',
@@ -41,7 +41,7 @@ diff --git a/src/mr.roboto/CHANGES.rst b/src/mr.roboto/CHANGES.rst
 index 2a20bdc..57ce05f 100644
 --- a/src/mr.roboto/CHANGES.rst
 +++ b/src/mr.roboto/CHANGES.rst
-@@ -16,6 +16,7 @@
+@@ -16,5 +16,6 @@
      'pyramid_debugtoolbar',
      'pytest',
      'WebTest',
@@ -51,11 +51,11 @@ index 2a20bdc..57ce05f 100644
 """
 
 DIFF_WITH_NEWS_ENTRY = """
-diff --git a/src/mr.roboto/CHANGES.rst b/src/mr.roboto/news/1.bugfix
+diff --git a/src/mr.roboto/news/1.bugfix b/src/mr.roboto/news/1.bugfix
 index 2a20bdc..57ce05f 100644
 --- a/src/mr.roboto/news/1.bugfix
 +++ b/src/mr.roboto/news/1.bugfix
-@@ -16,6 +16,7 @@
+@@ -1,5 +1,6 @@
      'pyramid_debugtoolbar',
      'pytest',
      'WebTest',
@@ -68,7 +68,7 @@ DIFF_WITH_CHANGELOG_ON_HISTORY_txt = """diff --git a/src/mr.roboto/HISTORY.rst b
 index 2a20bdc..57ce05f 100644
 --- a/src/mr.roboto/HISTORY.rst
 +++ b/src/mr.roboto/HISTORY.rst
-@@ -16,6 +16,7 @@
+@@ -1,5 +1,6 @@
      'pyramid_debugtoolbar',
      'pytest',
      'WebTest',
@@ -104,59 +104,44 @@ class MockDiff:
         return self.data
 
 
-class ChangeLogEntrySubscriberTest(unittest.TestCase):
-    def test_repo_whitelisted(self):
-        event = NewPullRequest(
-            pull_request=WHITELISTED_REPO_PAYLOAD, request=MockRequest()
-        )
+def test_repo_whitelisted(caplog):
+    event = NewPullRequest(pull_request=WHITELISTED_REPO_PAYLOAD, request=MockRequest())
+    caplog.set_level(logging.INFO)
+    WarnNoChangelogEntry(event)
+    assert 'whitelisted for changelog entries' in caplog.records[-1].msg
 
-        with LogCapture() as captured_data:
-            WarnNoChangelogEntry(event)
 
-        self.assertIn(
-            'whitelisted for changelog entries', captured_data.records[-1].msg
-        )
+@patch('requests.get')
+def test_no_change_log_file(m1, caplog):
+    m1.return_value = MockDiff(DIFF_NO_CHANGELOG)
+    event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
+    caplog.set_level(logging.INFO)
+    WarnNoChangelogEntry(event)
+    assert 'changelog entry: error' in caplog.records[-1].msg
 
-    @mock.patch('requests.get')
-    def test_no_change_log_file(self, m1):
-        m1.return_value = MockDiff(DIFF_NO_CHANGELOG)
 
-        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
+@patch('requests.get')
+def test_with_change_log_file(m1, caplog):
+    m1.return_value = MockDiff(DIFF_WITH_CHANGELOG)
+    event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
+    caplog.set_level(logging.INFO)
+    WarnNoChangelogEntry(event)
+    assert 'changelog entry: success' in caplog.records[-1].msg
 
-        with LogCapture() as captured_data:
-            WarnNoChangelogEntry(event)
 
-        self.assertIn('changelog entry: error', captured_data.records[-1].msg)
+@patch('requests.get')
+def test_with_news_entry(m1, caplog):
+    m1.return_value = MockDiff(DIFF_WITH_NEWS_ENTRY)
+    event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
+    caplog.set_level(logging.INFO)
+    WarnNoChangelogEntry(event)
+    assert 'changelog entry: success' in caplog.records[-1].msg
 
-    @mock.patch('requests.get')
-    def test_with_change_log_file(self, m1):
-        m1.return_value = MockDiff(DIFF_WITH_CHANGELOG)
 
-        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
-
-        with LogCapture() as captured_data:
-            WarnNoChangelogEntry(event)
-
-        self.assertIn('changelog entry: success', captured_data.records[-1].msg)
-
-    @mock.patch('requests.get')
-    def test_with_news_entry(self, m1):
-        m1.return_value = MockDiff(DIFF_WITH_NEWS_ENTRY)
-
-        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
-
-        with LogCapture() as captured_data:
-            WarnNoChangelogEntry(event)
-
-        self.assertIn('changelog entry: success', captured_data.records[-1].msg)
-
-    @mock.patch('requests.get')
-    def test_with_change_log_file_history(self, m1):
-        m1.return_value = MockDiff(DIFF_WITH_CHANGELOG_ON_HISTORY_txt)
-
-        event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
-
-        with LogCapture() as captured_data:
-            WarnNoChangelogEntry(event)
-
-        self.assertIn('changelog entry: success', captured_data.records[-1].msg)
+@patch('requests.get')
+def test_with_change_log_file_history(m1, caplog):
+    m1.return_value = MockDiff(DIFF_WITH_CHANGELOG_ON_HISTORY_txt)
+    event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
+    caplog.set_level(logging.INFO)
+    WarnNoChangelogEntry(event)
+    assert 'changelog entry: success' in caplog.records[-1].msg

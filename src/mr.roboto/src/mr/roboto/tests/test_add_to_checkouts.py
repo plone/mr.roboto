@@ -1,13 +1,12 @@
 from mr.roboto.events import MergedPullRequest
 from mr.roboto.subscriber import UpdateCoredevCheckouts
 from tempfile import NamedTemporaryFile
-from testfixtures import LogCapture
 from unittest import mock
 
 import copy
+import logging
 import os
 import pickle
-import unittest
 
 
 """
@@ -147,98 +146,83 @@ class MockRequest:
             os.remove(self._settings['sources_file'])
 
 
-class AddToCheckoutsSubscriberTest(unittest.TestCase):
-    def create_event(self, checkouts_data, sources_data, payload):
-        request = MockRequest()
-        request.set_checkouts(checkouts_data)
-        request.set_sources(sources_data)
-        event = MergedPullRequest(pull_request=payload, request=request)
-        return event
+def create_event(checkouts_data, sources_data, payload):
+    request = MockRequest()
+    request.set_checkouts(checkouts_data)
+    request.set_sources(sources_data)
+    event = MergedPullRequest(pull_request=payload, request=request)
+    return event
 
-    def test_buildout_coredev_merge(self):
-        event = self.create_event({}, {}, payload=PAYLOAD)
 
-        with LogCapture() as captured_data:
-            UpdateCoredevCheckouts(event)
+def test_buildout_coredev_merge(caplog):
+    event = create_event({}, {}, payload=PAYLOAD)
+    caplog.set_level(logging.INFO)
+    UpdateCoredevCheckouts(event)
+    event.request.cleanup()
+    assert len(caplog.records) == 0
 
-        event.request.cleanup()
 
-        self.assertEqual(len(captured_data.records), 0)
+def test_not_targeting_any_plone_version(caplog):
+    event = create_event({}, {}, payload=NO_PLONE_VERSION_PAYLOAD)
+    caplog.set_level(logging.INFO)
+    UpdateCoredevCheckouts(event)
+    event.request.cleanup()
 
-    def test_not_targeting_any_plone_version(self):
-        event = self.create_event({}, {}, payload=NO_PLONE_VERSION_PAYLOAD)
+    assert len(caplog.records) == 1
+    assert (
+        'no plone coredev version tracks branch my-upstream-branch of '
+        'plone.uuid, checkouts.cfg not updated'
+    ) in caplog.records[0].msg
 
-        with LogCapture() as captured_data:
-            UpdateCoredevCheckouts(event)
 
-        event.request.cleanup()
+def test_in_checkouts(caplog):
+    checkouts = {'5.1': ['plone.uuid']}
+    sources = {('plone/plone.uuid', 'master'): ['5.1']}
+    event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
+    caplog.set_level(logging.INFO)
+    UpdateCoredevCheckouts(event)
+    event.request.cleanup()
 
-        self.assertEqual(len(captured_data.records), 1)
+    assert len(caplog.records) == 1
+    assert (
+        'is already on checkouts.cfg of all plone versions that it targets'
+    ) in caplog.records[0].msg
 
-        self.assertIn(
-            'no plone coredev version tracks branch my-upstream-branch of '
-            'plone.uuid, checkouts.cfg not updated',
-            captured_data.records[0].msg,
-        )
 
-    def test_in_checkouts(self):
-        checkouts = {'5.1': ['plone.uuid']}
-        sources = {('plone/plone.uuid', 'master'): ['5.1']}
-        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
+def test_in_multiple_checkouts(caplog):
+    checkouts = {'5.0': ['plone.uuid'], '5.1': ['plone.uuid']}
+    sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
+    event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
+    caplog.set_level(logging.INFO)
+    UpdateCoredevCheckouts(event)
+    event.request.cleanup()
 
-        with LogCapture() as captured_data:
-            UpdateCoredevCheckouts(event)
+    assert len(caplog.records) == 1
+    assert (
+        'is already on checkouts.cfg of all plone versions that it targets'
+    ) in caplog.records[0].msg
 
-        event.request.cleanup()
 
-        self.assertEqual(len(captured_data.records), 1)
-        self.assertIn(
-            'is already on checkouts.cfg of all plone versions that it targets',
-            captured_data.records[0].msg,
-        )
+def test_not_in_checkouts(caplog):
+    checkouts = {'5.0': [], '5.1': ['plone.uuid']}
+    sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
+    event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
+    caplog.set_level(logging.INFO)
+    UpdateCoredevCheckouts(event)
+    event.request.cleanup()
 
-    def test_in_multiple_checkouts(self):
-        checkouts = {'5.0': ['plone.uuid'], '5.1': ['plone.uuid']}
-        sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
-        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
+    assert len(caplog.records) == 1
+    assert 'add to checkouts.cfg of buildout.coredev 5.0' in caplog.records[0].msg
 
-        with LogCapture() as captured_data:
-            UpdateCoredevCheckouts(event)
 
-        event.request.cleanup()
+def test_not_in_multiple_checkouts(caplog):
+    checkouts = {'4.3': [], '5.0': [], '5.1': ['plone.uuid']}
+    sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0', '4.3']}
+    event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
+    caplog.set_level(logging.INFO)
+    UpdateCoredevCheckouts(event)
+    event.request.cleanup()
 
-        self.assertEqual(len(captured_data.records), 1)
-        self.assertIn(
-            'is already on checkouts.cfg of all plone versions that it targets',
-            captured_data.records[0].msg,
-        )
-
-    def test_not_in_checkouts(self):
-        checkouts = {'5.0': [], '5.1': ['plone.uuid']}
-        sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
-        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
-
-        with LogCapture() as captured_data:
-            UpdateCoredevCheckouts(event)
-
-        event.request.cleanup()
-
-        self.assertEqual(len(captured_data.records), 1)
-        self.assertIn(
-            'add to checkouts.cfg of buildout.coredev 5.0', captured_data.records[0].msg
-        )
-
-    def test_not_in_multiple_checkouts(self):
-        checkouts = {'4.3': [], '5.0': [], '5.1': ['plone.uuid']}
-        sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0', '4.3']}
-        event = self.create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
-
-        with LogCapture() as captured_data:
-            UpdateCoredevCheckouts(event)
-
-        event.request.cleanup()
-
-        self.assertEqual(len(captured_data.records), 2)
-        messages = sorted([m.msg for m in captured_data.records])
-        self.assertIn('add to checkouts.cfg of buildout.coredev 4.3', messages[0])
-        self.assertIn('add to checkouts.cfg of buildout.coredev 5.0', messages[1])
+    assert len(caplog.records) == 2
+    assert 'add to checkouts.cfg of buildout.coredev 5.0' in caplog.records[0].msg
+    assert 'add to checkouts.cfg of buildout.coredev 4.3' in caplog.records[1].msg

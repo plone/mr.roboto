@@ -1,12 +1,12 @@
 from hashlib import sha1
 from mr.roboto.tests import minimal_main
-from testfixtures import LogCapture
 from webtest import TestApp as BaseApp
 
 import copy
 import hmac
 import json
-import unittest
+import logging
+import pytest
 import urllib
 
 
@@ -37,70 +37,70 @@ CLOSED_AND_MERGED_PR_ACTION_PAYLOAD['action'] = 'closed'
 CLOSED_AND_MERGED_PR_ACTION_PAYLOAD['pull_request']['merged'] = True
 
 
-class RunCoreJobTest(unittest.TestCase):
-    def setUp(self):
-        settings = {}
-        app = minimal_main(settings, 'mr.roboto.views.pull_requests')
-        self.roboto = BaseApp(app)
-        self.settings = app.registry.settings
+@pytest.fixture
+def roboto():
+    settings = {}
+    app = minimal_main(settings, 'mr.roboto.views.pull_requests')
+    roboto = BaseApp(app)
+    return roboto
 
-    def prepare_data(self, payload):
-        body = urllib.parse.urlencode({'payload': json.dumps(payload)})
-        hmac_value = hmac.new(self.settings['api_key'].encode(), body.encode(), sha1)
-        digest = hmac_value.hexdigest()
-        return digest, body
 
-    def call_view(self, payload):
-        digest, body = self.prepare_data(payload)
-        result = self.roboto.post(
-            '/run/pull-request',
-            headers={'X-Hub_Signature': f'sha1={digest}'},
-            params=body,
-        )
-        return result
+def prepare_data(settings, payload):
+    body = urllib.parse.urlencode({'payload': json.dumps(payload)})
+    hmac_value = hmac.new(settings['api_key'].encode(), body.encode(), sha1)
+    digest = hmac_value.hexdigest()
+    return digest, body
 
-    def test_no_validation(self):
-        res = self.roboto.post('/run/pull-request')
-        self.assertIn('Token not active', res.ubody)
 
-    def test_ping_answer(self):
-        result = self.call_view({'ping': 'true'})
+def call_view(roboto, payload):
+    settings = roboto.app.registry.settings
+    digest, body = prepare_data(settings, payload)
+    result = roboto.post(
+        '/run/pull-request',
+        headers={'X-Hub_Signature': f'sha1={digest}'},
+        params=body,
+    )
+    return result
 
-        self.assertIn('No action', result.ubody)
 
-    def test_pull_request_view(self):
-        result = self.call_view(NEW_PR_PAYLOAD)
+def test_no_validation(roboto):
+    result = roboto.post('/run/pull-request')
+    assert result.json['message'] == 'Token not active'
 
-        self.assertIn('Handlers already took care of this pull request', result.ubody)
 
-    def test_update_pull_request(self):
-        result = self.call_view(UPDATED_PR_PAYLOAD)
+def test_ping_answer(roboto):
+    result = call_view(roboto, {'ping': 'true'})
+    assert 'No action' in result.json['message']
 
-        self.assertIn('Handlers already took care of this pull request', result.ubody)
 
-    def test_unknown_pull_request_action(self):
-        with LogCapture() as captured_data:
-            self.call_view(UNKNOWN_PR_ACTION_PAYLOAD)
+def test_pull_request_view(roboto):
+    result = call_view(roboto, NEW_PR_PAYLOAD)
+    assert 'Handlers already took care of this pull request' in result.json['message']
 
-        self.assertEqual(len(captured_data.records), 2)
 
-        self.assertIn(
-            'PR plone/mr.roboto#1: action "unknown" (merged: False) not handled',
-            captured_data.records[-1].msg,
-        )
+def test_update_pull_request(roboto):
+    result = call_view(roboto, UPDATED_PR_PAYLOAD)
+    assert 'Handlers already took care of this pull request' in result.json['message']
 
-    def test_closed_not_merged_pull_request_action(self):
-        with LogCapture() as captured_data:
-            self.call_view(CLOSED_NOT_MERGED_PR_ACTION_PAYLOAD)
 
-        self.assertEqual(len(captured_data.records), 2)
+def test_unknown_pull_request_action(roboto, caplog):
+    caplog.set_level(logging.INFO)
+    call_view(roboto, UNKNOWN_PR_ACTION_PAYLOAD)
 
-        self.assertIn(
-            'PR plone/mr.roboto#1: action "closed" (merged: False) not handled',
-            captured_data.records[-1].msg,
-        )
+    assert len(caplog.records) == 2
+    msg = 'PR plone/mr.roboto#1: action "unknown" (merged: False) not handled'
+    assert msg in caplog.records[-1].msg
 
-    def test_closed_and_merged_pull_request_action(self):
-        result = self.call_view(CLOSED_AND_MERGED_PR_ACTION_PAYLOAD)
 
-        self.assertIn('Handlers already took care of this pull request', result.ubody)
+def test_closed_not_merged_pull_request_action(roboto, caplog):
+    caplog.set_level(logging.INFO)
+    call_view(roboto, CLOSED_NOT_MERGED_PR_ACTION_PAYLOAD)
+
+    assert len(caplog.records) == 2
+    msg = 'PR plone/mr.roboto#1: action "closed" (merged: False) not handled'
+    assert msg in caplog.records[-1].msg
+
+
+def test_closed_and_merged_pull_request_action(roboto):
+    result = call_view(roboto, CLOSED_AND_MERGED_PR_ACTION_PAYLOAD)
+    assert 'Handlers already took care of this pull request' in result.json['message']
