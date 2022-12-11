@@ -9,8 +9,6 @@ contributors_file = open('CONTRIBUTORS.rst').read()
 changes_file = open('CHANGES.rst').read()
 long_description = f'{readme_file}\n{contributors_file}\n{changes_file}\n'
 
-test_requires = ['mock', 'pyramid_debugtoolbar', 'pytest', 'WebTest', 'testfixtures']
-
 setup(
     name='mr.roboto',
     version=version,
@@ -30,7 +28,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'configparser',
         'cornice',
         'gitpython',
         'PyGithub',
@@ -40,9 +37,6 @@ setup(
         'setuptools',
         'unidiff',
     ],
-    extras_require={'test': test_requires},
-    tests_require=test_requires,
-    test_suite='mr.roboto.tests',
     entry_points="""
     [paste.app_factory]
     main = mr.roboto:main
