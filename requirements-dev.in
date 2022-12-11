@@ -1,3 +1,5 @@
+-r requirements-app.txt
+
 black
 codespell
 coveralls
@@ -16,3 +18,4 @@ isort
 pytest
 pytest-cov
 pyupgrade
+WebTest
