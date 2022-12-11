@@ -40,3 +40,8 @@ jobs:
       # linters
       - name: Lint with flake8
         run: flake8 `find src -name *.py`
+      # tests and coverage
+      - name: Test
+        run: pytest src --cov --cov-report term-missing
+      - name: Coverage
+        run: coveralls --service=github
