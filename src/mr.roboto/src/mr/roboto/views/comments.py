@@ -28,13 +28,13 @@ def handle_comment(request):
     # bail out early if it's just a github check ?? see pull requests
     payload = json.loads(request.POST['payload'])
     if 'action' not in payload:
-        return 'No action'  # handle github pings
+        return {'message': 'No action'}  # handle github pings
 
     if 'comment' not in payload:
-        return 'Comment is missing in payload. No action.'
+        return {'message': 'Comment is missing in payload. No action.'}
 
     if 'issue' not in payload or 'pull_request' not in payload['issue']:
-        return 'The comment is not from a pull request. No action.'
+        return {'message': 'The comment is not from a pull request. No action.'}
 
     action = payload['action']
     comment_payload = payload['comment']
@@ -47,7 +47,9 @@ def handle_comment(request):
         logger.info(
             f'COMMENT {comment_short_url}: IGNORED as it is from {comment_user_id}'
         )
-        return f'Comment on PR {comment_short_url} ignored as is from {comment_user_id}. No action.'
+        return {
+            'message': f'Comment on PR {comment_short_url} ignored as is from {comment_user_id}. No action.'
+        }
 
     pull_request_payload = payload['issue']['pull_request']
     pull_request_short_url = shorten_pull_request_url(pull_request_payload['html_url'])
@@ -62,4 +64,4 @@ def handle_comment(request):
         )
 
     msg = 'Thanks! Handlers already took care of this comment'
-    return json.dumps({'message': msg})
+    return {'message': msg}

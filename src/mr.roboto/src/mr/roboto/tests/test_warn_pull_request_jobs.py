@@ -1,13 +1,12 @@
 from mr.roboto.subscriber import WarnTestsNeedToRun
 from mr.roboto.tests import default_settings
 from tempfile import NamedTemporaryFile
-from testfixtures import LogCapture
 from unittest import mock
 
 import copy
+import logging
 import os
 import pickle
-import unittest
 
 
 """
@@ -68,104 +67,82 @@ class MockRequest:
             os.remove(self._settings['sources_file'])
 
 
-class WarnPullRequestSubscriberTest(unittest.TestCase):
-    def create_event(self, sources_data, payload=None):
-        from mr.roboto.events import NewPullRequest
+def create_event(sources_data, payload=None):
+    from mr.roboto.events import NewPullRequest
 
-        if not payload:
-            payload = PAYLOAD
+    if not payload:
+        payload = PAYLOAD
 
-        request = MockRequest()
-        request.set_sources(sources_data)
-        event = NewPullRequest(pull_request=payload, request=request)
-        return event
+    request = MockRequest()
+    request.set_sources(sources_data)
+    event = NewPullRequest(pull_request=payload, request=request)
+    return event
 
-    def test_not_targeting_any_source(self):
-        event = self.create_event({('plone/mr.roboto', 'stable'): ['5.1']})
 
-        with LogCapture() as captured_data:
-            WarnTestsNeedToRun(event)
+def test_not_targeting_any_source(caplog):
+    caplog.set_level(logging.INFO)
+    event = create_event({('plone/mr.roboto', 'stable'): ['5.1']})
+    WarnTestsNeedToRun(event)
+    event.request.cleanup_sources()
 
-        event.request.cleanup_sources()
+    assert len(caplog.records) == 1
+    assert 'does not target any Plone version', caplog.records[-1].msg
 
-        self.assertEqual(len(captured_data.records), 1)
-        self.assertIn('does not target any Plone version', captured_data.records[0].msg)
 
-    def test_target_one_plone_version(self):
-        event = self.create_event({('plone/mr.roboto', 'master'): ['5.2']})
+def test_target_one_plone_version(caplog):
+    caplog.set_level(logging.INFO)
+    event = create_event({('plone/mr.roboto', 'master'): ['5.2']})
+    WarnTestsNeedToRun(event)
+    event.request.cleanup_sources()
 
-        with LogCapture() as captured_data:
-            WarnTestsNeedToRun(event)
+    assert len(caplog.records) == 2
+    assert 'created pending status for plone 5.2 on python 2.7' in caplog.records[0].msg
+    assert 'created pending status for plone 5.2 on python 3.6' in caplog.records[1].msg
 
-        event.request.cleanup_sources()
 
-        self.assertEqual(len(captured_data.records), 2)
-        self.assertIn(
-            'created pending status for plone 5.2 on python 2.7',
-            captured_data.records[0].msg,
-        )
-        self.assertIn(
-            'created pending status for plone 5.2 on python 3.6',
-            captured_data.records[1].msg,
-        )
+def test_target_multiple_plone_versions(caplog):
+    caplog.set_level(logging.INFO)
+    event = create_event({('plone/mr.roboto', 'master'): ['5.2', '6.0']})
+    WarnTestsNeedToRun(event)
+    event.request.cleanup_sources()
 
-    def test_target_multiple_plone_versions(self):
-        event = self.create_event({('plone/mr.roboto', 'master'): ['5.2', '6.0']})
+    assert len(caplog.records) == 4
+    messages = sorted([m.msg for m in caplog.records])
+    pairs = (('5.2', '2.7'), ('5.2', '3.6'), ('6.0', '3.8'), ('6.0', '3.9'))
+    for pair, msg in zip(pairs, messages):
+        plone, python = pair
+        assert f'created pending status for plone {plone} on python {python}' in msg
 
-        with LogCapture() as captured_data:
-            WarnTestsNeedToRun(event)
 
-        event.request.cleanup_sources()
+def test_buildout_coredev_not_targeting_plone_release(caplog):
+    caplog.set_level(logging.INFO)
+    event = create_event({}, payload=COREDEV_RANDOM_BRANCH_PAYLOAD)
+    WarnTestsNeedToRun(event)
+    event.request.cleanup_sources()
 
-        self.assertEqual(len(captured_data.records), 4)
+    assert len(caplog.records) == 1
+    assert (
+        'PR plone/buildout.coredev#3: does not target any Plone version'
+        in caplog.records[0].msg
+    )
 
-        messages = sorted([m.msg for m in captured_data.records])
 
-        pairs = (('5.2', '2.7'), ('5.2', '3.6'), ('6.0', '3.8'), ('6.0', '3.9'))
-        for pair, msg in zip(pairs, messages):
-            plone, python = pair
-            self.assertIn(
-                f'created pending status for plone {plone} on python {python}', msg
-            )
+def test_buildout_coredev_targeting_plone_release(caplog):
+    caplog.set_level(logging.INFO)
+    event = create_event({}, payload=COREDEV_PAYLOAD)
+    WarnTestsNeedToRun(event)
+    event.request.cleanup_sources()
 
-    def test_buildout_coredev_not_targeting_plone_release(self):
-        event = self.create_event({}, payload=COREDEV_RANDOM_BRANCH_PAYLOAD)
+    assert len(caplog.records) == 2
+    assert 'for plone 6.0 on python 3.8' in caplog.records[0].msg
+    assert 'for plone 6.0 on python 3.9' in caplog.records[1].msg
 
-        with LogCapture() as captured_data:
-            WarnTestsNeedToRun(event)
 
-        event.request.cleanup_sources()
+def test_whitelisted(caplog):
+    caplog.set_level(logging.INFO)
+    event = create_event({}, payload=WHITELISTED_REPO)
+    WarnTestsNeedToRun(event)
+    event.request.cleanup_sources()
 
-        self.assertEqual(len(captured_data.records), 1)
-
-        self.assertIn(
-            'PR plone/buildout.coredev#3: does not target any Plone version',
-            captured_data.records[0].msg,
-        )
-
-    def test_buildout_coredev_targeting_plone_release(self):
-        event = self.create_event({}, payload=COREDEV_PAYLOAD)
-
-        with LogCapture() as captured_data:
-            WarnTestsNeedToRun(event)
-
-        event.request.cleanup_sources()
-
-        self.assertEqual(len(captured_data.records), 2)
-
-        self.assertIn('for plone 6.0 on python 3.8', captured_data.records[0].msg)
-        self.assertIn('for plone 6.0 on python 3.9', captured_data.records[1].msg)
-
-    def test_whitelisted(self):
-        event = self.create_event({}, payload=WHITELISTED_REPO)
-
-        with LogCapture() as captured_data:
-            WarnTestsNeedToRun(event)
-
-        event.request.cleanup_sources()
-
-        self.assertEqual(len(captured_data.records), 1)
-
-        self.assertIn(
-            'skip adding test warnings, repo whitelisted', captured_data.records[0].msg
-        )
+    assert len(caplog.records) == 1
+    assert 'skip adding test warnings, repo whitelisted' in caplog.records[0].msg

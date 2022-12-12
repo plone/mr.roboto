@@ -77,7 +77,7 @@ class RunHooksTest(unittest.TestCase):
                 return []
 
             def create_hook(self, *args, **kwargs):
-                raise GithubException('one', 'two')
+                raise GithubException('one', 'two', headers={})
 
         class DummyGetRepos:
             def get_repos(self):
