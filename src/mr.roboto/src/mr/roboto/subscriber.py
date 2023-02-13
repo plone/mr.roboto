@@ -50,6 +50,7 @@ IGNORE_NO_AGREEMENT = ('icalendar', 'planet.plone.org', 'documentation', 'traini
 IGNORE_USER_NO_AGREEMENT = (
     'web-flow',
     'dependabot',
+    'pre-commit-ci[bot]',
 )
 
 IGNORE_NO_TEST_NEEDED = ('plone.releaser',)
