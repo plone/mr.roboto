@@ -1,6 +1,7 @@
 from collections import namedtuple
 from cornice import Service
 from github.GithubException import GithubException
+from github.GithubException import UnknownObjectException
 from mr.roboto.security import validate_service_token
 
 import json
@@ -39,6 +40,17 @@ def create_github_post_commit_hooks_view(request):
     ]
 
     messages = []
+
+    one_repo = request.GET.get('repo', None)
+    if one_repo:
+        msg = f'Create hooks only for {one_repo}'
+        logger.info(msg)
+        try:
+            repo = github.get_organization('plone').get_repo(one_repo)
+        except UnknownObjectException:
+            return json.dumps({'message': f'Repository {one_repo} not found'})
+        messages.append(update_hooks_on_repo(repo, roboto_hooks, request))
+        return json.dumps(messages)
 
     collective_repos = [
         repo.strip()

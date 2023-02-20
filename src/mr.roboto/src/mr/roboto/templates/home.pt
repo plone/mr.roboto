@@ -58,6 +58,10 @@
       <a href="${info.roboto_url}/run/githubcommithooks?token=XXXXX">Re-create GitHub commit hooks</a>
       <em class="alert">Token needed</em>
     </li>
+    <li>
+      <a href="${info.roboto_url}/run/githubcommithooks?token=XXXXX&repo=plone.batching">Re-create GitHub commit hooks (on one single repo)</a>
+      <em class="alert">Token needed</em>
+    </li>
   </ul>
 
 </body>
