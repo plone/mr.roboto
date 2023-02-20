@@ -85,7 +85,6 @@ def mail_to_cvs(payload, mailer):
         return
 
     for commit in payload['commits']:
-
         commit_data = get_info_from_commit(commit)
 
         data = {

@@ -43,7 +43,6 @@ def handle_comment(request):
 
     github_users = request.registry.settings['github_users']
     if comment_user_id in github_users:
-
         logger.info(
             f'COMMENT {comment_short_url}: IGNORED as it is from {comment_user_id}'
         )
