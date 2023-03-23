@@ -276,8 +276,8 @@ class PullRequestSubscriber:
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class ContributorsAgreementSigned(PullRequestSubscriber):
     def __init__(self, event):
-        self.cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
-        self.github_help_setup_email_url = 'https://help.github.com/articles/adding-an-email-address-to-your-github-account/'  # noqa
+        self.cla_url = 'https://plone.org/foundation/contributors-agreement'  # noqa
+        self.github_help_setup_email_url = 'https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/adding-an-email-address-to-your-github-account'  # noqa
         self.status_context = 'Plone Contributors Agreement verifier'
 
         super().__init__(event)
@@ -285,7 +285,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
     def run(self):
         """Check if all users involved in a pull request have signed the CLA"""
         if self.repo_name in IGNORE_NO_AGREEMENT:
-            self.log('whitelisted for contributors agreement')
+            self.log('allow-listed for contributors agreement')
             return
 
         json_data = self.get_json_commits()
@@ -309,7 +309,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             users = ' @'.join(not_foundation)
             msg = (
                 f'@{users} you need to sign the Plone Contributor '
-                f'Agreement in order to merge this pull request. \n\n'
+                f'Agreement to merge this pull request. \n\n'
                 f'Learn about the Plone Contributor Agreement: {self.cla_url}'
             )
             self.g_issue.create_comment(body=msg)
@@ -349,7 +349,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
     def run(self):
         """If the pull request does not add a changelog entry, warn about it"""
         if self.repo_name in IGNORE_NO_CHANGELOG:
-            self.log('whitelisted for changelog entries')
+            self.log('allow-listed for changelog entries')
             return
 
         status = 'success'
@@ -419,7 +419,7 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
 
     def _plone_versions_targeted(self):
         if self.repo_name in IGNORE_NO_TEST_NEEDED:
-            self.log('skip adding test warnings, repo whitelisted')
+            self.log('skip adding test warnings, repo allow-listed')
             return []
 
         target_branch = self.pull_request['base']['ref']
@@ -581,7 +581,7 @@ class TriggerPullRequestJenkinsJobs:
         pull_request_url = self.event.pull_request['html_url']
         repo_name = pull_request_url.split('/')[-3]
         if repo_name in IGNORE_NO_TEST_NEEDED:
-            self.log('skip triggering jenkins jobs, repo is whitelisted')
+            self.log('skip triggering jenkins jobs, repo is allow-listed')
             return False
 
         return '@jenkins-plone-org please run jobs' in self.event.comment['body']
