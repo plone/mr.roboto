@@ -285,7 +285,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
     def run(self):
         """Check if all users involved in a pull request have signed the CLA"""
         if self.repo_name in IGNORE_NO_AGREEMENT:
-            self.log('allow-listed for contributors agreement')
+            self.log('whitelisted for contributors agreement')
             return
 
         json_data = self.get_json_commits()
@@ -349,7 +349,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
     def run(self):
         """If the pull request does not add a changelog entry, warn about it"""
         if self.repo_name in IGNORE_NO_CHANGELOG:
-            self.log('allow-listed for changelog entries')
+            self.log('whitelisted for changelog entries')
             return
 
         status = 'success'
@@ -419,7 +419,7 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
 
     def _plone_versions_targeted(self):
         if self.repo_name in IGNORE_NO_TEST_NEEDED:
-            self.log('skip adding test warnings, repo allow-listed')
+            self.log('skip adding test warnings, repo whitelisted')
             return []
 
         target_branch = self.pull_request['base']['ref']
@@ -581,7 +581,7 @@ class TriggerPullRequestJenkinsJobs:
         pull_request_url = self.event.pull_request['html_url']
         repo_name = pull_request_url.split('/')[-3]
         if repo_name in IGNORE_NO_TEST_NEEDED:
-            self.log('skip triggering jenkins jobs, repo is allow-listed')
+            self.log('skip triggering jenkins jobs, repo is whitelisted')
             return False
 
         return '@jenkins-plone-org please run jobs' in self.event.comment['body']
