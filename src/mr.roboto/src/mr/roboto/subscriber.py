@@ -276,8 +276,8 @@ class PullRequestSubscriber:
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class ContributorsAgreementSigned(PullRequestSubscriber):
     def __init__(self, event):
-        self.cla_url = 'http://docs.plone.org/develop/coredev/docs/contributors_agreement_explained.html'  # noqa
-        self.github_help_setup_email_url = 'https://help.github.com/articles/adding-an-email-address-to-your-github-account/'  # noqa
+        self.cla_url = 'https://plone.org/foundation/contributors-agreement'  # noqa
+        self.github_help_setup_email_url = 'https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/adding-an-email-address-to-your-github-account'  # noqa
         self.status_context = 'Plone Contributors Agreement verifier'
 
         super().__init__(event)
@@ -309,7 +309,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             users = ' @'.join(not_foundation)
             msg = (
                 f'@{users} you need to sign the Plone Contributor '
-                f'Agreement in order to merge this pull request. \n\n'
+                f'Agreement to merge this pull request. \n\n'
                 f'Learn about the Plone Contributor Agreement: {self.cla_url}'
             )
             self.g_issue.create_comment(body=msg)
