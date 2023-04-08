@@ -364,7 +364,7 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
             patch_data = PatchSet(
                 diff_data.content.splitlines(), encoding=diff_data.encoding
             )
-        except Exception:
+        except UnicodeDecodeError:
             patch_data = []
 
         for diff_file in patch_data:
