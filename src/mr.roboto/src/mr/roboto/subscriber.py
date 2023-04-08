@@ -27,7 +27,9 @@ import requests
 
 logger = logging.getLogger('mr.roboto')
 
-VALID_CHANGELOG_FILES = re.compile(r'(CHANGES|HISTORY|CHANGELOG).(txt|rst|md)$')
+VALID_CHANGELOG_FILES = re.compile(
+    r'(.pre-commit-config|CHANGES|HISTORY|CHANGELOG).(txt|rst|md|yaml)$'
+)
 
 IGNORE_NO_CHANGELOG = (
     'documentation',
