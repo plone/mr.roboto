@@ -138,7 +138,7 @@ def test_buildout_coredev_targeting_plone_release(caplog):
     assert 'for plone 6.0 on python 3.9' in caplog.records[1].msg
 
 
-def test_ignoed(caplog):
+def test_ignored(caplog):
     caplog.set_level(logging.INFO)
     event = create_event({}, payload=IGNORED_REPO)
     WarnTestsNeedToRun(event)
