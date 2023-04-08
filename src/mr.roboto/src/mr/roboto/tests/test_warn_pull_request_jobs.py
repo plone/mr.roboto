@@ -36,10 +36,10 @@ COREDEV_PAYLOAD['base']['repo']['full_name'] = 'plone/buildout.coredev'
 COREDEV_RANDOM_BRANCH_PAYLOAD = copy.deepcopy(COREDEV_PAYLOAD)
 COREDEV_RANDOM_BRANCH_PAYLOAD['base']['ref'] = 'random'
 
-WHITELISTED_REPO = copy.deepcopy(PAYLOAD)
-WHITELISTED_REPO['html_url'] = 'https://github.com/plone/plone.releaser/pull/5'
-WHITELISTED_REPO['base']['repo']['full_name'] = 'plone/plone.releaser'
-WHITELISTED_REPO['base']['repo']['name'] = 'plone.releaser'
+IGNORED_REPO = copy.deepcopy(PAYLOAD)
+IGNORED_REPO['html_url'] = 'https://github.com/plone/plone.releaser/pull/5'
+IGNORED_REPO['base']['repo']['full_name'] = 'plone/plone.releaser'
+IGNORED_REPO['base']['repo']['name'] = 'plone.releaser'
 
 
 class MockRequest:
@@ -138,11 +138,11 @@ def test_buildout_coredev_targeting_plone_release(caplog):
     assert 'for plone 6.0 on python 3.9' in caplog.records[1].msg
 
 
-def test_whitelisted(caplog):
+def test_ignored(caplog):
     caplog.set_level(logging.INFO)
-    event = create_event({}, payload=WHITELISTED_REPO)
+    event = create_event({}, payload=IGNORED_REPO)
     WarnTestsNeedToRun(event)
     event.request.cleanup_sources()
 
     assert len(caplog.records) == 1
-    assert 'skip adding test warnings, repo whitelisted' in caplog.records[0].msg
+    assert 'skip adding test warnings, repo ignored' in caplog.records[0].msg

@@ -19,8 +19,8 @@ PAYLOAD = {
     'base': {'repo': {'name': 'Products.CMFPlone', 'owner': {'login': 'plone'}}},
 }
 
-WHITELISTED_REPO_PAYLOAD = copy.deepcopy(PAYLOAD)
-WHITELISTED_REPO_PAYLOAD['base']['repo']['name'] = 'documentation'
+IGNORED_REPO_PAYLOAD = copy.deepcopy(PAYLOAD)
+IGNORED_REPO_PAYLOAD['base']['repo']['name'] = 'documentation'
 
 DIFF_NO_CHANGELOG = """
 diff --git a/src/mr.roboto/setup.py b/src/mr.roboto/setup.py
@@ -104,11 +104,11 @@ class MockDiff:
         return self.data
 
 
-def test_repo_whitelisted(caplog):
-    event = NewPullRequest(pull_request=WHITELISTED_REPO_PAYLOAD, request=MockRequest())
+def test_repo_ignored(caplog):
+    event = NewPullRequest(pull_request=IGNORED_REPO_PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     WarnNoChangelogEntry(event)
-    assert 'whitelisted for changelog entries' in caplog.records[-1].msg
+    assert 'no need to have a changelog entry' in caplog.records[-1].msg
 
 
 @patch('requests.get')

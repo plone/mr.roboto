@@ -20,8 +20,8 @@ PAYLOAD = {
 }
 COLLECTIVE_PAYLOAD = copy.deepcopy(PAYLOAD)
 COLLECTIVE_PAYLOAD['base']['repo']['owner']['login'] = 'collective'
-WHITELISTED_PAYLOAD = copy.deepcopy(PAYLOAD)
-WHITELISTED_PAYLOAD['base']['repo']['name'] = 'icalendar'
+IGNORED_PAYLOAD = copy.deepcopy(PAYLOAD)
+IGNORED_PAYLOAD['base']['repo']['name'] = 'icalendar'
 
 
 class MockRequest:
@@ -176,9 +176,9 @@ def test_ignore_witelisted_users(m1, caplog):
     assert 'Contributors Agreement report: success' in caplog.records[-1].msg
 
 
-def test_whitelisted(caplog):
-    event = NewPullRequest(pull_request=WHITELISTED_PAYLOAD, request=MockRequest())
+def test_ignored(caplog):
+    event = NewPullRequest(pull_request=IGNORED_PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     ContributorsAgreementSigned(event)
 
-    assert 'whitelisted for contributors agreement', caplog.records[-1].msg
+    assert 'no need to sign contributors agreement' in caplog.records[-1].msg
