@@ -12,11 +12,11 @@ import pickle
 import pytest
 
 
-WHITELISTED_PKG_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
-WHITELISTED_PKG_PAYLOAD['comment'][
+IGNORED_PKG_PAYLOAD = copy.deepcopy(COMMENT_PAYLOAD)
+IGNORED_PKG_PAYLOAD['comment'][
     'html_url'
 ] = 'https://github.com/plone/plone.releaser/pull/42#issuecomment-290382'
-WHITELISTED_PKG_PAYLOAD['issue']['pull_request'][
+IGNORED_PKG_PAYLOAD['issue']['pull_request'][
     'html_url'
 ] = 'https://github.com/plone/plone.releaser/pull/1'
 
@@ -96,11 +96,11 @@ def test_short_url(roboto):
     assert subscriber.short_url == 'plone/plone.api#42-290382'
 
 
-def test_package_whitelisted_no_jobs_triggered(roboto, caplog):
+def test_package_ignoed_no_jobs_triggered(roboto, caplog):
     caplog.set_level(logging.INFO)
-    _subscriber(roboto, WHITELISTED_PKG_PAYLOAD, {})
+    _subscriber(roboto, IGNORED_PKG_PAYLOAD, {})
     logger_record = caplog.records[-1].msg
-    assert 'skip triggering jenkins jobs, repo is whitelisted' in logger_record
+    assert 'skip triggering jenkins jobs, repo is ignored' in logger_record
 
 
 def test_random_comment_no_jobs_triggered(roboto, caplog):
