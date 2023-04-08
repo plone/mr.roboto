@@ -32,6 +32,7 @@ VALID_CHANGELOG_FILES = re.compile(
 )
 
 IGNORE_NO_CHANGELOG = (
+    '.github',
     'documentation',
     'mockup',
     'mr.roboto',
