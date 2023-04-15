@@ -57,7 +57,7 @@ IGNORE_USER_NO_AGREEMENT = (
     'pre-commit-ci[bot]',
 )
 
-IGNORE_NO_TEST_NEEDED = ('plone.releaser',)
+IGNORE_NO_TEST_NEEDED = ('plone.releaser', 'plone.versioncheck')
 
 IGNORE_NO_AUTO_CHECKOUT = ('documentation',)
 
