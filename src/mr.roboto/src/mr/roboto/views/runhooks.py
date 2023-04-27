@@ -48,7 +48,10 @@ def create_github_post_commit_hooks_view(request):
         try:
             repo = github.get_organization('plone').get_repo(one_repo)
         except UnknownObjectException:
-            return json.dumps({'message': f'Repository {one_repo} not found'})
+            try:
+                repo = github.get_organization('collective').get_repo(one_repo)
+            except UnknownObjectException:
+                return json.dumps({'message': f'Repository {one_repo} not found'})
         messages.append(update_hooks_on_repo(repo, roboto_hooks, request))
         return json.dumps(messages)
 
