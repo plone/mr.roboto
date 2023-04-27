@@ -77,6 +77,7 @@ IGNORE_NO_AUTO_CHECKOUT = (
 IGNORE_NO_JENKINS = (
     'documentation',
     'icalendar',
+    'plone.recipe.zeoserver',
     'plone.recipe.zope2instance',
 )
 
