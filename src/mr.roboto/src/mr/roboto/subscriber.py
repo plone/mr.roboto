@@ -33,37 +33,51 @@ VALID_CHANGELOG_FILES = re.compile(
 
 IGNORE_NO_CHANGELOG = (
     '.github',
+    'buildout.coredev',
     'documentation',
+    'jenkins.plone.org',
     'mockup',
     'mr.roboto',
-    'jenkins.plone.org',
-    'plone.jenkins_node',
-    'plone.jenkins_server',
-    'buildout.coredev',
-    'ploneorg.core',
-    'ploneorg.theme',
     'planet.plone.org',
-    'training',
     'plone-backend',
     'plone-frontend',
+    'plone.jenkins_node',
+    'plone.jenkins_server',
+    'ploneorg.core',
+    'ploneorg.theme',
+    'training',
 )
 
-IGNORE_NO_AGREEMENT = ('icalendar', 'planet.plone.org', 'documentation', 'training')
+IGNORE_NO_AGREEMENT = (
+    'documentation',
+    'icalendar',
+    'planet.plone.org',
+    'training',
+)
 
 IGNORE_USER_NO_AGREEMENT = (
-    'web-flow',
     'dependabot',
     'dependabot[bot]',
     'pre-commit-ci[bot]',
+    'web-flow',
 )
 
-IGNORE_NO_TEST_NEEDED = ('plone.releaser', 'plone.versioncheck')
+IGNORE_NO_TEST_NEEDED = (
+    'icalendar',
+    'plone.releaser',
+    'plone.versioncheck',
+)
 
-IGNORE_NO_AUTO_CHECKOUT = ('documentation',)
+IGNORE_NO_AUTO_CHECKOUT = (
+    'documentation',
+    'icalendar',
+)
 
 # Ignore packages that have no influence on Jenkins.
 IGNORE_NO_JENKINS = (
     'documentation',
+    'icalendar',
+    'plone.recipe.zeoserver',
     'plone.recipe.zope2instance',
 )
 
