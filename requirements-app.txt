@@ -4,23 +4,27 @@
 #
 #    pip-compile requirements-app.in
 #
-certifi==2022.12.7
+certifi==2023.5.7
     # via requests
 cffi==1.15.1
-    # via pynacl
-chameleon==3.10.2
+    # via
+    #   cryptography
+    #   pynacl
+chameleon==4.0.0
     # via pyramid-chameleon
-charset-normalizer==3.0.1
+charset-normalizer==3.1.0
     # via requests
 cornice==6.0.1
     # via -r requirements-app.in
+cryptography==40.0.2
+    # via pyjwt
 deprecated==1.2.13
     # via pygithub
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.30
+gitpython==3.1.31
     # via -r requirements-app.in
-hupper==1.11
+hupper==1.12
     # via pyramid
 idna==3.4
     # via requests
@@ -34,9 +38,9 @@ plaster-pastedeploy==1.0.1
     # via pyramid
 pycparser==2.21
     # via cffi
-pygithub==1.57
+pygithub==1.58.2
     # via -r requirements-app.in
-pyjwt==2.6.0
+pyjwt[crypto]==2.7.0
     # via pygithub
 pynacl==1.5.0
     # via pygithub
@@ -51,21 +55,21 @@ pyramid-mailer==0.15.1
     # via -r requirements-app.in
 repoze-sendmail==4.4.1
     # via pyramid-mailer
-requests==2.28.2
+requests==2.30.0
     # via pygithub
 smmap==5.0.0
     # via gitdb
 supervisor==4.2.5
     # via -r requirements-app.in
-transaction==3.0.1
+transaction==3.1.0
     # via
     #   pyramid-mailer
     #   repoze-sendmail
 translationstring==1.4
     # via pyramid
-unidiff==0.7.4
+unidiff==0.7.5
     # via -r requirements-app.in
-urllib3==1.26.14
+urllib3==2.0.2
     # via requests
 venusian==3.0.0
     # via
@@ -73,11 +77,11 @@ venusian==3.0.0
     #   pyramid
 webob==1.8.7
     # via pyramid
-wrapt==1.14.1
+wrapt==1.15.0
     # via deprecated
-zope-deprecation==4.4.0
+zope-deprecation==5.0
     # via pyramid
-zope-interface==5.5.2
+zope-interface==6.0
     # via
     #   pyramid
     #   repoze-sendmail
