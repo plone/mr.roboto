@@ -226,3 +226,18 @@ def test_not_in_multiple_checkouts(caplog):
     assert len(caplog.records) == 2
     assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[0].msg
     assert "add to checkouts.cfg of buildout.coredev 4.3" in caplog.records[1].msg
+
+
+def test_no_pr_commit_for_pre_commit_ci(caplog):
+    payload = copy.deepcopy(PLONE_VERSION_PAYLOAD)
+    payload["user"]["login"] = "pre-commit-ci[bot]"
+    event = create_event({}, {}, payload=payload)
+    caplog.set_level(logging.INFO)
+    UpdateCoredevCheckouts(event)
+    event.request.cleanup()
+
+    assert len(caplog.records) == 1
+    assert (
+        "no commits on buildout.coredev as user pre-commit-ci[bot] is ignored"
+        in caplog.records[0].msg
+    )
