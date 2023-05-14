@@ -5,3 +5,5 @@ pyramid_chameleon
 pyramid_mailer
 supervisor
 unidiff
+waitress
+Paste

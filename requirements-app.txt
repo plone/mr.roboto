@@ -28,6 +28,8 @@ hupper==1.12
     # via pyramid
 idna==3.4
     # via requests
+paste==3.5.3
+    # via -r requirements-app.in
 pastedeploy==3.0.1
     # via plaster-pastedeploy
 plaster==1.1.2
@@ -57,6 +59,8 @@ repoze-sendmail==4.4.1
     # via pyramid-mailer
 requests==2.30.0
     # via pygithub
+six==1.16.0
+    # via paste
 smmap==5.0.0
     # via gitdb
 supervisor==4.2.5
@@ -75,6 +79,8 @@ venusian==3.0.0
     # via
     #   cornice
     #   pyramid
+waitress==2.1.2
+    # via -r requirements-app.in
 webob==1.8.7
     # via pyramid
 wrapt==1.15.0
