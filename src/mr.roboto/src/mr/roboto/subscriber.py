@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import cached_property
 from github import GithubException
 from github import InputGitAuthor
 from github import InputGitTreeElement
@@ -150,85 +151,55 @@ def send_mail_on_missing_checkout(event):
 class PullRequestSubscriber:
     def __init__(self, event):
         self.event = event
-        self._github = None
-        self._short_url = None
-        self._pull_request = None
-        self._repo_name = None
-        self._repo_full_name = None
-        self._g_pull = None
-        self._g_issue = None
-        self._commits_url = None
-        self._target_branch = None
-
         self.run()
 
-    @property
+    @cached_property
     def github(self):
-        if self._github is None:
-            self._github = self.event.request.registry.settings['github']
-        return self._github
+        return self.event.request.registry.settings['github']
 
-    @property
+    @cached_property
     def short_url(self):
-        if self._short_url is None:
-            self._short_url = shorten_pull_request_url(
-                self.event.pull_request['html_url']
-            )
-        return self._short_url
+        return shorten_pull_request_url(self.event.pull_request['html_url'])
 
-    @property
+    @cached_property
     def pull_request(self):
-        if self._pull_request is None:
-            self._pull_request = self.event.pull_request
-        return self._pull_request
+        return self.event.pull_request
 
-    @property
+    @cached_property
     def repo_name(self):
-        if self._repo_name is None:
-            self._repo_name = self.pull_request['base']['repo']['name']
-        return self._repo_name
+        return self.pull_request['base']['repo']['name']
 
-    @property
+    @cached_property
     def repo_full_name(self):
-        if self._repo_full_name is None:
-            self._repo_full_name = self.pull_request['base']['repo']['full_name']
-        return self._repo_full_name
+        return self.pull_request['base']['repo']['full_name']
 
-    @property
+    @cached_property
     def g_pull(self):
         """Get pygithub's pull request object and the last commit on it"""
-        if self._g_pull is None:
-            org = self.pull_request['base']['repo']['owner']['login']
-            pull_number = int(self.pull_request['number'])
+        org = self.pull_request['base']['repo']['owner']['login']
+        pull_number = int(self.pull_request['number'])
 
-            g_org = self.github.get_organization(org)
-            g_repo = g_org.get_repo(self.repo_name)
-            self._g_pull = g_repo.get_pull(pull_number)
-        return self._g_pull
+        g_org = self.github.get_organization(org)
+        g_repo = g_org.get_repo(self.repo_name)
+        return g_repo.get_pull(pull_number)
 
-    @property
+    @cached_property
     def g_issue(self):
         """Get pygithub's issue for the current pull request"""
-        if self._g_issue is None:
-            org = self.pull_request['base']['repo']['owner']['login']
-            pull_number = int(self.pull_request['number'])
+        org = self.pull_request['base']['repo']['owner']['login']
+        pull_number = int(self.pull_request['number'])
 
-            g_org = self.github.get_organization(org)
-            g_repo = g_org.get_repo(self.repo_name)
-            self._g_issue = g_repo.get_issue(pull_number)
-        return self._g_issue
+        g_org = self.github.get_organization(org)
+        g_repo = g_org.get_repo(self.repo_name)
+        return g_repo.get_issue(pull_number)
 
-    @property
+    @cached_property
     def commits_url(self):
-        if self._commits_url is None:
-            self._commits_url = self.pull_request['commits_url']
-        return self._commits_url
+        return self.pull_request['commits_url']
 
-    @property
+    @cached_property
     def target_branch(self):
-        if self._target_branch is None:
-            self._target_branch = self.pull_request['base']['ref']
-        return self._target_branch
+        return self.pull_request['base']['ref']
 
     def run(self):
         raise NotImplementedError  # pragma: no cover
