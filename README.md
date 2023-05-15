@@ -1,26 +1,28 @@
-.. -*- coding: utf-8 -*-
+# mr.roboto
 
-=========
-mr.roboto
-=========
-The main goal of mr.roboto is to make sure `Plone's Jenkins CI <http://jenkins.plone.org>`_ test every single change made by Plone developers.
+The main goal of mr.roboto is to make sure [Plone's Jenkins CI](http://jenkins.plone.org)
+test every single change made by Plone developers.
 
 This way not only Plone contributors will be promptly notified (by Jenkins) that a change broke the tests,
 but at the same time,
 and most importantly,
 they will be able to know exactly what change broke the build.
 
-Use Cases
-=========
+## Use Cases
 
-See log
--------
+Notice that a few URLs below have `token` parameter,
+for obvious reasons it is not shared here.
+
+Ask the CI team for it, if you need to it.
+
+### See log
+
 To see the log that's being processed:
 
 http://jenkins.plone.org/roboto/log?token=XXXXX
 
-Autoconfigure hooks
--------------------
+### Autoconfigure a single repository hooks
+
 mr.roboto needs to get notified whenever a change has been made on a Plone core package,
 so it can take all the necessary actions to ensure our CI system gets notified,
 if needed,
@@ -32,11 +34,22 @@ At the same time it removes all previously installed hooks to be sure no cruft i
 
 To do so, call this URL:
 
+http://jenkins.plone.org/roboto/run/githubcommithooks?token=XXXXX&repo=plone.batching
+
+### Autoconfigure hooks
+
+When a massive change on the hooks happens,
+it is not practical to run the previous command for each repository.
+
+Removing the `repo` parameter will install the hooks on all repositories.
+
+To do so, call this URL:
+
 http://jenkins.plone.org/roboto/run/githubcommithooks?token=XXXXX
 
-There is a commit to a package that's on the core-dev sources
--------------------------------------------------------------
-The hook installed on all Plone Github repositories notify this end-point whenever a change happens in them.
+### New commits on a core repository
+
+The hook installed on all Plone GitHub repositories notify this end-point whenever a change happens in them.
 
 This way mr.roboto can make all the needed actions to ensure our CI setup is notified and runs the necessary jobs.
 
@@ -44,8 +57,8 @@ The URL that's being called is:
 
 http://jenkins.plone.org/roboto/run/corecommit?token=XXXXX
 
-Get sources and checkouts
--------------------------
+### Get sources and checkouts
+
 For debugging purposes,
 knowing what exactly mr.roboto has in its sources and checkouts can be really useful.
 
@@ -53,34 +66,48 @@ http://jenkins.plone.org/roboto/sources.json
 
 http://jenkins.plone.org/roboto/checkouts.json
 
-Branches overview
------------------
+### Branches overview
+
 Get an overview of which branch of each package is being used on any plone release.
 
 http://jenkins.plone.org/roboto/branches
 
-Update sources and checkouts
-----------------------------
+### Update sources and checkouts
+
 If there is something wrong with sources or checkouts,
 or they are empty (new deployment),
 you can force them to be created:
 
 http://jenkins.plone.org/roboto/update-sources-and-checkouts?token=XXX
 
-Development
-===========
-To test mr.roboto locally,
+## Development
+
+To run mr.roboto locally,
 do the following:
 
-- rename ``development.ini.sample`` to ``development.ini`` and edit as needed
-- run buildout::
+```shell
+python3.11 -m venv .
+. bin/activate
+pip install pip-tools
+pip-sync requirements-dev.txt
+pip install -e src/mr.roboto
+cp development.ini.sample development.ini
+./bin/pserve development.ini --reload
+```
 
-      virtualenv .
-      source bin/activate
-      bin/buildout
+_Happy hacking!_
 
-- start pyramid::
+### Test and QA
 
-      bin/pserve development.ini --reload
+To run tests:
 
-- *hack away!*
+```shell
+tox -e test
+```
+
+To format code and run QA tools:
+
+```shell
+tox -e format
+tox -e lint
+```
