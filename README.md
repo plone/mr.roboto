@@ -136,5 +136,5 @@ and create a pull request to get the changes checked by GHA.
 
 ```mermaid
 graph TD;
-  "plone.app.relationfield" --> "plone.app.dexterity";
+  "plone.app.relationfield"-->"plone.app.dexterity";
 ```
