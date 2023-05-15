@@ -26,71 +26,71 @@ import re
 import requests
 
 
-logger = logging.getLogger('mr.roboto')
+logger = logging.getLogger("mr.roboto")
 
 VALID_CHANGELOG_FILES = re.compile(
-    r'(.pre-commit-config|CHANGES|HISTORY|CHANGELOG).(txt|rst|md|yaml)$'
+    r"(.pre-commit-config|CHANGES|HISTORY|CHANGELOG).(txt|rst|md|yaml)$"
 )
 
 IGNORE_NO_CHANGELOG = (
-    '.github',
-    'buildout.coredev',
-    'documentation',
-    'jenkins.plone.org',
-    'mockup',
-    'mr.roboto',
-    'planet.plone.org',
-    'plone-backend',
-    'plone-frontend',
-    'plone.jenkins_node',
-    'plone.jenkins_server',
-    'ploneorg.core',
-    'ploneorg.theme',
-    'training',
+    ".github",
+    "buildout.coredev",
+    "documentation",
+    "jenkins.plone.org",
+    "mockup",
+    "mr.roboto",
+    "planet.plone.org",
+    "plone-backend",
+    "plone-frontend",
+    "plone.jenkins_node",
+    "plone.jenkins_server",
+    "ploneorg.core",
+    "ploneorg.theme",
+    "training",
 )
 
 IGNORE_NO_AGREEMENT = (
-    'documentation',
-    'icalendar',
-    'planet.plone.org',
-    'training',
+    "documentation",
+    "icalendar",
+    "planet.plone.org",
+    "training",
 )
 
 IGNORE_USER_NO_AGREEMENT = (
-    'dependabot',
-    'dependabot[bot]',
-    'pre-commit-ci[bot]',
-    'web-flow',
+    "dependabot",
+    "dependabot[bot]",
+    "pre-commit-ci[bot]",
+    "web-flow",
 )
 
 IGNORE_NO_TEST_NEEDED = (
-    'icalendar',
-    'plone.releaser',
-    'plone.versioncheck',
+    "icalendar",
+    "plone.releaser",
+    "plone.versioncheck",
 )
 
 IGNORE_NO_AUTO_CHECKOUT = (
-    'documentation',
-    'icalendar',
+    "documentation",
+    "icalendar",
 )
 
 # Ignore packages that have no influence on Jenkins.
 IGNORE_NO_JENKINS = (
-    'documentation',
-    'icalendar',
-    'plone.recipe.zeoserver',
-    'plone.recipe.zope2instance',
+    "documentation",
+    "icalendar",
+    "plone.recipe.zeoserver",
+    "plone.recipe.zope2instance",
 )
 
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
-        subject=f'POSSIBLE CHECKOUT ERROR {repo} {branch}',
-        sender='Jenkins Job FAIL <jenkins@plone.org>',
+        subject=f"POSSIBLE CHECKOUT ERROR {repo} {branch}",
+        sender="Jenkins Job FAIL <jenkins@plone.org>",
         # If you would love to receive *all* such emails,
         # feel free to add your email address in this list. :-)
         recipients=[email],
-        body=templates['error_commit_checkout.pt'](
+        body=templates["error_commit_checkout.pt"](
             who=who, repo=repo, branch=branch, pv=pv
         ),
     )
@@ -100,28 +100,28 @@ def mail_missing_checkout(mailer, who, repo, branch, pv, email):
 def mail_to_cvs(payload, mailer):
     # safeguard against github getting confused and sending us the entire
     # history
-    if len(payload['commits']) > 40:
+    if len(payload["commits"]) > 40:
         return
 
-    for commit in payload['commits']:
+    for commit in payload["commits"]:
         commit_data = get_info_from_commit(commit)
 
         data = {
-            'push': payload,
-            'commit': commit,
-            'files': '\n'.join(commit_data['files']),
-            'diff': commit_data['diff'],
+            "push": payload,
+            "commit": commit,
+            "files": "\n".join(commit_data["files"]),
+            "diff": commit_data["diff"],
         }
 
-        repo_name = payload['repository']['name']
-        branch = payload['ref'].split('/')[-1]
-        commit_msg = commit_data['short_commit_msg']
+        repo_name = payload["repository"]["name"]
+        branch = payload["ref"].split("/")[-1]
+        commit_msg = commit_data["short_commit_msg"]
         msg = Message(
-            subject=f'{repo_name}/{branch}: {commit_msg}',
+            subject=f"{repo_name}/{branch}: {commit_msg}",
             sender=f'{commit["committer"]["name"]} <svn-changes@plone.org>',
-            recipients=['plone-cvs@lists.sourceforge.net'],
-            body=templates['commit_email.pt'](**data),
-            extra_headers={'Reply-To': commit_data['reply_to']},
+            recipients=["plone-cvs@lists.sourceforge.net"],
+            body=templates["commit_email.pt"](**data),
+            extra_headers={"Reply-To": commit_data["reply_to"]},
         )
 
         mailer.send_immediately(msg, fail_silently=False)
@@ -131,8 +131,8 @@ def mail_to_cvs(payload, mailer):
 def send_mail_on_coredev(event):
     mailer = get_mailer(event.request)
     payload = event.payload
-    repo_name = payload['repository']['name']
-    logger.info(f'Commit: send mail: coredev push to {repo_name}')
+    repo_name = payload["repository"]["name"]
+    logger.info(f"Commit: send mail: coredev push to {repo_name}")
     mail_to_cvs(payload, mailer)
 
 
@@ -140,8 +140,8 @@ def send_mail_on_coredev(event):
 def send_mail_on_missing_checkout(event):
     mailer = get_mailer(event.request)
     logger.info(
-        f'Commit: send mail: coredev push without checkout of '
-        f'{event.repo} by {event.who}'
+        f"Commit: send mail: coredev push without checkout of "
+        f"{event.repo} by {event.who}"
     )
     mail_missing_checkout(
         mailer, event.who, event.repo, event.branch, event.pv, event.email
@@ -155,11 +155,11 @@ class PullRequestSubscriber:
 
     @cached_property
     def github(self):
-        return self.event.request.registry.settings['github']
+        return self.event.request.registry.settings["github"]
 
     @cached_property
     def short_url(self):
-        return shorten_pull_request_url(self.event.pull_request['html_url'])
+        return shorten_pull_request_url(self.event.pull_request["html_url"])
 
     @cached_property
     def pull_request(self):
@@ -167,17 +167,17 @@ class PullRequestSubscriber:
 
     @cached_property
     def repo_name(self):
-        return self.pull_request['base']['repo']['name']
+        return self.pull_request["base"]["repo"]["name"]
 
     @cached_property
     def repo_full_name(self):
-        return self.pull_request['base']['repo']['full_name']
+        return self.pull_request["base"]["repo"]["full_name"]
 
     @cached_property
     def g_pull(self):
         """Get pygithub's pull request object and the last commit on it"""
-        org = self.pull_request['base']['repo']['owner']['login']
-        pull_number = int(self.pull_request['number'])
+        org = self.pull_request["base"]["repo"]["owner"]["login"]
+        pull_number = int(self.pull_request["number"])
 
         g_org = self.github.get_organization(org)
         g_repo = g_org.get_repo(self.repo_name)
@@ -186,8 +186,8 @@ class PullRequestSubscriber:
     @cached_property
     def g_issue(self):
         """Get pygithub's issue for the current pull request"""
-        org = self.pull_request['base']['repo']['owner']['login']
-        pull_number = int(self.pull_request['number'])
+        org = self.pull_request["base"]["repo"]["owner"]["login"]
+        pull_number = int(self.pull_request["number"])
 
         g_org = self.github.get_organization(org)
         g_repo = g_org.get_repo(self.repo_name)
@@ -195,20 +195,20 @@ class PullRequestSubscriber:
 
     @cached_property
     def commits_url(self):
-        return self.pull_request['commits_url']
+        return self.pull_request["commits_url"]
 
     @cached_property
     def target_branch(self):
-        return self.pull_request['base']['ref']
+        return self.pull_request["base"]["ref"]
 
     def run(self):
         raise NotImplementedError  # pragma: no cover
 
-    def log(self, msg, level='info'):
-        if level == 'warn':  # pragma: no cover
-            logger.warning(f'PR {self.short_url}: {msg}')
+    def log(self, msg, level="info"):
+        if level == "warn":  # pragma: no cover
+            logger.warning(f"PR {self.short_url}: {msg}")
             return
-        logger.info(f'PR {self.short_url}: {msg}')
+        logger.info(f"PR {self.short_url}: {msg}")
 
     def get_pull_request_last_commit(self):
         return self.g_pull.get_commits().reversed[0]
@@ -221,29 +221,29 @@ class PullRequestSubscriber:
         try:
             commits_data = requests.get(self.commits_url)
         except RequestException:
-            self.log('error while trying to get its commits')
+            self.log("error while trying to get its commits")
             return
 
         try:
             json_data = commits_data.json()
         except ValueError:
-            self.log('error while getting its commits in JSON')
+            self.log("error while getting its commits in JSON")
             return
 
         return json_data
 
     def check_membership(self, json_data):
-        plone_org = self.github.get_organization('plone')
+        plone_org = self.github.get_organization("plone")
         unknown = []
         members = []
         not_foundation = []
         for commit_info in json_data:
-            for user in ('committer', 'author'):
+            for user in ("committer", "author"):
                 try:
-                    login = commit_info[user]['login']
+                    login = commit_info[user]["login"]
                 except TypeError:
-                    self.log(f'commit does not have {user} user info')
-                    unknown.append(commit_info['commit']['author']['name'])
+                    self.log(f"commit does not have {user} user info")
+                    unknown.append(commit_info["commit"]["author"]["name"])
                     continue
 
                 if login in IGNORE_USER_NO_AGREEMENT:
@@ -265,16 +265,16 @@ class PullRequestSubscriber:
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class ContributorsAgreementSigned(PullRequestSubscriber):
     def __init__(self, event):
-        self.cla_url = 'https://plone.org/foundation/contributors-agreement'  # noqa
-        self.github_help_setup_email_url = 'https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/adding-an-email-address-to-your-github-account'  # noqa
-        self.status_context = 'Plone Contributors Agreement verifier'
+        self.cla_url = "https://plone.org/foundation/contributors-agreement"  # noqa
+        self.github_help_setup_email_url = "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/adding-an-email-address-to-your-github-account"  # noqa
+        self.status_context = "Plone Contributors Agreement verifier"
 
         super().__init__(event)
 
     def run(self):
         """Check if all users involved in a pull request have signed the CLA"""
         if self.repo_name in IGNORE_NO_AGREEMENT:
-            self.log('no need to sign contributors agreement')
+            self.log("no need to sign contributors agreement")
             return
 
         json_data = self.get_json_commits()
@@ -286,36 +286,36 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
 
-        status = 'success'
-        status_message = 'All users have signed it'
+        status = "success"
+        status_message = "All users have signed it"
         if not_foundation or unknown:
-            status = 'error'
-            status_message = 'Some users need to sign it'
+            status = "error"
+            status_message = "Some users need to sign it"
 
         if not_foundation:
             # add a message mentioning all users that have not signed the
             # Contributors Agreement
-            users = ' @'.join(not_foundation)
+            users = " @".join(not_foundation)
             msg = (
-                f'@{users} you need to sign the Plone Contributor '
-                f'Agreement to merge this pull request. \n\n'
-                f'Learn about the Plone Contributor Agreement: {self.cla_url}'
+                f"@{users} you need to sign the Plone Contributor "
+                f"Agreement to merge this pull request. \n\n"
+                f"Learn about the Plone Contributor Agreement: {self.cla_url}"
             )
             self.g_issue.create_comment(body=msg)
 
         if unknown:
             # add a message mentioning all unknown users,
             # but mention each of them only once
-            users = ', '.join(set(unknown))
-            self.log(f'{users} missing contributors agreement')
+            users = ", ".join(set(unknown))
+            self.log(f"{users} missing contributors agreement")
             msg = (
-                f'{users} your emails are not known to GitHub and thus it '
-                f'is impossible to know if you have signed the Plone '
-                f'Contributor Agreement, which is required to merge this '
-                f'pull request.\n\n'
-                f'Learn about the Plone Contributor Agreement: {self.cla_url} '
-                f'How to add more emails to your GitHub account: '
-                f'{self.github_help_setup_email_url} '
+                f"{users} your emails are not known to GitHub and thus it "
+                f"is impossible to know if you have signed the Plone "
+                f"Contributor Agreement, which is required to merge this "
+                f"pull request.\n\n"
+                f"Learn about the Plone Contributor Agreement: {self.cla_url} "
+                f"How to add more emails to your GitHub account: "
+                f"{self.github_help_setup_email_url} "
             )
             self.g_issue.create_comment(body=msg)
 
@@ -325,28 +325,28 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             description=status_message,
             context=self.status_context,
         )
-        self.log(f'Contributors Agreement report: {status}')
+        self.log(f"Contributors Agreement report: {status}")
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnNoChangelogEntry(PullRequestSubscriber):
     def __init__(self, event):
-        self.status_context = 'Changelog verifier'
+        self.status_context = "Changelog verifier"
 
         super().__init__(event)
 
     def run(self):
         """If the pull request does not add a changelog entry, warn about it"""
         if self.repo_name in IGNORE_NO_CHANGELOG:
-            self.log('no need to have a changelog entry')
+            self.log("no need to have a changelog entry")
             return
 
-        status = 'success'
-        description = 'Entry found'
-        roboto_url = self.event.request.registry.settings['roboto_url']
+        status = "success"
+        description = "Entry found"
+        roboto_url = self.event.request.registry.settings["roboto_url"]
 
         # check if the pull request modifies the changelog file
-        diff_url = self.pull_request['diff_url']
+        diff_url = self.pull_request["diff_url"]
         diff_data = requests.get(diff_url)
         try:
             patch_data = PatchSet(
@@ -358,33 +358,33 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
         for diff_file in patch_data:
             if VALID_CHANGELOG_FILES.search(diff_file.path):
                 break
-            if 'news/' in diff_file.path:
+            if "news/" in diff_file.path:
                 # towncrier news snippet
                 break
         else:
-            status = 'error'
-            description = 'No entry found!'
+            status = "error"
+            description = "No entry found!"
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
 
         last_commit.create_status(
             status,
-            target_url=f'{roboto_url}/missing-changelog',
+            target_url=f"{roboto_url}/missing-changelog",
             description=description,
             context=self.status_context,
         )
 
-        self.log(f'changelog entry: {status}')
+        self.log(f"changelog entry: {status}")
 
 
 @subscriber(NewPullRequest, UpdatedPullRequest)
 class WarnTestsNeedToRun(PullRequestSubscriber):
     def __init__(self, event):
         self.jenkins_pr_job_url = (
-            'http://jenkins.plone.org/job/pull-request-{0}/build?delay=0sec'
+            "http://jenkins.plone.org/job/pull-request-{0}/build?delay=0sec"
         )
-        self.status_context = 'Plone Jenkins CI - pull-request-{0}'
+        self.status_context = "Plone Jenkins CI - pull-request-{0}"
 
         super().__init__(event)
 
@@ -393,11 +393,11 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
         before a pull request can be safely merged
         """
         if self.repo_name in IGNORE_NO_JENKINS:
-            self.log(f'Not adding pending Jenkins checks: {self.repo_name} ignored.')
+            self.log(f"Not adding pending Jenkins checks: {self.repo_name} ignored.")
             return
 
         plone_versions = self._plone_versions_targeted()
-        python_versions = self.event.request.registry.settings['py_versions']
+        python_versions = self.event.request.registry.settings["py_versions"]
 
         # get the pull request last commit
         last_commit = self.get_pull_request_last_commit()
@@ -406,40 +406,40 @@ class WarnTestsNeedToRun(PullRequestSubscriber):
             for py_version in python_versions[plone_version]:
                 self._create_commit_status(last_commit, plone_version, py_version)
                 self.log(
-                    f'created pending status for plone {plone_version} on python {py_version}'
+                    f"created pending status for plone {plone_version} on python {py_version}"
                 )
 
     def _plone_versions_targeted(self):
         if self.repo_name in IGNORE_NO_TEST_NEEDED:
-            self.log('skip adding test warnings, repo ignored')
+            self.log("skip adding test warnings, repo ignored")
             return []
 
-        target_branch = self.pull_request['base']['ref']
+        target_branch = self.pull_request["base"]["ref"]
 
         plone_versions = plone_versions_targeted(
             self.repo_full_name, target_branch, self.event.request
         )
 
-        tracked_versions = self.event.request.registry.settings['plone_versions']
+        tracked_versions = self.event.request.registry.settings["plone_versions"]
         if (
-            self.repo_full_name == 'plone/buildout.coredev'
+            self.repo_full_name == "plone/buildout.coredev"
             and target_branch in tracked_versions
         ):
             plone_versions = (target_branch,)
 
         elif not plone_versions:
-            self.log('does not target any Plone version')
+            self.log("does not target any Plone version")
             return []
 
         return plone_versions
 
     def _create_commit_status(self, commit, plone_version, python_version):
-        combination = f'{plone_version}-{python_version}'
+        combination = f"{plone_version}-{python_version}"
         commit.create_status(
-            'pending',
-            target_url=f'https://jenkins.plone.org/job/pull-request-{combination}/build?delay=0sec',
-            description='Please run the job, click here --->',
-            context=f'Plone Jenkins CI - pull-request-{combination}',
+            "pending",
+            target_url=f"https://jenkins.plone.org/job/pull-request-{combination}/build?delay=0sec",
+            description="Please run the job, click here --->",
+            context=f"Plone Jenkins CI - pull-request-{combination}",
         )
 
 
@@ -453,7 +453,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         targeted by the pull request
         """
         # pull requests on buildout.coredev itself do not need any extra work
-        if self.repo_full_name == 'plone/buildout.coredev':
+        if self.repo_full_name == "plone/buildout.coredev":
             return
 
         if self.repo_name in IGNORE_NO_AUTO_CHECKOUT:
@@ -464,13 +464,13 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         )
         if not plone_versions:
             self.log(
-                f'no plone coredev version tracks branch {self.target_branch} '
-                f'of {self.repo_name}, checkouts.cfg not updated'
+                f"no plone coredev version tracks branch {self.target_branch} "
+                f"of {self.repo_name}, checkouts.cfg not updated"
             )
             return
 
         checkouts = get_pickled_data(
-            self.event.request.registry.settings['checkouts_file']
+            self.event.request.registry.settings["checkouts_file"]
         )
         not_in_checkouts = [
             version
@@ -479,8 +479,8 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         ]
         if not not_in_checkouts:
             self.log(
-                f'is already on checkouts.cfg of all plone '
-                f'versions that it targets {plone_versions}'
+                f"is already on checkouts.cfg of all plone "
+                f"versions that it targets {plone_versions}"
             )
             return
 
@@ -492,10 +492,10 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         user = InputGitAuthor(
             last_commit.commit.author.name,
             last_commit.commit.author.email,
-            datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
+            datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
         )
-        org = self.github.get_organization('plone')
-        repo = org.get_repo('buildout.coredev')
+        org = self.github.get_organization("plone")
+        repo = org.get_repo("buildout.coredev")
 
         for version in versions:
             attempts = 0
@@ -506,19 +506,19 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
                     attempts += 1
                     if attempts == 5:
                         self.log(
-                            f'Could not update checkouts.cfg of {version} '
-                            f'with {self.repo_name}',
-                            level='warn',
+                            f"Could not update checkouts.cfg of {version} "
+                            f"with {self.repo_name}",
+                            level="warn",
                         )
                 else:
-                    self.log(f'add to checkouts.cfg of buildout.coredev {version}')
+                    self.log(f"add to checkouts.cfg of buildout.coredev {version}")
                     break
 
     def make_commit(self, repo, version, user):
-        filename = 'checkouts.cfg'
-        head_ref = repo.get_git_ref(f'heads/{version}')
+        filename = "checkouts.cfg"
+        head_ref = repo.get_git_ref(f"heads/{version}")
         checkouts_cfg_file = repo.get_contents(filename, head_ref.object.sha)
-        line = f'    {self.repo_name}\n'
+        line = f"    {self.repo_name}\n"
         checkouts_content = checkouts_cfg_file.decoded_content.decode()
         checkouts_new_data = checkouts_content + line
         latest_commit = repo.get_git_commit(head_ref.object.sha)
@@ -527,7 +527,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         if mode:  # pragma: no cover
             mode = mode[0]
         else:
-            mode = '100644'
+            mode = "100644"
 
         element = InputGitTreeElement(
             path=filename,
@@ -538,7 +538,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         new_tree = repo.create_git_tree([element], base_tree)
 
         new_commit = repo.create_git_commit(
-            f'[fc] Add {self.repo_name} to {filename}',
+            f"[fc] Add {self.repo_name} to {filename}",
             new_tree,
             [latest_commit],
             user,
@@ -556,13 +556,13 @@ class TriggerPullRequestJenkinsJobs:
 
     @property
     def short_url(self):
-        return shorten_comment_url(self.event.comment['html_url'])
+        return shorten_comment_url(self.event.comment["html_url"])
 
-    def log(self, msg, level='info'):
-        if level == 'warn':
-            logger.warning(f'COMMENT {self.short_url}: {msg}')
+    def log(self, msg, level="info"):
+        if level == "warn":
+            logger.warning(f"COMMENT {self.short_url}: {msg}")
             return
-        logger.info(f'COMMENT {self.short_url}: {msg}')
+        logger.info(f"COMMENT {self.short_url}: {msg}")
 
     def run(self):
         if self._should_trigger_jobs():
@@ -570,60 +570,60 @@ class TriggerPullRequestJenkinsJobs:
             self._trigger_jobs(plone_versions)
 
     def _should_trigger_jobs(self):
-        pull_request_url = self.event.pull_request['html_url']
-        repo_name = pull_request_url.split('/')[-3]
+        pull_request_url = self.event.pull_request["html_url"]
+        repo_name = pull_request_url.split("/")[-3]
         if repo_name in IGNORE_NO_TEST_NEEDED:
-            self.log('skip triggering jenkins jobs, repo is ignored')
+            self.log("skip triggering jenkins jobs, repo is ignored")
             return False
 
-        return '@jenkins-plone-org please run jobs' in self.event.comment['body']
+        return "@jenkins-plone-org please run jobs" in self.event.comment["body"]
 
     def _which_plone_versions(self):
-        response = requests.get(self.event.pull_request['url'])
+        response = requests.get(self.event.pull_request["url"])
         if response.status_code != 200:
-            self.log('Could not get information regarding pull request', level='warn')
+            self.log("Could not get information regarding pull request", level="warn")
             return []
 
         data = response.json()
-        target_branch = data['base']['ref']
-        repo_full_name = data['base']['repo']['full_name']
+        target_branch = data["base"]["ref"]
+        repo_full_name = data["base"]["repo"]["full_name"]
 
         plone_versions = plone_versions_targeted(
             repo_full_name, target_branch, self.event.request
         )
 
-        tracked_versions = self.event.request.registry.settings['plone_versions']
+        tracked_versions = self.event.request.registry.settings["plone_versions"]
         if (
-            repo_full_name == 'plone/buildout.coredev'
+            repo_full_name == "plone/buildout.coredev"
             and target_branch in tracked_versions
         ):
             plone_versions = (target_branch,)
 
         elif not plone_versions:
-            self.log('Does not target any Plone version')
+            self.log("Does not target any Plone version")
 
         return plone_versions
 
     def _trigger_jobs(self, plone_versions):
         settings = self.event.request.registry.settings
-        python_versions = settings['py_versions']
+        python_versions = settings["py_versions"]
 
         for plone in plone_versions:
             for python in python_versions[plone]:
-                self._create_job(f'{plone}-{python}')
+                self._create_job(f"{plone}-{python}")
 
     def _create_job(self, version):
         settings = self.event.request.registry.settings
-        jenkins_user = settings['jenkins_user_id']
-        jenkins_token = settings['jenkins_user_token']
-        pull_request_url = self.event.pull_request['html_url']
+        jenkins_user = settings["jenkins_user_id"]
+        jenkins_token = settings["jenkins_user_token"]
+        pull_request_url = self.event.pull_request["html_url"]
 
         requests.post(
-            f'https://jenkins.plone.org/job/pull-request-{version}/buildWithParameters',
+            f"https://jenkins.plone.org/job/pull-request-{version}/buildWithParameters",
             auth=(jenkins_user, jenkins_token),
-            data={'PULL_REQUEST_URL': pull_request_url},
+            data={"PULL_REQUEST_URL": pull_request_url},
         )
-        self.log(f'Triggered jenkins job for PR {version}.')
+        self.log(f"Triggered jenkins job for PR {version}.")
 
 
 @subscriber(NewPullRequest)
@@ -645,27 +645,27 @@ class ExplainHowToTriggerJenkinsJobs(PullRequestSubscriber):
         if not plone_versions:
             return
 
-        user = self.pull_request['user']['login']
+        user = self.pull_request["user"]["login"]
         msg = (
-            f'@{user} thanks for creating this Pull Request and helping to improve '
-            'Plone!\n'
-            '\n'
-            'TL;DR: Finish pushing changes, pass all other checks, '
-            'then paste a comment:\n'
-            '```\n'
-            '@jenkins-plone-org please run jobs\n'
-            '```\n'
-            '\n'
-            'To ensure that these changes do not break other parts of Plone, the Plone '
-            'test suite matrix needs to pass, but it takes 30-60 min.  '
-            'Other CI checks are usually much faster and the Plone Jenkins resources '
-            'are limited, so when done pushing changes and all other checks pass '
-            'either [start all Jenkins PR jobs yourself]'
-            '(https://jenkinsploneorg.readthedocs.io/en/latest/'
-            'run-pull-request-jobs.html#run-a-pull-request-job), '
-            'or simply add the comment above in this PR to start all the jobs '
-            'automatically.\n'
-            '\n'
-            'Happy hacking!'
+            f"@{user} thanks for creating this Pull Request and helping to improve "
+            "Plone!\n"
+            "\n"
+            "TL;DR: Finish pushing changes, pass all other checks, "
+            "then paste a comment:\n"
+            "```\n"
+            "@jenkins-plone-org please run jobs\n"
+            "```\n"
+            "\n"
+            "To ensure that these changes do not break other parts of Plone, the Plone "
+            "test suite matrix needs to pass, but it takes 30-60 min.  "
+            "Other CI checks are usually much faster and the Plone Jenkins resources "
+            "are limited, so when done pushing changes and all other checks pass "
+            "either [start all Jenkins PR jobs yourself]"
+            "(https://jenkinsploneorg.readthedocs.io/en/latest/"
+            "run-pull-request-jobs.html#run-a-pull-request-job), "
+            "or simply add the comment above in this PR to start all the jobs "
+            "automatically.\n"
+            "\n"
+            "Happy hacking!"
         )
         self.g_issue.create_comment(body=msg)

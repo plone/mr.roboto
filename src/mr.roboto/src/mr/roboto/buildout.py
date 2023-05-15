@@ -12,10 +12,10 @@ import re
 import shutil
 
 
-logger = logging.getLogger('mr.roboto')
+logger = logging.getLogger("mr.roboto")
 
 PATH_RE = re.compile(
-    r'(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)'
+    r"(\w+://)(.+@)*([\w\d\.]+)(:[\d]+){0,1}/(?P<path>.+(?=\.git))(\.git)"
 )
 
 
@@ -32,19 +32,19 @@ class Source:
         self.url = source_parts[1]
         for param in source_parts[2:]:
             if param is not None:
-                key, value = param.split('=')
-                if key != 'path':
+                key, value = param.split("=")
+                if key != "path":
                     setattr(self, key, value)
         if self.pushurl is not None:
             # I doubt this is needed, should be handled already with
             # param.split above.
-            self.pushurl = self.pushurl.split('=')[-1]
+            self.pushurl = self.pushurl.split("=")[-1]
         if self.branch is None:
-            self.branch = 'master'
+            self.branch = "master"
         else:
             # I doubt this is needed, should be handled already with
             # param.split above.
-            self.branch = self.branch.split('=')[-1]
+            self.branch = self.branch.split("=")[-1]
         return self
 
     @property
@@ -52,7 +52,7 @@ class Source:
         if self.url:
             match = PATH_RE.match(self.url)
             if match:
-                return match.groupdict()['path']
+                return match.groupdict()["path"]
         return None  # pragma: no cover
 
 
@@ -71,14 +71,14 @@ class SourcesFile(UserDict):
             config.read_file(f)
         # Insert buildout:directory, as workaround for
         # https://github.com/plone/mr.roboto/issues/82
-        config['buildout']['directory'] = os.getcwd()
+        config["buildout"]["directory"] = os.getcwd()
         # Same now for buildout:docs-directory, as workaround for
         # https://github.com/plone/mr.roboto/issues/89
-        config['buildout']['docs-directory'] = os.path.join(os.getcwd(), 'docs')
+        config["buildout"]["docs-directory"] = os.path.join(os.getcwd(), "docs")
         sources_dict = OrderedDict()
-        for name, value in config['sources'].items():
+        for name, value in config["sources"].items():
             source = Source().create_from_string(value)
-            if getattr(source, 'egg', 'true').lower() == 'false':
+            if getattr(source, "egg", "true").lower() == "false":
                 continue
             sources_dict[name] = source
         self._data = sources_dict
@@ -100,26 +100,26 @@ class CheckoutsFile(UserDict):
         config = ConfigParser(interpolation=ExtendedInterpolation())
         with open(self.file_location) as f:
             config.read_file(f)
-        checkouts = config.get('buildout', 'auto-checkout')
-        checkout_list = checkouts.split('\n')
+        checkouts = config.get("buildout", "auto-checkout")
+        checkout_list = checkouts.split("\n")
         self._data = checkout_list
         return self._data
 
 
 class PloneCoreBuildout:
-    PLONE_COREDEV_LOCATION = 'https://github.com/plone/buildout.coredev.git'
+    PLONE_COREDEV_LOCATION = "https://github.com/plone/buildout.coredev.git"
 
     def __init__(self, core_version=None):
         self.core_version = core_version
         self.location = mkdtemp()
         self.clone()
-        self.sources = SourcesFile(f'{self.location}/sources.cfg')
-        self.checkouts = CheckoutsFile(f'{self.location}/checkouts.cfg')
+        self.sources = SourcesFile(f"{self.location}/sources.cfg")
+        self.checkouts = CheckoutsFile(f"{self.location}/checkouts.cfg")
 
     def clone(self):
         logger.info(
-            f'Commit: cloning github repository {self.location}, '
-            f'branch={self.core_version}'
+            f"Commit: cloning github repository {self.location}, "
+            f"branch={self.core_version}"
         )
         git.Repo.clone_from(
             self.PLONE_COREDEV_LOCATION,
@@ -142,11 +142,11 @@ def get_sources_and_checkouts(request):
     sources_dict = {}
     checkouts_dict = {}
 
-    actual_plone_versions = request.registry.settings['plone_versions']
+    actual_plone_versions = request.registry.settings["plone_versions"]
 
     for plone_version in actual_plone_versions:
         logger.info(
-            f'Commit: checking sources and checkouts ' f'from plone {plone_version}'
+            f"Commit: checking sources and checkouts " f"from plone {plone_version}"
         )
         buildout = PloneCoreBuildout(plone_version)
 
@@ -159,7 +159,7 @@ def get_sources_and_checkouts(request):
                 else:
                     sources_dict[key].append(plone_version)
             else:  # pragma: no cover
-                logger.warning(f'Package {source} does not have a valid URL')
+                logger.warning(f"Package {source} does not have a valid URL")
 
         checkouts_dict[plone_version] = []
         for checkout in buildout.checkouts.data:
@@ -168,10 +168,10 @@ def get_sources_and_checkouts(request):
 
         buildout.cleanup()
 
-    sources_file = request.registry.settings['sources_file']
-    with open(sources_file, 'bw') as sf:
+    sources_file = request.registry.settings["sources_file"]
+    with open(sources_file, "bw") as sf:
         sf.write(pickle.dumps(sources_dict))
 
-    checkouts_file = request.registry.settings['checkouts_file']
-    with open(checkouts_file, 'bw') as sf:
+    checkouts_file = request.registry.settings["checkouts_file"]
+    with open(checkouts_file, "bw") as sf:
         sf.write(pickle.dumps(checkouts_dict))

@@ -15,29 +15,29 @@ Reduced set of data sent by Github about a pull request.
 Each payload is adapted later on to test all corner cases.
 """
 PAYLOAD = {
-    'number': '45',
-    'html_url': 'https://github.com/plone/buildout.coredev/pull/34567',
-    'base': {
-        'repo': {
-            'full_name': 'plone/buildout.coredev',
-            'name': 'buildout.coredev',
-            'owner': {'login': 'plone'},
+    "number": "45",
+    "html_url": "https://github.com/plone/buildout.coredev/pull/34567",
+    "base": {
+        "repo": {
+            "full_name": "plone/buildout.coredev",
+            "name": "buildout.coredev",
+            "owner": {"login": "plone"},
         }
     },
-    'user': {'login': 'mr.bean'},
+    "user": {"login": "mr.bean"},
 }
 
 NO_PLONE_VERSION_PAYLOAD = copy.deepcopy(PAYLOAD)
 NO_PLONE_VERSION_PAYLOAD[
-    'html_url'
-] = 'https://github.com/plone/plone.uuid/pull/3'  # noqa
-NO_PLONE_VERSION_PAYLOAD['base']['ref'] = 'my-upstream-branch'
-NO_PLONE_VERSION_PAYLOAD['base']['repo']['name'] = 'plone.uuid'
-NO_PLONE_VERSION_PAYLOAD['base']['repo']['full_name'] = 'plone/plone.uuid'
+    "html_url"
+] = "https://github.com/plone/plone.uuid/pull/3"  # noqa
+NO_PLONE_VERSION_PAYLOAD["base"]["ref"] = "my-upstream-branch"
+NO_PLONE_VERSION_PAYLOAD["base"]["repo"]["name"] = "plone.uuid"
+NO_PLONE_VERSION_PAYLOAD["base"]["repo"]["full_name"] = "plone/plone.uuid"
 
 
 PLONE_VERSION_PAYLOAD = copy.deepcopy(NO_PLONE_VERSION_PAYLOAD)
-PLONE_VERSION_PAYLOAD['base']['ref'] = 'master'
+PLONE_VERSION_PAYLOAD["base"]["ref"] = "master"
 
 
 class FakeGithub:
@@ -55,7 +55,7 @@ class FakeGithub:
 
             @property
             def sha(self):
-                return 'shaaaaa'
+                return "shaaaaa"
 
             def edit(self, sha=None, force=False):
                 return
@@ -67,7 +67,7 @@ class FakeGithub:
 
     @property
     def decoded_content(self):
-        return b'some text'
+        return b"some text"
 
     def get_git_commit(self, sha):
         return self
@@ -78,7 +78,7 @@ class FakeGithub:
 
     @property
     def type(self):
-        return 'file'
+        return "file"
 
     def create_git_commit(self, one, two, three, four, five):
         return mock.MagicMock()
@@ -106,16 +106,16 @@ class FakeGithub:
 
     @property
     def name(self):
-        return 'someone'
+        return "someone"
 
     @property
     def email(self):
-        return 'hi@dummy.com'
+        return "hi@dummy.com"
 
 
 class MockRequest:
     def __init__(self):
-        self._settings = {'github': FakeGithub(), 'plone_versions': ['4.3', '5.1']}
+        self._settings = {"github": FakeGithub(), "plone_versions": ["4.3", "5.1"]}
 
     @property
     def registry(self):
@@ -128,22 +128,22 @@ class MockRequest:
     def set_data(self, data, key):
         with NamedTemporaryFile(delete=False) as tmp_file:
             pickle_filename = tmp_file.name
-            with open(pickle_filename, 'bw') as tmp_file_writer:
+            with open(pickle_filename, "bw") as tmp_file_writer:
                 tmp_file_writer.write(pickle.dumps(data))
 
         self._settings[key] = pickle_filename
 
     def set_checkouts(self, data):
-        self.set_data(data, 'checkouts_file')
+        self.set_data(data, "checkouts_file")
 
     def set_sources(self, data):
-        self.set_data(data, 'sources_file')
+        self.set_data(data, "sources_file")
 
     def cleanup(self):
-        if os.path.exists(self._settings['checkouts_file']):
-            os.remove(self._settings['checkouts_file'])
-        if os.path.exists(self._settings['sources_file']):
-            os.remove(self._settings['sources_file'])
+        if os.path.exists(self._settings["checkouts_file"]):
+            os.remove(self._settings["checkouts_file"])
+        if os.path.exists(self._settings["sources_file"]):
+            os.remove(self._settings["sources_file"])
 
 
 def create_event(checkouts_data, sources_data, payload):
@@ -170,14 +170,14 @@ def test_not_targeting_any_plone_version(caplog):
 
     assert len(caplog.records) == 1
     assert (
-        'no plone coredev version tracks branch my-upstream-branch of '
-        'plone.uuid, checkouts.cfg not updated'
+        "no plone coredev version tracks branch my-upstream-branch of "
+        "plone.uuid, checkouts.cfg not updated"
     ) in caplog.records[0].msg
 
 
 def test_in_checkouts(caplog):
-    checkouts = {'5.1': ['plone.uuid']}
-    sources = {('plone/plone.uuid', 'master'): ['5.1']}
+    checkouts = {"5.1": ["plone.uuid"]}
+    sources = {("plone/plone.uuid", "master"): ["5.1"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
     caplog.set_level(logging.INFO)
     UpdateCoredevCheckouts(event)
@@ -185,13 +185,13 @@ def test_in_checkouts(caplog):
 
     assert len(caplog.records) == 1
     assert (
-        'is already on checkouts.cfg of all plone versions that it targets'
+        "is already on checkouts.cfg of all plone versions that it targets"
     ) in caplog.records[0].msg
 
 
 def test_in_multiple_checkouts(caplog):
-    checkouts = {'5.0': ['plone.uuid'], '5.1': ['plone.uuid']}
-    sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
+    checkouts = {"5.0": ["plone.uuid"], "5.1": ["plone.uuid"]}
+    sources = {("plone/plone.uuid", "master"): ["5.1", "5.0"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
     caplog.set_level(logging.INFO)
     UpdateCoredevCheckouts(event)
@@ -199,30 +199,30 @@ def test_in_multiple_checkouts(caplog):
 
     assert len(caplog.records) == 1
     assert (
-        'is already on checkouts.cfg of all plone versions that it targets'
+        "is already on checkouts.cfg of all plone versions that it targets"
     ) in caplog.records[0].msg
 
 
 def test_not_in_checkouts(caplog):
-    checkouts = {'5.0': [], '5.1': ['plone.uuid']}
-    sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0']}
+    checkouts = {"5.0": [], "5.1": ["plone.uuid"]}
+    sources = {("plone/plone.uuid", "master"): ["5.1", "5.0"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
     caplog.set_level(logging.INFO)
     UpdateCoredevCheckouts(event)
     event.request.cleanup()
 
     assert len(caplog.records) == 1
-    assert 'add to checkouts.cfg of buildout.coredev 5.0' in caplog.records[0].msg
+    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[0].msg
 
 
 def test_not_in_multiple_checkouts(caplog):
-    checkouts = {'4.3': [], '5.0': [], '5.1': ['plone.uuid']}
-    sources = {('plone/plone.uuid', 'master'): ['5.1', '5.0', '4.3']}
+    checkouts = {"4.3": [], "5.0": [], "5.1": ["plone.uuid"]}
+    sources = {("plone/plone.uuid", "master"): ["5.1", "5.0", "4.3"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
     caplog.set_level(logging.INFO)
     UpdateCoredevCheckouts(event)
     event.request.cleanup()
 
     assert len(caplog.records) == 2
-    assert 'add to checkouts.cfg of buildout.coredev 5.0' in caplog.records[0].msg
-    assert 'add to checkouts.cfg of buildout.coredev 4.3' in caplog.records[1].msg
+    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[0].msg
+    assert "add to checkouts.cfg of buildout.coredev 4.3" in caplog.records[1].msg
