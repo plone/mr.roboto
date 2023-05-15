@@ -132,10 +132,3 @@ pip-compile requirements-dev.in
 After these steps,
 look with `git diff` the changes on `requirements-dev.txt` and `requirements-app.txt`
 and create a pull request to get the changes checked by GHA.
-
-
-```mermaid
-graph TD;
-  plone.app.dexterity[plone App Dexterity la lo li]
-  plone.app.dexterity-->B;
-```
