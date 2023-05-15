@@ -13,14 +13,14 @@ Reduced set of data sent by Github about a pull request.
 Each payload is adapted later on to test all corner cases.
 """
 PAYLOAD = {
-    'number': '34',
-    'html_url': 'https://github.com/plone/mr.roboto/pull/34',
-    'diff_url': 'https://github.com/plone/mr.roboto/pull/34.diff',
-    'base': {'repo': {'name': 'Products.CMFPlone', 'owner': {'login': 'plone'}}},
+    "number": "34",
+    "html_url": "https://github.com/plone/mr.roboto/pull/34",
+    "diff_url": "https://github.com/plone/mr.roboto/pull/34.diff",
+    "base": {"repo": {"name": "Products.CMFPlone", "owner": {"login": "plone"}}},
 }
 
 IGNORED_REPO_PAYLOAD = copy.deepcopy(PAYLOAD)
-IGNORED_REPO_PAYLOAD['base']['repo']['name'] = 'documentation'
+IGNORED_REPO_PAYLOAD["base"]["repo"]["name"] = "documentation"
 
 DIFF_NO_CHANGELOG = """
 diff --git a/src/mr.roboto/setup.py b/src/mr.roboto/setup.py
@@ -86,8 +86,8 @@ class MockRequest:
     @property
     def settings(self):
         return {
-            'github': mock.MagicMock(),
-            'roboto_url': 'http://jenkins.plone.org/roboto',
+            "github": mock.MagicMock(),
+            "roboto_url": "http://jenkins.plone.org/roboto",
         }
 
 
@@ -97,7 +97,7 @@ class MockDiff:
 
     @property
     def encoding(self):
-        return 'utf-8'
+        return "utf-8"
 
     @property
     def content(self):
@@ -108,40 +108,40 @@ def test_repo_ignored(caplog):
     event = NewPullRequest(pull_request=IGNORED_REPO_PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     WarnNoChangelogEntry(event)
-    assert 'no need to have a changelog entry' in caplog.records[-1].msg
+    assert "no need to have a changelog entry" in caplog.records[-1].msg
 
 
-@patch('requests.get')
+@patch("requests.get")
 def test_no_change_log_file(m1, caplog):
     m1.return_value = MockDiff(DIFF_NO_CHANGELOG)
     event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     WarnNoChangelogEntry(event)
-    assert 'changelog entry: error' in caplog.records[-1].msg
+    assert "changelog entry: error" in caplog.records[-1].msg
 
 
-@patch('requests.get')
+@patch("requests.get")
 def test_with_change_log_file(m1, caplog):
     m1.return_value = MockDiff(DIFF_WITH_CHANGELOG)
     event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     WarnNoChangelogEntry(event)
-    assert 'changelog entry: success' in caplog.records[-1].msg
+    assert "changelog entry: success" in caplog.records[-1].msg
 
 
-@patch('requests.get')
+@patch("requests.get")
 def test_with_news_entry(m1, caplog):
     m1.return_value = MockDiff(DIFF_WITH_NEWS_ENTRY)
     event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     WarnNoChangelogEntry(event)
-    assert 'changelog entry: success' in caplog.records[-1].msg
+    assert "changelog entry: success" in caplog.records[-1].msg
 
 
-@patch('requests.get')
+@patch("requests.get")
 def test_with_change_log_file_history(m1, caplog):
     m1.return_value = MockDiff(DIFF_WITH_CHANGELOG_ON_HISTORY_txt)
     event = NewPullRequest(pull_request=PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     WarnNoChangelogEntry(event)
-    assert 'changelog entry: success' in caplog.records[-1].msg
+    assert "changelog entry: success" in caplog.records[-1].msg

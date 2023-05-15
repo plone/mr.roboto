@@ -11,8 +11,8 @@ import shutil
 import unittest
 
 
-git_source = 'https://github.com/plone/Products'
-ssh_source = 'git@github.com:plone/Products'
+git_source = "https://github.com/plone/Products"
+ssh_source = "git@github.com:plone/Products"
 SOURCES = f"""
 [buildout]
 
@@ -34,44 +34,44 @@ class BuildoutTest(unittest.TestCase):
     def setUp(self):
         self.coredev_repo = Repo.init(mkdtemp())
         PloneCoreBuildout.PLONE_COREDEV_LOCATION = (
-            f'file://{self.coredev_repo.working_tree_dir}'
+            f"file://{self.coredev_repo.working_tree_dir}"
         )
 
-        self._commit(SOURCES, filename='sources.cfg')
-        self._commit(CHECKOUTS, filename='checkouts.cfg')
+        self._commit(SOURCES, filename="sources.cfg")
+        self._commit(CHECKOUTS, filename="checkouts.cfg")
 
         app = main({}, **default_settings(parsed=False))
         self.roboto = BaseApp(app)
         self.settings = app.registry.settings
 
-        for plone in self.settings['plone_versions']:
+        for plone in self.settings["plone_versions"]:
             self.coredev_repo.create_head(plone)
 
     def tearDown(self):
         shutil.rmtree(self.coredev_repo.working_tree_dir)
-        os.remove(self.settings['sources_file'])
-        os.remove(self.settings['checkouts_file'])
+        os.remove(self.settings["sources_file"])
+        os.remove(self.settings["checkouts_file"])
 
-    def _commit(self, content='', filename='dummy'):
+    def _commit(self, content="", filename="dummy"):
         dummy_file = os.path.join(self.coredev_repo.working_tree_dir, filename)
-        with open(dummy_file, 'w') as afile:
+        with open(dummy_file, "w") as afile:
             afile.write(content)
         self.coredev_repo.index.add([dummy_file])
-        self.coredev_repo.index.commit('Random commit')
+        self.coredev_repo.index.commit("Random commit")
 
     def test_get_sources_and_checkouts(self):
         self.roboto.get(
             f'/update-sources-and-checkouts?token={self.settings["api_key"]}'
         )
 
-        with open(self.settings['sources_file'], 'br') as sources:
+        with open(self.settings["sources_file"], "br") as sources:
             data = pickle.load(sources)
 
-        self.assertEqual(data[('plone/Products.CMFPlone', 'master')], ['5.2', '6.0'])
-        self.assertEqual(data[('plone/Products.CMFCore', '2.2.x')], ['5.2', '6.0'])
+        self.assertEqual(data[("plone/Products.CMFPlone", "master")], ["5.2", "6.0"])
+        self.assertEqual(data[("plone/Products.CMFCore", "2.2.x")], ["5.2", "6.0"])
 
-        with open(self.settings['checkouts_file'], 'br') as checkouts:
+        with open(self.settings["checkouts_file"], "br") as checkouts:
             data = pickle.load(checkouts)
 
-        self.assertEqual(data['5.2'], ['plone.app.contenttypes', 'Products.CMFPlone'])
-        self.assertEqual(data['6.0'], ['plone.app.contenttypes', 'Products.CMFPlone'])
+        self.assertEqual(data["5.2"], ["plone.app.contenttypes", "Products.CMFPlone"])
+        self.assertEqual(data["6.0"], ["plone.app.contenttypes", "Products.CMFPlone"])

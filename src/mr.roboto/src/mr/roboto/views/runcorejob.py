@@ -17,12 +17,12 @@ import json
 import logging
 
 
-logger = logging.getLogger('mr.roboto')
+logger = logging.getLogger("mr.roboto")
 
 runCoreTests = Service(
-    name='Run core tests',
-    path='/run/corecommit',
-    description='Run the core-dev buildout',
+    name="Run core tests",
+    path="/run/corecommit",
+    description="Run the core-dev buildout",
 )
 
 
@@ -34,12 +34,12 @@ class GMT1(datetime.tzinfo):
         return datetime.timedelta(0)
 
     def tzname(self, dt):  # pragma: no cover
-        return 'Europe/Catalunya'
+        return "Europe/Catalunya"
 
 
 def get_user(data):
-    if data['name'] == 'none':
-        who = 'NoBody <nobody@plone.org>'
+    if data["name"] == "none":
+        who = "NoBody <nobody@plone.org>"
     else:
         who = f'{data["name"]} <{data["email"]}>'
     return who
@@ -48,22 +48,22 @@ def get_user(data):
 def commit_to_coredev(
     request, payload, plone_version, changeset, changeset_long, timestamp
 ):
-    logger.info('Commit: LETS COMMIT ON COREDEV')
-    gh = request.registry.settings['github']
-    org = gh.get_organization('plone')
-    repo = org.get_repo('buildout.coredev')
-    head_ref = repo.get_git_ref(f'heads/{plone_version}')
+    logger.info("Commit: LETS COMMIT ON COREDEV")
+    gh = request.registry.settings["github"]
+    org = gh.get_organization("plone")
+    repo = org.get_repo("buildout.coredev")
+    head_ref = repo.get_git_ref(f"heads/{plone_version}")
     latest_commit = repo.get_git_commit(head_ref.object.sha)
     base_tree = latest_commit.tree
     element = InputGitTreeElement(
-        path='last_commit.txt', mode='100644', type='blob', content=changeset_long
+        path="last_commit.txt", mode="100644", type="blob", content=changeset_long
     )
     new_tree = repo.create_git_tree([element], base_tree)
     new_user = InputGitAuthor(
-        payload['pusher']['name'], payload['pusher']['email'], timestamp
+        payload["pusher"]["name"], payload["pusher"]["email"], timestamp
     )
     new_commit = repo.create_git_commit(
-        f'[fc] {changeset}', new_tree, [latest_commit], new_user, new_user
+        f"[fc] {changeset}", new_tree, [latest_commit], new_user, new_user
     )
     head_ref.edit(sha=new_commit.sha, force=False)
 
@@ -83,37 +83,37 @@ def get_info(payload, repo, branch):
     cases.
     """
     timestamp = datetime.datetime.now(GMT1()).isoformat()
-    changeset = ''
-    changeset_long = ''
+    changeset = ""
+    changeset_long = ""
     fake = False
     skip = False
     source_or_checkout = False
-    for commit in payload['commits']:
+    for commit in payload["commits"]:
         # get the commit data structure
         commit_data = get_info_from_commit(commit)
-        files = '\n'.join(commit_data['files'])
+        files = "\n".join(commit_data["files"])
 
-        if '[fc]' in commit_data['short_commit_msg']:
+        if "[fc]" in commit_data["short_commit_msg"]:
             fake = True
-        if '[ci skip]' in commit_data['full_commit_msg']:
+        if "[ci skip]" in commit_data["full_commit_msg"]:
             skip = True
-        if '[ci-skip]' in commit_data['full_commit_msg']:
+        if "[ci-skip]" in commit_data["full_commit_msg"]:
             skip = True
-        if 'sources.cfg' in files or 'checkouts.cfg' in files:
+        if "sources.cfg" in files or "checkouts.cfg" in files:
             source_or_checkout = True
 
         # prepare a changeset text message
         data = {
-            'push': payload,
-            'commit': commit,
-            'files': files,
-            'diff': commit_data['diff'],
+            "push": payload,
+            "commit": commit,
+            "files": files,
+            "diff": commit_data["diff"],
         }
-        changeset += templates['github_commit.pt'](**data)
-        changeset_long += templates['jenkins_changeset.pt'](**data)
+        changeset += templates["github_commit.pt"](**data)
+        changeset_long += templates["jenkins_changeset.pt"](**data)
 
         # get a timestamp for later usage when creating commits
-        timestamp = commit['timestamp']
+        timestamp = commit["timestamp"]
 
         msg = f'Commit: on {repo} {branch} {commit["id"]}'
         logger.info(msg)
@@ -130,17 +130,17 @@ def run_function_core_tests(request):
     to run for the given repository and branch:
     """
     # bail out early if it's just a github check
-    payload = json.loads(request.POST['payload'])
-    if 'ref' not in payload:
-        return json.dumps({'message': 'pong'})
+    payload = json.loads(request.POST["payload"])
+    if "ref" not in payload:
+        return json.dumps({"message": "pong"})
 
     # lots of variables
-    repo_name = payload['repository']['name']
-    repo = payload['repository']['full_name']
-    branch = payload['ref'].split('/')[-1]
+    repo_name = payload["repository"]["name"]
+    repo = payload["repository"]["full_name"]
+    branch = payload["ref"].split("/")[-1]
 
     # who pushed the commits?
-    who = get_user(payload['pusher'])
+    who = get_user(payload["pusher"])
 
     data = get_info(payload, repo, branch)
     timestamp, changeset, changeset_long, fake, skip, source_or_checkout = data
@@ -150,23 +150,23 @@ def run_function_core_tests(request):
 
     # If it is a push to buildout.coredev,
     # update sources and checkouts and quit
-    if repo == 'plone/buildout.coredev':
-        logger.info('Commit: on coredev - do nothing')
+    if repo == "plone/buildout.coredev":
+        logger.info("Commit: on coredev - do nothing")
         if source_or_checkout:
             get_sources_and_checkouts(request)
 
-        return json.dumps({'message': 'Thanks! Commit to coredev, nothing to do'})
+        return json.dumps({"message": "Thanks! Commit to coredev, nothing to do"})
 
     # If it is a push to a package we ignore,
     # update sources and checkouts and quit
     if repo_name in IGNORE_NO_JENKINS:
-        logger.info('Commit: repo in IGNORE_NO_JENKINS - do nothing')
+        logger.info("Commit: repo in IGNORE_NO_JENKINS - do nothing")
         if source_or_checkout:
             get_sources_and_checkouts(request)
 
         return json.dumps(
             {
-                'message': 'Thanks! Commit to package that is not tested on Jenkins, nothing to do',
+                "message": "Thanks! Commit to package that is not tested on Jenkins, nothing to do",
             }
         )
 
@@ -176,23 +176,23 @@ def run_function_core_tests(request):
 
     # if it's a skip commit, log and done
     if skip:
-        logger.info(f'Commit: skip CI - {repo} - {branch} do nothing')
-        return json.dumps({'message': 'Thanks! Skipping CI'})
+        logger.info(f"Commit: skip CI - {repo} - {branch} do nothing")
+        return json.dumps({"message": "Thanks! Skipping CI"})
 
     # if the repo+branch are not in any plone version sources.cfg,
     # log and done
     plone_versions = plone_versions_targeted(repo, branch, request)
     if not plone_versions:
         # Error repo not in sources
-        logger.info(f'Commit: not in sources - {repo} - {branch} do nothing')
+        logger.info(f"Commit: not in sources - {repo} - {branch} do nothing")
         return json.dumps(
-            {'message': 'Thanks! Commits done on a branch, nothing to do'}
+            {"message": "Thanks! Commits done on a branch, nothing to do"}
         )
 
     ##
     # a commit on a branch that's part of a plone version
     ##
-    checkouts = get_pickled_data(request.registry.settings['checkouts_file'])
+    checkouts = get_pickled_data(request.registry.settings["checkouts_file"])
     for plone_version in plone_versions:
         # if the repository is not on checkouts.cfg things could be broken
         # at a later point when it's added, warn about it!!
@@ -205,7 +205,7 @@ def run_function_core_tests(request):
             plone_version, request, payload, changeset, changeset_long, timestamp
         )
 
-    return json.dumps({'message': 'Thanks! Plone Jenkins CI will run tests'})
+    return json.dumps({"message": "Thanks! Plone Jenkins CI will run tests"})
 
 
 def warn_repo_not_in_checkouts(plone_version, request, who, repo, branch, payload):
@@ -216,7 +216,7 @@ def warn_repo_not_in_checkouts(plone_version, request, who, repo, branch, payloa
             repo,
             branch,
             plone_version,
-            payload['pusher']['email'],  # duplicated, already on 'who'
+            payload["pusher"]["email"],  # duplicated, already on 'who'
         )
     )
 
@@ -235,7 +235,7 @@ def commit_on_plone_version(
             )
         except GithubException:  # pragma: no cover
             logger.warning(
-                'Got an exception while trying to commit, give it another try'
+                "Got an exception while trying to commit, give it another try"
             )
             attempts += 1
             continue
@@ -243,4 +243,4 @@ def commit_on_plone_version(
         attempts = 5  # escape from the while
 
     if attempts != 5:
-        logger.error('Could not commit to coredev!')
+        logger.error("Could not commit to coredev!")
