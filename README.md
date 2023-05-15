@@ -132,3 +132,56 @@ pip-compile requirements-dev.in
 After these steps,
 look with `git diff` the changes on `requirements-dev.txt` and `requirements-app.txt`
 and create a pull request to get the changes checked by GHA.
+
+
+```mermaid
+graph TD;
+	"plone.app.relationfield" --> "plone.app.dexterity";
+	"plone.app.dexterity" --> "plone.app.layout";
+	"plone.app.relationfield (0)" --> "plone.app.dexterity (0)";
+	"plone.app.dexterity (0)" --> "plone.app.layout (0)";
+	"plone.app.layout" --> "plone.app.multilingual";
+	"plone.app.layout (0)" --> "plone.app.multilingual (0)";
+	"plone.app.multilingual" --> "plone.app.dexterity";
+	"plone.app.multilingual" --> "plone.app.event";
+	"plone.app.multilingual (0)" --> "plone.app.event (0)";
+	"plone.app.event" --> "plone.app.contenttypes";
+	"plone.app.event (0)" --> "plone.app.contenttypes (0)";
+	"plone.app.contenttypes" --> "plone.app.dexterity";
+	"plone.app.contenttypes" --> "plone.app.linkintegrity";
+	"plone.app.contenttypes (0)" --> "plone.app.linkintegrity (0)";
+	"plone.app.linkintegrity (0)" --> "plone.app.relationfield (0)";
+	"plone.app.relationfield (1)" --> "plone.app.dexterity (1)";
+	"plone.app.dexterity (1)" --> "plone.app.layout (1)";
+	"plone.app.layout (1)" --> "plone.app.multilingual (1)";
+	"plone.app.multilingual (1)" --> "plone.app.event (1)";
+	"plone.app.event (1)" --> "plone.app.contenttypes (1)";
+	"plone.app.contenttypes (1)" --> "plone.app.relationfield (1)";
+	"plone.app.relationfield (2)" --> "plone.app.dexterity (2)";
+	"plone.app.dexterity (2)" --> "plone.app.layout (2)";
+	"plone.app.layout (2)" --> "plone.app.relationfield (2)";
+	"plone.app.portlets" --> "plone.app.layout";
+	"plone.app.portlets (3)" --> "plone.app.layout (3)";
+	"plone.app.layout (3)" --> "plone.app.multilingual (3)";
+	"plone.app.multilingual (3)" --> "plone.app.event (3)";
+	"plone.app.event (3)" --> "plone.app.portlets (3)";
+	"plone.app.versioningbehavior" --> "plone.app.dexterity";
+	"plone.app.versioningbehavior (4)" --> "plone.app.dexterity (4)";
+	"plone.app.dexterity (4)" --> "plone.app.layout (4)";
+	"plone.app.layout (4)" --> "plone.app.multilingual (4)";
+	"plone.app.multilingual (4)" --> "plone.app.event (4)";
+	"plone.app.event (4)" --> "plone.app.contenttypes (4)";
+	"plone.app.contenttypes (4)" --> "plone.app.versioningbehavior (4)";
+	"plone.app.event (5)" --> "plone.app.contenttypes (5)";
+	"plone.app.contenttypes (5)" --> "plone.app.dexterity (5)";
+	"plone.app.dexterity (5)" --> "plone.app.layout (5)";
+	"plone.app.layout (5)" --> "plone.app.multilingual (5)";
+	"plone.app.multilingual (5)" --> "plone.app.event (5)";
+	"plone.app.event (6)" --> "plone.app.contenttypes (6)";
+	"plone.app.contenttypes (6)" --> "plone.app.event (6)";
+	"plone.app.layout (9)" --> "plone.app.multilingual (9)";
+	"plone.app.multilingual (9)" --> "plone.app.dexterity (9)";
+	"plone.app.dexterity (9)" --> "plone.app.layout (9)";
+	"plone.app.layout (10)" --> "plone.app.multilingual (10)";
+	"plone.app.multilingual (10)" --> "plone.app.layout (10)";
+```
