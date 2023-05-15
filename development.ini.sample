@@ -2,22 +2,26 @@
 use = egg:mr.roboto
 
 debug = True
-api_key = trololo
+api_key = XXX
 
 mail.host = smtp.gmail.com
 mail.port = 587
 mail.tls = true
-mail.username = X
-mail.password = X
+mail.username = XXX
+mail.password = XXX
 
-plone_versions = ['4.3', '5.0', '5.1']
+plone_versions = ['5.2', '6.0', '6.1' ]
+py_versions = {'5.2': ['2.7', '3.8'], '6.0': ['3.8', '3.11'], '6.1': ['3.11']}
 
 sources_file = sources.pickle
 checkouts_file = checkouts.pickle
 
 roboto_url = http://localhost:6543
+jenkins_url = https://jenkins.plone.org
+jenkins_user_id = XXX
+jenkins_user_token = XXX
 
-github_token = X
+github_token = XXX
 
 collective_repos = collective.elephantvocabulary,icalendar,Products.DateRecurringIndex
 
@@ -42,27 +46,44 @@ port = 6543
 # Begin logging configuration
 
 [loggers]
-keys = root, mr_roboto
+keys = root, mr_roboto, wsgi
 
 [handlers]
-keys = console
+keys = robotolog, wsgierrors
 
 [formatters]
 keys = generic
 
 [logger_root]
 level = INFO
-handlers = console
+handlers = robotolog, wsgierrors
 
 [logger_mr_roboto]
 level = DEBUG
-handlers =
+handlers = robotolog, wsgierrors
+qualname = mr_roboto
+
+[logger_wsgi]
+level = INFO
+handlers = robotolog
 qualname = mr_roboto
 
 [handler_console]
 class = StreamHandler
 args = (sys.stderr,)
 level = NOTSET
+formatter = generic
+
+[handler_robotolog]
+class = handlers.RotatingFileHandler
+args = ('roboto.log', 'a', 50*1024*1024, 10, 'utf-8')
+level = NOTSET
+formatter = generic
+
+[handler_wsgierrors]
+class = handlers.RotatingFileHandler
+args = ('roboto-error.log', 'a', 50*1024*1024, 10, 'utf-8')
+level = ERROR
 formatter = generic
 
 [formatter_generic]
