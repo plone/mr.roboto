@@ -136,5 +136,5 @@ and create a pull request to get the changes checked by GHA.
 
 ```mermaid
 graph TD;
-  A-->B;
+  "lala A"-->B;
 ```
