@@ -136,5 +136,6 @@ and create a pull request to get the changes checked by GHA.
 
 ```mermaid
 graph TD;
-  "lala A"-->B;
+  plone.app.dexterity[plone App Dexterity la lo li]
+  plone.app.dexterity-->B;
 ```
