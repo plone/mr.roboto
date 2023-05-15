@@ -111,3 +111,24 @@ To format code and run QA tools:
 tox -e format
 tox -e lint
 ```
+
+### Update dependencies
+
+We use [`pip-tools`](https://pypi.org/project/pip-tools)
+to pin all versions used by `mr.roboto`.
+
+Now and then they need to be updated though,
+to do so run the following commands:
+
+```shell
+python3.11 -m venv .
+. bin/activate
+pip install pip-tools
+rm -f requirements*.txt
+pip-compile requirements-app.in
+pip-compile requirements-dev.in
+```
+
+After these steps,
+look with `git diff` the changes on `requirements-dev.txt` and `requirements-app.txt`
+and create a pull request to get the changes checked by GHA.
