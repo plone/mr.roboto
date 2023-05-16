@@ -82,6 +82,10 @@ IGNORE_NO_JENKINS = (
     "plone.recipe.zope2instance",
 )
 
+# Authors that will not trigger a commit on buildout.coredev
+# when their PRs get merged
+IGNORE_PR_AUTHORS = ("pre-commit-ci[bot]",)
+
 
 def mail_missing_checkout(mailer, who, repo, branch, pv, email):
     msg = Message(
@@ -168,6 +172,10 @@ class PullRequestSubscriber:
     @cached_property
     def repo_name(self):
         return self.pull_request["base"]["repo"]["name"]
+
+    @cached_property
+    def pull_request_author(self):
+        return self.pull_request["user"]["login"]
 
     @cached_property
     def repo_full_name(self):
@@ -457,6 +465,13 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             return
 
         if self.repo_name in IGNORE_NO_AUTO_CHECKOUT:
+            return
+
+        if self.pull_request_author in IGNORE_PR_AUTHORS:
+            self.log(
+                f"no commits on buildout.coredev as "
+                f"user {self.pull_request_author} is ignored"
+            )
             return
 
         plone_versions = plone_versions_targeted(
