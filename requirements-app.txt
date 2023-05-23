@@ -57,7 +57,7 @@ pyramid-mailer==0.15.1
     # via -r requirements-app.in
 repoze-sendmail==4.4.1
     # via pyramid-mailer
-requests==2.30.0
+requests==2.31.0
     # via pygithub
 six==1.16.0
     # via paste

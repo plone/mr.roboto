@@ -142,7 +142,7 @@ pyupgrade==3.4.0
     # via -r requirements-dev.in
 repoze-sendmail==4.4.1
     # via pyramid-mailer
-requests==2.30.0
+requests==2.31.0
     # via
     #   coveralls
     #   pygithub
