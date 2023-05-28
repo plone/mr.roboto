@@ -5,6 +5,9 @@
 - Remove `buildout.cfg` and clean up settings in `setup.cfg`.
   [gforcada]
 
+- Play with GitHub workflows.
+  [gforcada]
+
 ## 1.0.1
 
 - Add GHA to run the test suite and gather coverage info.
