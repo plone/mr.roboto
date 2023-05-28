@@ -4,12 +4,9 @@ from github import InputGitTreeElement
 from github.GithubException import GithubException
 from mr.roboto import templates
 from mr.roboto.buildout import get_sources_and_checkouts
-from mr.roboto.events import CommitAndMissingCheckout
-from mr.roboto.events import NewCoreDevPush
 from mr.roboto.security import validate_github
 from mr.roboto.subscriber import IGNORE_NO_JENKINS
 from mr.roboto.utils import get_info_from_commit
-from mr.roboto.utils import get_pickled_data
 from mr.roboto.utils import plone_versions_targeted
 
 import datetime
@@ -139,14 +136,8 @@ def run_function_core_tests(request):
     repo = payload["repository"]["full_name"]
     branch = payload["ref"].split("/")[-1]
 
-    # who pushed the commits?
-    who = get_user(payload["pusher"])
-
     data = get_info(payload, repo, branch)
-    timestamp, changeset, changeset_long, fake, skip, source_or_checkout = data
-
-    if not fake and not skip:
-        request.registry.notify(NewCoreDevPush(payload, request))
+    timestamp, changeset, changeset_long, _, skip, source_or_checkout = data
 
     # If it is a push to buildout.coredev,
     # update sources and checkouts and quit
@@ -192,33 +183,12 @@ def run_function_core_tests(request):
     ##
     # a commit on a branch that's part of a plone version
     ##
-    checkouts = get_pickled_data(request.registry.settings["checkouts_file"])
     for plone_version in plone_versions:
-        # if the repository is not on checkouts.cfg things could be broken
-        # at a later point when it's added, warn about it!!
-        if repo_name not in checkouts[plone_version]:
-            warn_repo_not_in_checkouts(
-                plone_version, request, who, repo, branch, payload
-            )
-
         commit_on_plone_version(
             plone_version, request, payload, changeset, changeset_long, timestamp
         )
 
     return json.dumps({"message": "Thanks! Plone Jenkins CI will run tests"})
-
-
-def warn_repo_not_in_checkouts(plone_version, request, who, repo, branch, payload):
-    request.registry.notify(
-        CommitAndMissingCheckout(
-            who,
-            request,
-            repo,
-            branch,
-            plone_version,
-            payload["pusher"]["email"],  # duplicated, already on 'who'
-        )
-    )
 
 
 def commit_on_plone_version(

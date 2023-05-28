@@ -2,7 +2,11 @@
 
 ## (unreleased)
 
-- _nothing_
+- Stop sending emails when packages are not in `checkouts.cfg`
+  [gforcada]
+
+- Stop sending emails for each commit to `plone-cvs@lists.sourceforge.net`
+  [gforcada]
 
 ## 1.0.3 (2023-05-28)
 
