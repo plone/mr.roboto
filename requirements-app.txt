@@ -18,7 +18,7 @@ cornice==6.0.1
     # via -r requirements-app.in
 cryptography==40.0.2
     # via pyjwt
-deprecated==1.2.13
+deprecated==1.2.14
     # via pygithub
 gitdb==4.0.10
     # via gitpython
@@ -57,7 +57,7 @@ pyramid-mailer==0.15.1
     # via -r requirements-app.in
 repoze-sendmail==4.4.1
     # via pyramid-mailer
-requests==2.30.0
+requests==2.31.0
     # via pygithub
 six==1.16.0
     # via paste

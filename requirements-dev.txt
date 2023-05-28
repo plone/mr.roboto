@@ -34,7 +34,7 @@ coveralls==3.3.1
     # via -r requirements-dev.in
 cryptography==40.0.2
     # via pyjwt
-deprecated==1.2.13
+deprecated==1.2.14
     # via pygithub
 docopt==0.6.2
     # via coveralls
@@ -136,13 +136,13 @@ pytest==7.3.1
     # via
     #   -r requirements-dev.in
     #   pytest-cov
-pytest-cov==4.0.0
+pytest-cov==4.1.0
     # via -r requirements-dev.in
 pyupgrade==3.4.0
     # via -r requirements-dev.in
 repoze-sendmail==4.4.1
     # via pyramid-mailer
-requests==2.30.0
+requests==2.31.0
     # via
     #   coveralls
     #   pygithub
