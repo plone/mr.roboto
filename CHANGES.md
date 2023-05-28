@@ -2,6 +2,10 @@
 
 ## (unreleased)
 
+- _nothing_
+
+## 1.1.0 (2023-05-28)
+
 - Stop sending emails when packages are not in `checkouts.cfg`
   [gforcada]
 
