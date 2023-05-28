@@ -1,6 +1,6 @@
 from hashlib import sha1
 from mr.roboto.tests import minimal_main
-from mr.roboto.views.runcorejob import get_pickled_data
+from mr.roboto.utils import get_pickled_data
 from mr.roboto.views.runcorejob import get_user
 from tempfile import NamedTemporaryFile
 from unittest import mock

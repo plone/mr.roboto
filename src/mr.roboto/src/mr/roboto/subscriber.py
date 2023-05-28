@@ -5,7 +5,6 @@ from github import InputGitAuthor
 from github import InputGitTreeElement
 from mr.roboto import templates
 from mr.roboto.events import CommentOnPullRequest
-from mr.roboto.events import CommitAndMissingCheckout
 from mr.roboto.events import MergedPullRequest
 from mr.roboto.events import NewCoreDevPush
 from mr.roboto.events import NewPullRequest
@@ -87,20 +86,6 @@ IGNORE_NO_JENKINS = (
 IGNORE_PR_AUTHORS = ("pre-commit-ci[bot]",)
 
 
-def mail_missing_checkout(mailer, who, repo, branch, pv, email):
-    msg = Message(
-        subject=f"POSSIBLE CHECKOUT ERROR {repo} {branch}",
-        sender="Jenkins Job FAIL <jenkins@plone.org>",
-        # If you would love to receive *all* such emails,
-        # feel free to add your email address in this list. :-)
-        recipients=[email],
-        body=templates["error_commit_checkout.pt"](
-            who=who, repo=repo, branch=branch, pv=pv
-        ),
-    )
-    mailer.send_immediately(msg, fail_silently=False)
-
-
 def mail_to_cvs(payload, mailer):
     # safeguard against github getting confused and sending us the entire
     # history
@@ -138,18 +123,6 @@ def send_mail_on_coredev(event):
     repo_name = payload["repository"]["name"]
     logger.info(f"Commit: send mail: coredev push to {repo_name}")
     mail_to_cvs(payload, mailer)
-
-
-@subscriber(CommitAndMissingCheckout)
-def send_mail_on_missing_checkout(event):
-    mailer = get_mailer(event.request)
-    logger.info(
-        f"Commit: send mail: coredev push without checkout of "
-        f"{event.repo} by {event.who}"
-    )
-    mail_missing_checkout(
-        mailer, event.who, event.repo, event.branch, event.pv, event.email
-    )
 
 
 class PullRequestSubscriber:

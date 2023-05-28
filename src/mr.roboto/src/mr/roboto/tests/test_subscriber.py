@@ -1,4 +1,3 @@
-from mr.roboto.subscriber import mail_missing_checkout
 from mr.roboto.subscriber import mail_to_cvs
 from unittest import mock
 
@@ -32,28 +31,6 @@ COMMIT = {
 
 
 class SubscribersTest(unittest.TestCase):
-    def test_mail_missing_checkout(self):
-        mock_mail = mock.MagicMock()
-        mail_missing_checkout(
-            mock_mail,
-            "mister-roboto <roboto@plone.org>",
-            "plone/Products.CMFPlone",
-            "master",
-            "5.1",
-            "roboto@plone.org",
-        )
-        self.assertTrue(mock_mail.send_immediately.called)
-
-        mail = mock_mail.send_immediately.call_args[0][0]
-        self.assertEqual(
-            mail.subject, "POSSIBLE CHECKOUT ERROR plone/Products.CMFPlone master"
-        )
-        self.assertEqual(mail.sender, "Jenkins Job FAIL <jenkins@plone.org>")
-        self.assertEqual(
-            mail.recipients,
-            ["roboto@plone.org"],
-        )
-
     def test_to_cvs_ignore(self):
         payload = {"commits": list(range(0, 50))}
 
