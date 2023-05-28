@@ -27,7 +27,6 @@ def create_github_post_commit_hooks_view(request):
     collective organizations and creates them anew.
     """
     github = request.registry.settings["github"]
-    jenkins_url = request.registry.settings["jenkins_url"]
     roboto_url = request.registry.settings["roboto_url"]
 
     # hooks URL
@@ -36,7 +35,6 @@ def create_github_post_commit_hooks_view(request):
         Hook(f"{roboto_url}/run/corecommit", ["push"]),
         Hook(f"{roboto_url}/run/pull-request", ["pull_request"]),
         Hook(f"{roboto_url}/run/comment", ["issue_comment"]),
-        Hook(f"{jenkins_url}/github-webhook/", ["*"]),
     ]
 
     messages = []
@@ -102,6 +100,14 @@ def update_hooks_on_repo(repo=None, new_hooks=None, request=None):
                     "secret": request.registry.settings["api_key"],
                 }
                 repo.create_hook("web", config, hook.events, True)
+            if repo.name == "buildout.coredev":
+                jenkins_url = request.registry.settings["jenkins_url"]
+                config = {
+                    "url": f"{jenkins_url}/github-webhook/",
+                    "secret": request.registry.settings["api_key"],
+                }
+                repo.create_hook("web", config, ["*"], True)
+
     except GithubException:
         logger.exception(f"Error creating hook on {repo.name}")
 
