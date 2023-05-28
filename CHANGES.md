@@ -2,7 +2,8 @@
 
 ## (unreleased)
 
-- _nothing_
+- Fix log parsing.
+  [gforcada]
 
 ## 1.0.2 (2023-05-28)
 

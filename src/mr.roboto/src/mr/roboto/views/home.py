@@ -14,7 +14,7 @@ LOG_LINE_RE = re.compile(
     r"([\d\-\s:,]+)"  # timestamp
     r"(\w+)"  # log level
     r"\s+"  # space
-    r"\[[\w\.]+\]\[\w+\]"  # logger name ([mr.roboto][waitress]
+    r"\[[\w\d\.\-]+\]\[[\w\d\.\-]+\]"  # logger name ([mr.roboto][waitress]
     r"(.+)"  # message
 )
 
