@@ -1,2 +1,5 @@
 [tool.codespell]
 ignore-words-list = "pullrequest"
+
+[tool.isort]
+profile = "plone"
