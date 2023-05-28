@@ -1,2 +1,8 @@
 [tool.codespell]
 ignore-words-list = "pullrequest"
+
+[tool.isort]
+profile = "plone"
+
+[tool.black]
+target-version = ["py311"]
