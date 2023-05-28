@@ -24,5 +24,7 @@ development.ini
 .plone.versioncheck.tracked.json
 lib64
 
+*.pickle
+*.pid
 # Variable, checkout-local data
 /var
