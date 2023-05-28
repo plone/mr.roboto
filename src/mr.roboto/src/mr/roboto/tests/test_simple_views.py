@@ -137,7 +137,7 @@ class SimpleViewsTest(unittest.TestCase):
 
     def test_parse_log_line_format_commit(self):
         msg = parse_log_line(
-            "2013-12-12 22:34 INFO [mr.roboto][lala] "
+            "2013-12-12 22:34 INFO [mr.roboto][waitress-2] "
             "Commit: on plone/ploneorg.core master "
             "fcbc0f2764f84a027766d96493ea0d40823f7ef1"
         )
