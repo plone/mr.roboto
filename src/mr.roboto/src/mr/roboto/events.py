@@ -1,9 +1,3 @@
-class NewCoreDevPush:
-    def __init__(self, payload, request):
-        self.payload = payload
-        self.request = request
-
-
 class PullRequest:
     def __init__(self, pull_request, request):
         self.pull_request = pull_request

@@ -3,20 +3,15 @@ from functools import cached_property
 from github import GithubException
 from github import InputGitAuthor
 from github import InputGitTreeElement
-from mr.roboto import templates
 from mr.roboto.events import CommentOnPullRequest
 from mr.roboto.events import MergedPullRequest
-from mr.roboto.events import NewCoreDevPush
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
-from mr.roboto.utils import get_info_from_commit
 from mr.roboto.utils import get_pickled_data
 from mr.roboto.utils import plone_versions_targeted
 from mr.roboto.utils import shorten_comment_url
 from mr.roboto.utils import shorten_pull_request_url
 from pyramid.events import subscriber
-from pyramid_mailer import get_mailer
-from pyramid_mailer.message import Message
 from requests.exceptions import RequestException
 from unidiff import PatchSet
 
@@ -84,45 +79,6 @@ IGNORE_NO_JENKINS = (
 # Authors that will not trigger a commit on buildout.coredev
 # when their PRs get merged
 IGNORE_PR_AUTHORS = ("pre-commit-ci[bot]",)
-
-
-def mail_to_cvs(payload, mailer):
-    # safeguard against github getting confused and sending us the entire
-    # history
-    if len(payload["commits"]) > 40:
-        return
-
-    for commit in payload["commits"]:
-        commit_data = get_info_from_commit(commit)
-
-        data = {
-            "push": payload,
-            "commit": commit,
-            "files": "\n".join(commit_data["files"]),
-            "diff": commit_data["diff"],
-        }
-
-        repo_name = payload["repository"]["name"]
-        branch = payload["ref"].split("/")[-1]
-        commit_msg = commit_data["short_commit_msg"]
-        msg = Message(
-            subject=f"{repo_name}/{branch}: {commit_msg}",
-            sender=f'{commit["committer"]["name"]} <svn-changes@plone.org>',
-            recipients=["plone-cvs@lists.sourceforge.net"],
-            body=templates["commit_email.pt"](**data),
-            extra_headers={"Reply-To": commit_data["reply_to"]},
-        )
-
-        mailer.send_immediately(msg, fail_silently=False)
-
-
-@subscriber(NewCoreDevPush)
-def send_mail_on_coredev(event):
-    mailer = get_mailer(event.request)
-    payload = event.payload
-    repo_name = payload["repository"]["name"]
-    logger.info(f"Commit: send mail: coredev push to {repo_name}")
-    mail_to_cvs(payload, mailer)
 
 
 class PullRequestSubscriber:

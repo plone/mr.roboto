@@ -4,7 +4,6 @@ from github import InputGitTreeElement
 from github.GithubException import GithubException
 from mr.roboto import templates
 from mr.roboto.buildout import get_sources_and_checkouts
-from mr.roboto.events import NewCoreDevPush
 from mr.roboto.security import validate_github
 from mr.roboto.subscriber import IGNORE_NO_JENKINS
 from mr.roboto.utils import get_info_from_commit
@@ -138,10 +137,7 @@ def run_function_core_tests(request):
     branch = payload["ref"].split("/")[-1]
 
     data = get_info(payload, repo, branch)
-    timestamp, changeset, changeset_long, fake, skip, source_or_checkout = data
-
-    if not fake and not skip:
-        request.registry.notify(NewCoreDevPush(payload, request))
+    timestamp, changeset, changeset_long, _, skip, source_or_checkout = data
 
     # If it is a push to buildout.coredev,
     # update sources and checkouts and quit
