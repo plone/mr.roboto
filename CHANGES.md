@@ -2,6 +2,10 @@
 
 ## (unreleased)
 
+- _nothing_
+
+## 1.0.2 (2023-05-28)
+
 - Remove `buildout.cfg` and clean up settings in `setup.cfg`.
   [gforcada]
 
