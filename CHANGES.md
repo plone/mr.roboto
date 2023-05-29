@@ -2,7 +2,8 @@
 
 ## (unreleased)
 
-- _nothing_
+- Cleanup settings and dependencies related to mailing.
+  [gforcada]
 
 ## 1.1.0 (2023-05-28)
 
