@@ -139,6 +139,7 @@ pyupgrade==3.4.0
     # via -r requirements-dev.in
 requests==2.31.0
     # via
+    #   -r requirements-app.in
     #   coveralls
     #   pygithub
 six==1.16.0
