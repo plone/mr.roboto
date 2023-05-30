@@ -7,6 +7,7 @@ pyramid_chameleon
 requests
 unidiff
 # deployment requirements
+Paste
+pip-tools
 supervisor
 waitress
-Paste
