@@ -4,12 +4,6 @@ use = egg:mr.roboto
 debug = True
 api_key = XXX
 
-mail.host = smtp.gmail.com
-mail.port = 587
-mail.tls = true
-mail.username = XXX
-mail.password = XXX
-
 plone_versions = ['5.2', '6.0', '6.1' ]
 py_versions = {'5.2': ['2.7', '3.8'], '6.0': ['3.8', '3.11'], '6.1': ['3.11']}
 

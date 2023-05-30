@@ -2,7 +2,6 @@ cornice
 gitpython
 PyGithub
 pyramid_chameleon
-pyramid_mailer
 supervisor
 unidiff
 waitress

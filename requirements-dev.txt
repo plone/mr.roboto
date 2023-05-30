@@ -127,10 +127,7 @@ pyramid==2.0.1
     # via
     #   cornice
     #   pyramid-chameleon
-    #   pyramid-mailer
 pyramid-chameleon==0.3
-    # via -r requirements-app.in
-pyramid-mailer==0.15.1
     # via -r requirements-app.in
 pytest==7.3.1
     # via
@@ -140,8 +137,6 @@ pytest-cov==4.1.0
     # via -r requirements-dev.in
 pyupgrade==3.4.0
     # via -r requirements-dev.in
-repoze-sendmail==4.4.1
-    # via pyramid-mailer
 requests==2.31.0
     # via
     #   coveralls
@@ -156,10 +151,6 @@ supervisor==4.2.5
     # via -r requirements-app.in
 tokenize-rt==5.0.0
     # via pyupgrade
-transaction==3.1.0
-    # via
-    #   pyramid-mailer
-    #   repoze-sendmail
 translationstring==1.4
     # via pyramid
 unidiff==0.7.5
@@ -185,10 +176,7 @@ wrapt==1.15.0
 zope-deprecation==5.0
     # via pyramid
 zope-interface==6.0
-    # via
-    #   pyramid
-    #   repoze-sendmail
-    #   transaction
+    # via pyramid
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

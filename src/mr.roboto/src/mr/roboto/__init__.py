@@ -22,8 +22,7 @@ def main(global_config, **settings):
     # add webservice support
     config.include("cornice")
 
-    # adds mailer and chameleon templates
-    config.include("pyramid_mailer")
+    # adds chameleon templates
     config.include("pyramid_chameleon")
 
     # plone versions
