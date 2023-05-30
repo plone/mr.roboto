@@ -4,6 +4,11 @@
 
 - _nothing_
 
+## 1.1.2 (2023-05-30)
+
+- Forgot another place where we still were referencing a mail related dependency.
+  [gforcada]
+
 ## 1.1.1 (2023-05-30)
 
 - Cleanup settings and dependencies related to mailing.
