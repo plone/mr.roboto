@@ -1,8 +1,12 @@
+# mr.roboto requirements
+# keep it sync with src/mr.roboto/setup.py
 cornice
 gitpython
 PyGithub
 pyramid_chameleon
-supervisor
+requests
 unidiff
+# deployment requirements
+supervisor
 waitress
 Paste

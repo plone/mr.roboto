@@ -32,7 +32,6 @@ setup(
         "gitpython",
         "PyGithub",
         "pyramid_chameleon",
-        "pyramid_mailer",
         "requests",
         "setuptools",
         "unidiff",
