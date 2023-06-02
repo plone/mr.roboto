@@ -2,7 +2,9 @@
 
 ## (unreleased)
 
-- _nothing_
+- Do not update `buildout.coredev` when a PR is merged
+  if the commit message has `[ci-skip]` or `[ci skip]` on it.
+  [gforcada]
 
 ## 1.1.2 (2023-05-30)
 
