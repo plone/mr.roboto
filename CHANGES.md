@@ -2,7 +2,8 @@
 
 ## (unreleased)
 
-- _nothing_
+- Re-apply and fix the changes from 1.2.0.
+  [gforcada]
 
 ## 1.2.1 (2023-06-02)
 
