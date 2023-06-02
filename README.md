@@ -132,3 +132,34 @@ pip-compile requirements-dev.in
 After these steps,
 look with `git diff` the changes on `requirements-dev.txt` and `requirements-app.txt`
 and create a pull request to get the changes checked by GHA.
+
+
+### How to deploy
+
+Until we fully automate `mr.roboto`'s deployment, do the following steps:
+
+- make a release:
+
+```shell
+$EDITOR CHANGES.md
+# set a date and version number on the unreleased header
+# add a new header and an empty bullet point
+git commit -m"Release and deploy" CHANGES.md
+git tag $VERSION
+git push --tag
+```
+
+- deploy!
+
+```
+ssh $SERVER
+cd /srv/mr.roboto
+git fetch -p
+git rebase
+. venv/bin/activate
+pip install -r requirements-app.txt
+pip install -e src/mr.roboto
+./bin/supervisorctl status
+./bin/supervisorctl restart all
+./bin/supervisorctl status
+```
