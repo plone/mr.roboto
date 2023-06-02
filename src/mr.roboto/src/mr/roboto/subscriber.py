@@ -8,7 +8,6 @@ from mr.roboto.events import MergedPullRequest
 from mr.roboto.events import NewPullRequest
 from mr.roboto.events import UpdatedPullRequest
 from mr.roboto.utils import get_pickled_data
-from mr.roboto.utils import is_skip_commit_message
 from mr.roboto.utils import plone_versions_targeted
 from mr.roboto.utils import shorten_comment_url
 from mr.roboto.utils import shorten_pull_request_url
@@ -404,10 +403,6 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             )
             return
 
-        if self.is_skip_commit():
-            self.log("Commit had a skip CI mark. No commit is done in buildout.coredev")
-            return
-
         plone_versions = plone_versions_targeted(
             self.repo_full_name, self.target_branch, self.event.request
         )
@@ -434,11 +429,6 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             return
 
         self.add_pacakge_to_checkouts(not_in_checkouts)
-
-    def is_skip_commit(self):
-        last_commit = self.get_pull_request_last_commit()
-        commit_msg = last_commit.message
-        return is_skip_commit_message(commit_msg)
 
     def add_pacakge_to_checkouts(self, versions):
         """Add package to checkouts.cfg on buildout.coredev plone version"""

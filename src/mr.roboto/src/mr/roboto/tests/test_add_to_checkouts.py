@@ -41,9 +41,6 @@ PLONE_VERSION_PAYLOAD["base"]["ref"] = "master"
 
 
 class FakeGithub:
-    def __init__(self, commit_msg):
-        self.message = commit_msg
-
     def get_organization(self, name):
         return self
 
@@ -117,11 +114,8 @@ class FakeGithub:
 
 
 class MockRequest:
-    def __init__(self, commit_msg):
-        self._settings = {
-            "github": FakeGithub(commit_msg),
-            "plone_versions": ["4.3", "5.1"],
-        }
+    def __init__(self):
+        self._settings = {"github": FakeGithub(), "plone_versions": ["4.3", "5.1"]}
 
     @property
     def registry(self):
@@ -152,8 +146,8 @@ class MockRequest:
             os.remove(self._settings["sources_file"])
 
 
-def create_event(checkouts_data, sources_data, payload, commit_msg=""):
-    request = MockRequest(commit_msg)
+def create_event(checkouts_data, sources_data, payload):
+    request = MockRequest()
     request.set_checkouts(checkouts_data)
     request.set_sources(sources_data)
     event = MergedPullRequest(pull_request=payload, request=request)
@@ -245,25 +239,5 @@ def test_no_pr_commit_for_pre_commit_ci(caplog):
     assert len(caplog.records) == 1
     assert (
         "no commits on buildout.coredev as user pre-commit-ci[bot] is ignored"
-        in caplog.records[0].msg
-    )
-
-
-def test_skip_coredev_commit(caplog):
-    checkouts = {"4.3": [], "5.0": [], "5.1": ["plone.uuid"]}
-    sources = {("plone/plone.uuid", "master"): ["5.1", "5.0", "4.3"]}
-    event = create_event(
-        checkouts,
-        sources,
-        payload=PLONE_VERSION_PAYLOAD,
-        commit_msg="Skip with [ci-skip]",
-    )
-    caplog.set_level(logging.INFO)
-    UpdateCoredevCheckouts(event)
-    event.request.cleanup()
-
-    assert len(caplog.records) == 1
-    assert (
-        "Commit had a skip CI mark. No commit is done in buildout.coredev"
         in caplog.records[0].msg
     )

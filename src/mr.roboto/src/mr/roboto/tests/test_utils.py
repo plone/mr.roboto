@@ -1,10 +1,8 @@
 from mr.roboto.utils import get_info_from_commit
-from mr.roboto.utils import is_skip_commit_message
 from mr.roboto.utils import shorten_comment_url
 from mr.roboto.utils import shorten_pull_request_url
 from unittest import mock
 
-import pytest
 import unittest
 
 
@@ -92,20 +90,3 @@ class TestGetInfoFromCommitTest(unittest.TestCase):
                 "Files changed:\nM CHANGES.rst\nM setup.py"
             )
         )
-
-
-@pytest.mark.parametrize(
-    "message,expect",
-    (
-        ("random message", False),
-        ("please skip me", False),
-        ("please skip me, really [ci skip]", True),
-        ("please skip me, really [ci-skip]", True),
-        ("please skip me\n next lines [ci-skip]", True),
-        ("please skip me\n next lines [ci skip]", True),
-        ("please skip me\n next lines [ci skip] extra text", True),
-        ("please skip[ci skip]extra", True),
-    ),
-)
-def test_skip_commit_message(message, expect):
-    assert is_skip_commit_message(message) is expect

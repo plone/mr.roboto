@@ -71,12 +71,3 @@ def get_info_from_commit(commit):
         "reply_to": reply_to,
         "sha": commit["id"],
     }
-
-
-def is_skip_commit_message(message):
-    """Check if the commit message has a mark to CI skip mark"""
-    if "[ci-skip]" in message:
-        return True
-    if "[ci skip]" in message:
-        return True
-    return False
