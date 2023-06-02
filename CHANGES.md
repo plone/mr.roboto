@@ -2,6 +2,10 @@
 
 ## (unreleased)
 
+- _nothing_
+
+## 1.2.3 (2023-06-02)
+
 - Get the merge commit rather than the last commit on the PR.
   [gforcada]
 
