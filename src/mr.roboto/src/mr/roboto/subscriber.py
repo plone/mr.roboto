@@ -450,7 +450,6 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
 
     def is_skip_commit(self):
         commit_message = self.g_merge_commit.commit.message
-        self.log(f'commit message -- {commit_message}')
         return is_skip_commit_message(commit_message)
 
     def add_pacakge_to_checkouts(self, versions):
