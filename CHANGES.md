@@ -4,6 +4,11 @@
 
 - _nothing_
 
+## 1.2.1 (2023-06-02)
+
+- Revert last release.
+  [gforcada]
+
 ## 1.2.0 (2023-06-02)
 
 - Do not update `buildout.coredev` when a PR is merged
