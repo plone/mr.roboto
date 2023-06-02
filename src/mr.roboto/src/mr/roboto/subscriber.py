@@ -132,6 +132,19 @@ class PullRequestSubscriber:
         return g_repo.get_issue(pull_number)
 
     @cached_property
+    def g_repo(self):
+        org = self.pull_request["base"]["repo"]["owner"]["login"]
+        g_org = self.github.get_organization(org)
+        return g_org.get_repo(self.repo_name)
+
+    @cached_property
+    def g_merge_commit(self):
+        if self.g_pull.is_merged():
+            merge_commit_sha = self.g_pull.merge_commit_sha
+            merge_commit = self.g_repo.get_commit(merge_commit_sha)
+            return merge_commit
+
+    @cached_property
     def commits_url(self):
         return self.pull_request["commits_url"]
 
@@ -436,9 +449,9 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         self.add_pacakge_to_checkouts(not_in_checkouts)
 
     def is_skip_commit(self):
-        last_commit = self.get_pull_request_last_commit()
-        commit_msg = last_commit.commit.message
-        return is_skip_commit_message(commit_msg)
+        commit_message = self.g_merge_commit.commit.message
+        self.log(f'commit message -- {commit_message}')
+        return is_skip_commit_message(commit_message)
 
     def add_pacakge_to_checkouts(self, versions):
         """Add package to checkouts.cfg on buildout.coredev plone version"""
