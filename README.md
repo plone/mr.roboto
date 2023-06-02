@@ -156,7 +156,7 @@ ssh $SERVER
 cd /srv/mr.roboto
 git fetch -p
 git rebase
-. venv/bin/activate
+. bin/activate
 pip install -r requirements-app.txt
 pip install -e src/mr.roboto
 ./bin/supervisorctl status
