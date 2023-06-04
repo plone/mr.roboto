@@ -54,7 +54,7 @@ class FakeGithub:
         return True
 
     def merge_commit_sha(self):
-        return ''
+        return ""
 
     def get_commit(self, commit):
         return self
