@@ -50,6 +50,15 @@ class FakeGithub:
     def get_repo(self, name):
         return self
 
+    def is_merged(self):
+        return True
+
+    def merge_commit_sha(self):
+        return ''
+
+    def get_commit(self, commit):
+        return self
+
     def get_git_ref(self, name):
         class HEAD:
             @property
