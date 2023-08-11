@@ -75,7 +75,7 @@ flake8-todo==0.7
     # via -r requirements-dev.in
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.31
+gitpython==3.1.32
     # via -r requirements-app.in
 hupper==1.12
     # via pyramid
