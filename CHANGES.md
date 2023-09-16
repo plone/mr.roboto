@@ -2,7 +2,8 @@
 
 ## (unreleased)
 
-- _nothing_
+- Bump dependencies.
+  [gforcada]
 
 ## 1.2.4 (2023-06-04)
 
