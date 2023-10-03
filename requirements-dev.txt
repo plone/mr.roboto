@@ -165,7 +165,7 @@ translationstring==1.4
     # via pyramid
 unidiff==0.7.5
     # via -r requirements-app.in
-urllib3==2.0.4
+urllib3==2.0.6
     # via requests
 venusian==3.0.0
     # via
