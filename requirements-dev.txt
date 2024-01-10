@@ -75,7 +75,7 @@ flake8-todo==0.7
     # via -r requirements-dev.in
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.37
+gitpython==3.1.41
     # via -r requirements-app.in
 hupper==1.12
     # via pyramid
@@ -127,7 +127,9 @@ pyflakes==3.1.0
 pygithub==2.1.1
     # via -r requirements-app.in
 pyjwt[crypto]==2.8.0
-    # via pygithub
+    # via
+    #   pygithub
+    #   pyjwt
 pynacl==1.5.0
     # via pygithub
 pyproject-hooks==1.0.0
