@@ -4,41 +4,41 @@
 #
 #    pip-compile requirements-app.in
 #
-build==1.0.3
+build==1.2.1
     # via pip-tools
-certifi==2023.7.22
+certifi==2024.7.4
     # via requests
-cffi==1.16.0
+cffi==1.17.0
     # via
     #   cryptography
     #   pynacl
-chameleon==4.2.0
+chameleon==4.5.4
     # via pyramid-chameleon
-charset-normalizer==3.3.0
+charset-normalizer==3.3.2
     # via requests
 click==8.1.7
     # via pip-tools
-cornice==6.0.1
+cornice==6.1.0
     # via -r requirements-app.in
-cryptography==41.0.4
+cryptography==43.0.0
     # via pyjwt
 deprecated==1.2.14
     # via pygithub
-gitdb==4.0.10
+gitdb==4.0.11
     # via gitpython
-gitpython==3.1.37
+gitpython==3.1.43
     # via -r requirements-app.in
-hupper==1.12
+hupper==1.12.1
     # via pyramid
-idna==3.4
+idna==3.7
     # via requests
-packaging==23.2
+packaging==24.1
     # via build
-paste==3.6.0
+paste==3.10.1
     # via -r requirements-app.in
-pastedeploy==3.0.1
+pastedeploy==3.1.0
     # via plaster-pastedeploy
-pip-tools==7.3.0
+pip-tools==7.4.1
     # via -r requirements-app.in
 plaster==1.1.2
     # via
@@ -46,61 +46,55 @@ plaster==1.1.2
     #   pyramid
 plaster-pastedeploy==1.0.1
     # via pyramid
-pycparser==2.21
+pycparser==2.22
     # via cffi
-pygithub==2.1.1
+pygithub==2.3.0
     # via -r requirements-app.in
-pyjwt[crypto]==2.8.0
+pyjwt[crypto]==2.9.0
     # via pygithub
 pynacl==1.5.0
     # via pygithub
-pyproject-hooks==1.0.0
-    # via build
+pyproject-hooks==1.1.0
+    # via
+    #   build
+    #   pip-tools
 pyramid==2.0.2
     # via
     #   cornice
     #   pyramid-chameleon
 pyramid-chameleon==0.3
     # via -r requirements-app.in
-python-dateutil==2.8.2
-    # via pygithub
-requests==2.31.0
+requests==2.32.3
     # via
     #   -r requirements-app.in
     #   pygithub
-six==1.16.0
-    # via
-    #   paste
-    #   python-dateutil
 smmap==5.0.1
     # via gitdb
 supervisor==4.2.5
     # via -r requirements-app.in
 translationstring==1.4
     # via pyramid
-typing-extensions==4.8.0
+typing-extensions==4.12.2
     # via pygithub
 unidiff==0.7.5
     # via -r requirements-app.in
-urllib3==2.0.6
+urllib3==2.2.2
     # via
     #   pygithub
     #   requests
-venusian==3.0.0
-    # via
-    #   cornice
-    #   pyramid
-waitress==2.1.2
-    # via -r requirements-app.in
-webob==1.8.7
+venusian==3.1.0
     # via pyramid
-wheel==0.41.2
+waitress==3.0.0
+    # via -r requirements-app.in
+webob==1.8.8
+    # via pyramid
+wheel==0.44.0
     # via pip-tools
-wrapt==1.15.0
+wrapt==1.16.0
     # via deprecated
 zope-deprecation==5.0
     # via pyramid
-zope-interface==6.1
+zope-interface==7.0.1
     # via pyramid
 
 # The following packages are considered to be unsafe in a requirements file:
