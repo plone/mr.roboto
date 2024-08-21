@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mr.roboto"
+version = "2.0"
+description = "Plone Jenkins Middleware"
+readme = "README.rst"
+requires-python = ">=3.11"
+license = "GPL"
+authors = [
+  { name = "Plone Foundation", email = "plone-developers@lists.sourceforge.net" },
+]
+keywords = ["jenkins", "plone"]
+classifiers = ["Programming Language :: Python"]
+dependencies = [
+  "cornice",
+  "gitpython",
+  "PyGithub",
+  "pyramid_chameleon",
+  "requests",
+  "unidiff",
+]
+
+[project.urls]
+Homepage = "https://github.com/plone/mr.roboto"
