@@ -75,6 +75,7 @@ IGNORE_NO_JENKINS = (
     "icalendar",
     "plone.recipe.zeoserver",
     "plone.recipe.zope2instance",
+    "plone.releaser",
 )
 
 # Authors that will not trigger a commit on buildout.coredev
