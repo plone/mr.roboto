@@ -145,4 +145,7 @@ def test_ignored(caplog):
     event.request.cleanup_sources()
 
     assert len(caplog.records) == 1
-    assert "skip adding test warnings, repo ignored" in caplog.records[0].msg
+    assert (
+        "Not adding pending Jenkins checks: plone.releaser ignored."
+        in caplog.records[0].msg
+    )
