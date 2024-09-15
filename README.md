@@ -121,8 +121,8 @@ Now and then they need to be updated though,
 to do so run the following commands:
 
 ```shell
-python3.11 -m venv .
-. bin/activate
+python3.11 -m venv .venv
+. .venv/bin/activate
 pip install pip-tools
 rm -f requirements*.txt
 pip-compile requirements-app.in
