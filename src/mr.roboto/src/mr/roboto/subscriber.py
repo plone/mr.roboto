@@ -70,9 +70,8 @@ IGNORE_NO_AUTO_CHECKOUT = (
 )
 
 # Ignore packages that have no influence on Jenkins.
-IGNORE_NO_JENKINS = (
+IGNORE_NO_JENKINS = IGNORE_NO_TEST_NEEDED + (
     "documentation",
-    "icalendar",
     "plone.recipe.zeoserver",
     "plone.recipe.zope2instance",
 )
