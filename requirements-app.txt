@@ -4,11 +4,11 @@
 #
 #    pip-compile requirements-app.in
 #
-build==1.2.1
+build==1.2.2
     # via pip-tools
-certifi==2024.7.4
+certifi==2024.8.30
     # via requests
-cffi==1.17.0
+cffi==1.17.1
     # via
     #   cryptography
     #   pynacl
@@ -20,7 +20,7 @@ click==8.1.7
     # via pip-tools
 cornice==6.1.0
     # via -r requirements-app.in
-cryptography==43.0.0
+cryptography==43.0.1
     # via pyjwt
 deprecated==1.2.14
     # via pygithub
@@ -30,7 +30,7 @@ gitpython==3.1.43
     # via -r requirements-app.in
 hupper==1.12.1
     # via pyramid
-idna==3.7
+idna==3.9
     # via requests
 packaging==24.1
     # via build
@@ -48,7 +48,7 @@ plaster-pastedeploy==1.0.1
     # via pyramid
 pycparser==2.22
     # via cffi
-pygithub==2.3.0
+pygithub==2.4.0
     # via -r requirements-app.in
 pyjwt[crypto]==2.9.0
     # via pygithub
@@ -78,7 +78,7 @@ typing-extensions==4.12.2
     # via pygithub
 unidiff==0.7.5
     # via -r requirements-app.in
-urllib3==2.2.2
+urllib3==2.2.3
     # via
     #   pygithub
     #   requests
@@ -94,7 +94,7 @@ wrapt==1.16.0
     # via deprecated
 zope-deprecation==5.0
     # via pyramid
-zope-interface==7.0.1
+zope-interface==7.0.3
     # via pyramid
 
 # The following packages are considered to be unsafe in a requirements file:

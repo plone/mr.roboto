@@ -10,11 +10,11 @@ beautifulsoup4==4.12.3
     # via webtest
 black==24.8.0
     # via -r requirements-dev.in
-build==1.2.1
+build==1.2.2
     # via pip-tools
-certifi==2024.7.4
+certifi==2024.8.30
     # via requests
-cffi==1.17.0
+cffi==1.17.1
     # via
     #   cryptography
     #   pynacl
@@ -36,7 +36,7 @@ coverage[toml]==7.6.1
     #   pytest-cov
 coveralls==4.0.1
     # via -r requirements-dev.in
-cryptography==43.0.0
+cryptography==43.0.1
     # via pyjwt
 deprecated==1.2.14
     # via pygithub
@@ -79,7 +79,7 @@ gitpython==3.1.43
     # via -r requirements-app.in
 hupper==1.12.1
     # via pyramid
-idna==3.7
+idna==3.9
     # via requests
 iniconfig==2.0.0
     # via pytest
@@ -110,7 +110,7 @@ plaster==1.1.2
     #   pyramid
 plaster-pastedeploy==1.0.1
     # via pyramid
-platformdirs==4.2.2
+platformdirs==4.3.3
     # via black
 pluggy==1.5.0
     # via pytest
@@ -124,7 +124,7 @@ pycparser==2.22
     # via cffi
 pyflakes==3.2.0
     # via flake8
-pygithub==2.3.0
+pygithub==2.4.0
     # via -r requirements-app.in
 pyjwt[crypto]==2.9.0
     # via pygithub
@@ -140,7 +140,7 @@ pyramid==2.0.2
     #   pyramid-chameleon
 pyramid-chameleon==0.3
     # via -r requirements-app.in
-pytest==8.3.2
+pytest==8.3.3
     # via
     #   -r requirements-dev.in
     #   pytest-cov
@@ -167,7 +167,7 @@ typing-extensions==4.12.2
     # via pygithub
 unidiff==0.7.5
     # via -r requirements-app.in
-urllib3==2.2.2
+urllib3==2.2.3
     # via
     #   pygithub
     #   requests
@@ -181,7 +181,7 @@ webob==1.8.8
     # via
     #   pyramid
     #   webtest
-webtest==3.0.0
+webtest==3.0.1
     # via -r requirements-dev.in
 wheel==0.44.0
     # via pip-tools
@@ -189,7 +189,7 @@ wrapt==1.16.0
     # via deprecated
 zope-deprecation==5.0
     # via pyramid
-zope-interface==7.0.1
+zope-interface==7.0.3
     # via pyramid
 
 # The following packages are considered to be unsafe in a requirements file:
