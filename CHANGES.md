@@ -4,6 +4,14 @@
 
 - _nothing_
 
+## 1.2.7 (2024-09-15)
+
+- Do not add Jenkins comment on plone.releaser PRs.
+  [mauritsvanrees]
+
+- Bump dependencies.
+  [gforcada]
+
 ## 1.2.6 (2023-10-14)
 
 - Bump dependencies.
