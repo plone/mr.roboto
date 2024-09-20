@@ -258,7 +258,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 "Once it is processed, you will receive an email invitation "
                 "to join the `plone` GitHub organization as a Contributor."
                 "\n\n"
-                "If after a week, you have not received an invitation, then "
+                "If after a week you have not received an invitation, then "
                 f"please contact {self.cla_email}."
             )
             self.g_issue.create_comment(body=msg)
@@ -278,8 +278,8 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f"{self.github_help_setup_email_url} "
                 "\n\n"
                 "If you have sent in your Plone Contributor Agreement, "
-                "and received an invitation to join the Plone GitHub organization, "
-                "but your emails are not known, then you might need to add "
+                "and received and accepted an invitation to join the Plone GitHub organization, "
+                "then you might need to add "
                 "the email address on your Agreement to your GitHub account."
             )
             self.g_issue.create_comment(body=msg)
