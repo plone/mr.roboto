@@ -248,8 +248,14 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             users = " @".join(not_foundation)
             msg = (
                 f"@{users} you need to sign the Plone Contributor "
-                f"Agreement to merge this pull request. \n\n"
+                "Agreement to merge this pull request.
+                "\n\n"
                 f"Learn about the Plone Contributor Agreement: {self.cla_url}"
+                "\n\n"
+                "If you have already signed the agreement, "
+                "please allow a week for your agreement to be processed.\n"
+                "Once it is processed, you will receive an email invitation "
+                "to join the `plone` GitHub organization as a Contributor."
             )
             self.g_issue.create_comment(body=msg)
 
