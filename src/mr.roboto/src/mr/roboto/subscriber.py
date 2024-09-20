@@ -278,8 +278,8 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f"{self.github_help_setup_email_url} "
                 "\n\n"
                 "If you have sent in your Plone Contributor Agreement, "
-                "and received and accepted an invitation to join the Plone GitHub organization, "
-                "then you might need to add "
+                "and received and accepted an invitation to join the "
+                "Plone GitHub organization, then you might need to add "
                 "the email address on your Agreement to your GitHub account."
             )
             self.g_issue.create_comment(body=msg)
