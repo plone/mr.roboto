@@ -248,7 +248,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             users = " @".join(not_foundation)
             msg = (
                 f"@{users} you need to sign the Plone Contributor "
-                "Agreement to merge this pull request.
+                "Agreement to merge this pull request."
                 "\n\n"
                 f"Learn about the Plone Contributor Agreement: {self.cla_url}"
                 "\n\n"
