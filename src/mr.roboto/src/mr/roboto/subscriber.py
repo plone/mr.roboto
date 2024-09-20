@@ -216,6 +216,7 @@ class PullRequestSubscriber:
 class ContributorsAgreementSigned(PullRequestSubscriber):
     def __init__(self, event):
         self.cla_url = "https://plone.org/foundation/contributors-agreement"  # noqa
+        self.cla_email = "agreements@plone.org"
         self.github_help_setup_email_url = "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/adding-an-email-address-to-your-github-account"  # noqa
         self.status_context = "Plone Contributors Agreement verifier"
 
@@ -256,6 +257,9 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 "please allow a week for your agreement to be processed.\n"
                 "Once it is processed, you will receive an email invitation "
                 "to join the `plone` GitHub organization as a Contributor."
+                "\n\n"
+                "If after a week, you have not received an invitation, then "
+                f"please contact {self.cla_email}."
             )
             self.g_issue.create_comment(body=msg)
 
@@ -272,6 +276,11 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
                 f"Learn about the Plone Contributor Agreement: {self.cla_url} "
                 f"How to add more emails to your GitHub account: "
                 f"{self.github_help_setup_email_url} "
+                "\n\n"
+                "If you have sent in your Plone Contributor Agreement, "
+                "and received an invitation to join the Plone GitHub organization, "
+                "but your emails are not known, then you might need to add "
+                "the email address on your Agreement to your GitHub account."
             )
             self.g_issue.create_comment(body=msg)
 
