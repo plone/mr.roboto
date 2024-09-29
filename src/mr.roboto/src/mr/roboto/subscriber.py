@@ -218,6 +218,7 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
         self.cla_url = "https://plone.org/foundation/contributors-agreement"  # noqa
         self.cla_email = "agreements@plone.org"
         self.github_help_setup_email_url = "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/adding-an-email-address-to-your-github-account"  # noqa
+        self.github_help_commit_email = "https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-personal-account-on-github/managing-email-preferences/setting-your-commit-email-address"
         self.status_context = "Plone Contributors Agreement verifier"
 
         super().__init__(event)
@@ -269,18 +270,26 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             users = ", ".join(set(unknown))
             self.log(f"{users} missing contributors agreement")
             msg = (
-                f"{users} your emails are not known to GitHub and thus it "
-                f"is impossible to know if you have signed the Plone "
-                f"Contributor Agreement, which is required to merge this "
-                f"pull request.\n\n"
+                f"{users} the email address in your commit does not match an "
+                "email in your GitHub account. Thus it is impossible to "
+                "determine whether you have signed the Plone Contributor "
+                "Agreement, which is required to merge this pull request."
+                "\n\n"
                 f"Learn about the Plone Contributor Agreement: {self.cla_url} "
-                f"How to add more emails to your GitHub account: "
-                f"{self.github_help_setup_email_url} "
                 "\n\n"
                 "If you have sent in your Plone Contributor Agreement, "
                 "and received and accepted an invitation to join the "
-                "Plone GitHub organization, then you might need to add "
-                "the email address on your Agreement to your GitHub account."
+                "Plone GitHub organization, then you might need to either add "
+                "the email address on your Agreement to your GitHub account "
+                "or change the email address in your commits. If you need to "
+                "do the latter, then you should squash the commits with your "
+                "matching email and push them."
+                "\n\n"
+                "Add more emails to your GitHub account:\n"
+                f"{self.github_help_setup_email_url}"
+                "\n\n"
+                "Change the email address in your commits:\n"
+                f"{self.github_help_commit_email}"
             )
             self.g_issue.create_comment(body=msg)
 
