@@ -155,7 +155,7 @@ git push --tag
 ssh $SERVER
 cd /srv/mr.roboto
 git fetch -p
-git rebase
+git checkout $VERSION
 . bin/activate
 pip install -r requirements-app.txt
 pip install -e src/mr.roboto
