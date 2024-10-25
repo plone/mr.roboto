@@ -4,6 +4,10 @@
 
 - _nothing_
 
+## 1.2.8 (2024-10-25)
+
+- Improve wording [davisagli] [stevepiercy]
+
 ## 1.2.7 (2024-09-15)
 
 - Do not add Jenkins comment on plone.releaser PRs.
