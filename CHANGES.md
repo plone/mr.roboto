@@ -4,6 +4,10 @@
 
 - _nothing_
 
+## 1.2.9 (2025-03-31)
+
+- Ignore weblate user on contributing agreement check [mauritsvanrees]
+
 ## 1.2.8 (2024-10-25)
 
 - Improve wording [davisagli] [stevepiercy]
