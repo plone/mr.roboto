@@ -28,9 +28,9 @@ PAYLOAD = {
 }
 
 NO_PLONE_VERSION_PAYLOAD = copy.deepcopy(PAYLOAD)
-NO_PLONE_VERSION_PAYLOAD[
-    "html_url"
-] = "https://github.com/plone/plone.uuid/pull/3"  # noqa
+NO_PLONE_VERSION_PAYLOAD["html_url"] = (
+    "https://github.com/plone/plone.uuid/pull/3"  # noqa
+)
 NO_PLONE_VERSION_PAYLOAD["base"]["ref"] = "my-upstream-branch"
 NO_PLONE_VERSION_PAYLOAD["base"]["repo"]["name"] = "plone.uuid"
 NO_PLONE_VERSION_PAYLOAD["base"]["repo"]["full_name"] = "plone/plone.uuid"
