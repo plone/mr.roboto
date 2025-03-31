@@ -54,8 +54,8 @@ class BuildoutTest(unittest.TestCase):
 
     def _commit(self, content="", filename="dummy"):
         dummy_file = os.path.join(self.coredev_repo.working_tree_dir, filename)
-        with open(dummy_file, "w") as afile:
-            afile.write(content)
+        with open(dummy_file, "w") as a_file:
+            a_file.write(content)
         self.coredev_repo.index.add([dummy_file])
         self.coredev_repo.index.commit("Random commit")
 

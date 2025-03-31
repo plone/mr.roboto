@@ -56,6 +56,7 @@ IGNORE_USER_NO_AGREEMENT = (
     "dependabot[bot]",
     "pre-commit-ci[bot]",
     "web-flow",
+    "weblate",
 )
 
 IGNORE_NO_TEST_NEEDED = (
