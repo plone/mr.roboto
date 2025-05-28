@@ -81,6 +81,11 @@ IGNORE_NO_JENKINS = IGNORE_NO_TEST_NEEDED + (
 # when their PRs get merged
 IGNORE_PR_AUTHORS = ("pre-commit-ci[bot]",)
 
+IGNORE_WEBLATE = {
+    # Repo   Ignored individual user checks
+    'volto': ['weblate']
+}
+
 
 class PullRequestSubscriber:
     def __init__(self, event):
@@ -234,7 +239,12 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
         if not json_data:
             return
 
-        not_foundation, unknown = self.check_membership(json_data)
+        if self.repo_name in IGNORE_WEBLATE:
+            if json_data.get('commiter', {}).get('login', '') in IGNORE_WEBLATE[self.repo_name]:
+                not_foundation, unknown = [], []
+
+        else:
+            not_foundation, unknown = self.check_membership(json_data)
 
         # get the pull request and last commit
         last_commit = self.get_pull_request_last_commit()
