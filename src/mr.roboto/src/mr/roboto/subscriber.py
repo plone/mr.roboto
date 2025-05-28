@@ -83,7 +83,7 @@ IGNORE_PR_AUTHORS = ("pre-commit-ci[bot]",)
 
 IGNORE_WEBLATE = {
     # Repo   Ignored individual user checks
-    'volto': ['weblate']
+    "volto": ["weblate"]
 }
 
 
@@ -240,7 +240,10 @@ class ContributorsAgreementSigned(PullRequestSubscriber):
             return
 
         if self.repo_name in IGNORE_WEBLATE:
-            if json_data.get('commiter', {}).get('login', '') in IGNORE_WEBLATE[self.repo_name]:
+            if (
+                json_data.get("committer", {}).get("login", "")
+                in IGNORE_WEBLATE[self.repo_name]
+            ):
                 not_foundation, unknown = [], []
 
         else:
