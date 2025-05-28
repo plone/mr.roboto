@@ -2,7 +2,7 @@
 
 ## (unreleased)
 
-- Ignore weblate user on contributing agreement check (2nd chanche) [erral, fredvd]_
+- Ignore weblate user on contributing agreement check (2nd change) [erral, fredvd]_
 
 ## 1.2.9 (2025-03-31)
 
