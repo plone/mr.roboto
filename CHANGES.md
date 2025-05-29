@@ -2,7 +2,9 @@
 
 ## (unreleased)
 
-- Ignore weblate user on contributing agreement check (2nd change) [erral, fredvd]_
+- Ignore weblate user on contributing agreement check (2nd change) [erral, fredvd]
+
+- Add locally added debug patch on the live server for #168 to git. [fredvd]
 
 ## 1.2.9 (2025-03-31)
 
