@@ -210,7 +210,7 @@ class PullRequestSubscriber:
         In such cases our check (see `check_membership`) does not work, because
         we check for both `author` and `committer`.
 
-        This is a shortcut, to check whether the commiter login is something we
+        This is a shortcut, to check whether the committer login is something we
         previously know, and if so we ignore it.
 
         """
