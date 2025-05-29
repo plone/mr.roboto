@@ -190,28 +190,28 @@ class PullRequestSubscriber:
 
     def is_weblate(self, commit_info):
         """check whether this commit info belongs to a user
-            that we have to ignore.
+        that we have to ignore.
 
-            When checking weblate commits, we often found this kind of info
+        When checking weblate commits, we often found this kind of info
 
-            {
-                ...
-                "author": null,
-                "commiter": {"login": "weblate", ...},
-                ...
-            },
+        {
+            ...
+            "author": null,
+            "commiter": {"login": "weblate", ...},
+            ...
+        },
 
-            This is because weblate is in itself a git repository and this JSON
-            is produced by GitHub.
+        This is because weblate is in itself a git repository and this JSON
+        is produced by GitHub.
 
-            Sometimes some weblate addons have not a corresponding user on GitHub
-            so the `author` value comes as `null`.
+        Sometimes some weblate addons have not a corresponding user on GitHub
+        so the `author` value comes as `null`.
 
-            In such cases our check (see `check_membership`) does not work, because
-            we check for both `author` and `committer`.
+        In such cases our check (see `check_membership`) does not work, because
+        we check for both `author` and `committer`.
 
-            This is a shortcut, to check whether the commiter login is something we
-            previously know, and if so we ignore it.
+        This is a shortcut, to check whether the commiter login is something we
+        previously know, and if so we ignore it.
 
         """
         if self.repo_name in IGNORE_WEBLATE:
