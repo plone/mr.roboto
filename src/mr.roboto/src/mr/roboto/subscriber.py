@@ -323,12 +323,19 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
         # check if the pull request modifies the changelog file
         diff_url = self.pull_request["diff_url"]
         diff_data = requests.get(diff_url)
-        try:
-            patch_data = PatchSet(
-                diff_data.content.splitlines(), encoding=diff_data.encoding
-            )
-        except UnicodeDecodeError:
-            patch_data = []
+        # try:
+        #    patch_data = PatchSet(
+        #        diff_data.content.splitlines(), encoding=diff_data.encoding
+        #    )
+        # except UnicodeDecodeError:
+        #    patch_data = []
+
+        # https://github.com/plone/mr.roboto/issues/168
+        patch_data = PatchSet(
+            diff_data.content.splitlines(), encoding=diff_data.encoding
+        )
+        if len(patch_data) == 0:
+            self.log("no files found on the patch")
 
         for diff_file in patch_data:
             if VALID_CHANGELOG_FILES.search(diff_file.path):
