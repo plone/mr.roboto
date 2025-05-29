@@ -197,7 +197,7 @@ class PullRequestSubscriber:
         {
             ...
             "author": null,
-            "commiter": {"login": "weblate", ...},
+            "committer": {"login": "weblate", ...},
             ...
         },
 
