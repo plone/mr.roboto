@@ -364,11 +364,11 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
         # check if the pull request modifies the changelog file
         diff_url = self.pull_request["diff_url"]
         diff_data = requests.get(diff_url)
-        #try:
+        # try:
         #    patch_data = PatchSet(
         #        diff_data.content.splitlines(), encoding=diff_data.encoding
         #    )
-        #except UnicodeDecodeError:
+        # except UnicodeDecodeError:
         #    patch_data = []
 
         # https://github.com/plone/mr.roboto/issues/168
