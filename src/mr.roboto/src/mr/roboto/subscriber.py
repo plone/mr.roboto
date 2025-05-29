@@ -81,6 +81,11 @@ IGNORE_NO_JENKINS = IGNORE_NO_TEST_NEEDED + (
 # when their PRs get merged
 IGNORE_PR_AUTHORS = ("pre-commit-ci[bot]",)
 
+IGNORE_WEBLATE = {
+    # Repo   Ignored individual user checks
+    "volto": ["weblate"]
+}
+
 
 class PullRequestSubscriber:
     def __init__(self, event):
@@ -183,32 +188,68 @@ class PullRequestSubscriber:
 
         return json_data
 
+    def is_weblate(self, commit_info):
+        """check whether this commit info belongs to a user
+        that we have to ignore.
+
+        When checking weblate commits, we often found this kind of info
+
+        {
+            ...
+            "author": null,
+            "committer": {"login": "weblate", ...},
+            ...
+        },
+
+        This is because weblate is in itself a git repository and this JSON
+        is produced by GitHub.
+
+        Sometimes some weblate addons have not a corresponding user on GitHub
+        so the `author` value comes as `null`.
+
+        In such cases our check (see `check_membership`) does not work, because
+        we check for both `author` and `committer`.
+
+        This is a shortcut, to check whether the committer login is something we
+        previously know, and if so we ignore it.
+
+        """
+        if self.repo_name in IGNORE_WEBLATE:
+            if (
+                commit_info.get("committer", {}).get("login", "")
+                in IGNORE_WEBLATE[self.repo_name]
+            ):
+                return True
+
+        return False
+
     def check_membership(self, json_data):
         plone_org = self.github.get_organization("plone")
         unknown = []
         members = []
         not_foundation = []
         for commit_info in json_data:
-            for user in ("committer", "author"):
-                try:
-                    login = commit_info[user]["login"]
-                except TypeError:
-                    self.log(f"commit does not have {user} user info")
-                    unknown.append(commit_info["commit"]["author"]["name"])
-                    continue
+            if not self.is_weblate(commit_info):
+                for user in ("committer", "author"):
+                    try:
+                        login = commit_info[user]["login"]
+                    except TypeError:
+                        self.log(f"commit does not have {user} user info")
+                        unknown.append(commit_info["commit"]["author"]["name"])
+                        continue
 
-                if login in IGNORE_USER_NO_AGREEMENT:
-                    continue
+                    if login in IGNORE_USER_NO_AGREEMENT:
+                        continue
 
-                # avoid looking up users twice
-                if login in members or login in not_foundation:
-                    continue
+                    # avoid looking up users twice
+                    if login in members or login in not_foundation:
+                        continue
 
-                g_user = self.github.get_user(login)
-                if plone_org.has_in_members(g_user):
-                    members.append(login)
-                else:
-                    not_foundation.append(login)
+                    g_user = self.github.get_user(login)
+                    if plone_org.has_in_members(g_user):
+                        members.append(login)
+                    else:
+                        not_foundation.append(login)
 
         return not_foundation, unknown
 
