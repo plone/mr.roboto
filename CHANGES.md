@@ -1,6 +1,6 @@
 # Changelog
 
-## (unreleased)
+## 1.2.10 (2025-05-29)
 
 - Ignore weblate user on contributing agreement check (2nd change) [erral, fredvd]
 
