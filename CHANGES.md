@@ -1,10 +1,8 @@
 # Changelog
 
-## 1.2.11 (unreleased)
+## 1.2.11 (2025-09-08)
 
-
-- Nothing changed yet.
-
+- Do not ask for contributors agreement or changelog entries for bots [mauritsvanrees]
 
 ## 1.2.10 (2025-05-29)
 
