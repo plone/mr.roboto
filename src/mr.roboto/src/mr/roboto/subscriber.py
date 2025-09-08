@@ -30,6 +30,7 @@ VALID_CHANGELOG_FILES = re.compile(
 IGNORE_NO_CHANGELOG = (
     ".github",
     "buildout.coredev",
+    "dependabot[bot]",
     "documentation",
     "jenkins.plone.org",
     "mockup",
@@ -41,6 +42,7 @@ IGNORE_NO_CHANGELOG = (
     "plone.jenkins_server",
     "ploneorg.core",
     "ploneorg.theme",
+    "pre-commit-ci[bot]",
     "training",
 )
 
@@ -52,7 +54,6 @@ IGNORE_NO_AGREEMENT = (
 )
 
 IGNORE_USER_NO_AGREEMENT = (
-    "dependabot",
     "dependabot[bot]",
     "pre-commit-ci[bot]",
     "web-flow",
@@ -79,7 +80,10 @@ IGNORE_NO_JENKINS = IGNORE_NO_TEST_NEEDED + (
 
 # Authors that will not trigger a commit on buildout.coredev
 # when their PRs get merged
-IGNORE_PR_AUTHORS = ("pre-commit-ci[bot]",)
+IGNORE_PR_AUTHORS = (
+    "pre-commit-ci[bot]",
+    "dependabot[bot]",
+)
 
 IGNORE_WEBLATE = {
     # Repo   Ignored individual user checks
