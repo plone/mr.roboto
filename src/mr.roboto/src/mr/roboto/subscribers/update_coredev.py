@@ -113,11 +113,12 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         Add the current package to checkouts.cfg and much more,
         plone.releaser will take care of it.
         """
+        token = self.event.request.registry.settings["github_token"]
         for version in versions:
             attempts = 0
             while attempts < 5:
                 try:
-                    buildout = PloneCoreBuildout(version)
+                    buildout = PloneCoreBuildout(version, auth_token=token)
                 except GitCommandError:
                     attempts += 1
                     if attempts == 5:
@@ -127,6 +128,14 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
                 else:
                     with contextlib.chdir(buildout.location):
                         add_checkout(self.repo_name)
+                        try:
+                            buildout.push_changes()
+                        except GitCommandError:
+                            logger.error(
+                                f"Could not push changes to buildout.coredev "
+                                f"on branch {version}"
+                            )
+                            continue
                         logger.info(
                             f"add to checkouts.cfg of buildout.coredev {version}"
                         )
