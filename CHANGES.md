@@ -2,7 +2,7 @@
 
 ## 1.2.12 (unreleased)
 
-- Run tests with Python 3.13 @gforcada
+- Run tests with Python 3.12 @gforcada
 
 ## 1.2.11 (2025-09-08)
 
