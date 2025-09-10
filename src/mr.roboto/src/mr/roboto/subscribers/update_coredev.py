@@ -1,14 +1,17 @@
 from .base import PullRequestSubscriber
-from datetime import datetime
-from github import GithubException
-from github import InputGitAuthor
-from github import InputGitTreeElement
+from mr.roboto.buildout import PloneCoreBuildout
 from mr.roboto.events import MergedPullRequest
 from mr.roboto.utils import get_pickled_data
 from mr.roboto.utils import is_skip_commit_message
 from mr.roboto.utils import plone_versions_targeted
+from plone.releaser.manage import add_checkout
 from pyramid.events import subscriber
 
+import contextlib
+import logging
+
+
+logger = logging.getLogger()
 
 # Changes in these repositories should not update buildout.coredev files
 IGNORE_NO_AUTO_CHECKOUT = (
@@ -40,7 +43,7 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         if not plone_versions:
             return
 
-        self.add_package_to_checkouts(plone_versions)
+        self.call_plone_releaser(plone_versions)
 
     def needs_update(self):
         """Check if we really need to update buildout.coredev"""
@@ -103,62 +106,15 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
             )
         return plone_versions_missing
 
-    def add_package_to_checkouts(self, versions):
-        """Add package to checkouts.cfg on buildout.coredev plone version"""
-        last_commit = self.get_pull_request_last_commit()
-        user = InputGitAuthor(
-            last_commit.commit.author.name,
-            last_commit.commit.author.email,
-            datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        )
-        org = self.github.get_organization("plone")
-        repo = org.get_repo("buildout.coredev")
+    def call_plone_releaser(self, versions):
+        """Use plone.releaser `add-checkout`
 
+        Add the current package to checkouts.cfg and much more,
+        plone.releaser will take care of it.
+        """
         for version in versions:
-            attempts = 0
-            while attempts < 5:
-                try:
-                    self.make_commit(repo, version, user)
-                except GithubException:  # pragma: no cover
-                    attempts += 1
-                    if attempts == 5:
-                        self.log(
-                            f"Could not update checkouts.cfg of {version} "
-                            f"with {self.repo_name}",
-                            level="warn",
-                        )
-                else:
-                    self.log(f"add to checkouts.cfg of buildout.coredev {version}")
-                    break
-
-    def make_commit(self, repo, version, user):
-        filename = "checkouts.cfg"
-        head_ref = repo.get_git_ref(f"heads/{version}")
-        checkouts_cfg_file = repo.get_contents(filename, head_ref.object.sha)
-        line = f"    {self.repo_name}\n"
-        checkouts_content = checkouts_cfg_file.decoded_content.decode()
-        checkouts_new_data = checkouts_content + line
-        latest_commit = repo.get_git_commit(head_ref.object.sha)
-        base_tree = latest_commit.tree
-        mode = [t.mode for t in base_tree.tree if t.path == filename]
-        if mode:  # pragma: no cover
-            mode = mode[0]
-        else:
-            mode = "100644"
-
-        element = InputGitTreeElement(
-            path=filename,
-            mode=mode,
-            type=checkouts_cfg_file.type,
-            content=checkouts_new_data,
-        )
-        new_tree = repo.create_git_tree([element], base_tree)
-
-        new_commit = repo.create_git_commit(
-            f"[fc] Add {self.repo_name} to {filename}",
-            new_tree,
-            [latest_commit],
-            user,
-            user,
-        )
-        head_ref.edit(sha=new_commit.sha, force=False)
+            buildout = PloneCoreBuildout(version)
+            with contextlib.chdir(buildout.location):
+                add_checkout(self.repo_name)
+                logger.info(f"add to checkouts.cfg of buildout.coredev {version}")
+            buildout.cleanup()

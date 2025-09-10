@@ -226,8 +226,9 @@ def test_not_in_checkouts(caplog):
     UpdateCoredevCheckouts(event)
     event.request.cleanup()
 
-    assert len(caplog.records) == 1
-    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[0].msg
+    # the record 0 is about cloning the repository
+    assert len(caplog.records) == 2
+    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[1].msg
 
 
 def test_not_in_multiple_checkouts(caplog):
@@ -238,9 +239,10 @@ def test_not_in_multiple_checkouts(caplog):
     UpdateCoredevCheckouts(event)
     event.request.cleanup()
 
-    assert len(caplog.records) == 2
-    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[0].msg
-    assert "add to checkouts.cfg of buildout.coredev 4.3" in caplog.records[1].msg
+    # the record 0 and 2 are about cloning the repository
+    assert len(caplog.records) == 4
+    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[1].msg
+    assert "add to checkouts.cfg of buildout.coredev 4.3" in caplog.records[3].msg
 
 
 def test_no_pr_commit_for_pre_commit_ci(caplog):
