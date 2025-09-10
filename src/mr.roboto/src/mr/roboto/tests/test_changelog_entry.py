@@ -1,5 +1,5 @@
 from mr.roboto.events import NewPullRequest
-from mr.roboto.subscriber import WarnNoChangelogEntry
+from mr.roboto.subscribers import WarnNoChangelogEntry
 from unittest import mock
 from unittest.mock import patch
 

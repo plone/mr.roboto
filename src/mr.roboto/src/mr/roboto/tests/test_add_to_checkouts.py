@@ -1,5 +1,5 @@
 from mr.roboto.events import MergedPullRequest
-from mr.roboto.subscriber import UpdateCoredevCheckouts
+from mr.roboto.subscribers import UpdateCoredevCheckouts
 from tempfile import NamedTemporaryFile
 from unittest import mock
 

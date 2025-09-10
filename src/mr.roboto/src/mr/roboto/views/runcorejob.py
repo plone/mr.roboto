@@ -5,7 +5,7 @@ from github.GithubException import GithubException
 from mr.roboto import templates
 from mr.roboto.buildout import get_sources_and_checkouts
 from mr.roboto.security import validate_github
-from mr.roboto.subscriber import IGNORE_NO_JENKINS
+from mr.roboto.subscribers.base import IGNORE_NO_JENKINS
 from mr.roboto.utils import get_info_from_commit
 from mr.roboto.utils import is_skip_commit_message
 from mr.roboto.utils import plone_versions_targeted

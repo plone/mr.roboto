@@ -67,7 +67,7 @@ def main(global_config, **settings):
 
     # Automatic views
     config.scan("mr.roboto.views")
-    config.scan("mr.roboto.subscriber")
+    config.scan("mr.roboto.subscribers")
 
     config.end()
 

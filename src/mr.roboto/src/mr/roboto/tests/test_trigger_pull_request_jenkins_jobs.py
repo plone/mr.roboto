@@ -1,5 +1,5 @@
 from mr.roboto.events import CommentOnPullRequest
-from mr.roboto.subscriber import TriggerPullRequestJenkinsJobs
+from mr.roboto.subscribers import TriggerPullRequestJenkinsJobs
 from mr.roboto.tests import minimal_main
 from mr.roboto.tests.test_comments import COMMENT_PAYLOAD
 from tempfile import NamedTemporaryFile
