@@ -113,22 +113,43 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         Add the current package to checkouts.cfg and much more,
         plone.releaser will take care of it.
         """
+        token = self.event.request.registry.settings["github_token"]
         for version in versions:
             attempts = 0
             while attempts < 5:
-                try:
-                    buildout = PloneCoreBuildout(version)
-                except GitCommandError:
-                    attempts += 1
-                    if attempts == 5:
-                        logger.error(
-                            f"Could not checkout buildout.coredev on branch {version}"
-                        )
-                else:
-                    with contextlib.chdir(buildout.location):
-                        add_checkout(self.repo_name)
-                        logger.info(
-                            f"add to checkouts.cfg of buildout.coredev {version}"
-                        )
-                    buildout.cleanup()
+                attempts = self.commit_and_push(token, version, attempts)
+
+                if attempts == 5:
+                    logger.error(
+                        f"Could not checkout buildout.coredev on branch {version}"
+                    )
+
+                if attempts == 5 or attempts == 10:
                     break
+
+    def commit_and_push(self, token, version, attempts):
+        attempts += 1
+        try:
+            buildout = PloneCoreBuildout(version, auth_token=token)
+        except GitCommandError:
+            buildout.cleanup()
+            return attempts
+
+        with contextlib.chdir(buildout.location):
+            add_checkout(self.repo_name)
+            try:
+                buildout.commit_changes(message=f"Add {self.repo_name} to checkouts")
+                buildout.push_changes()
+            except GitCommandError:
+                buildout.cleanup()
+                logger.error(
+                    f"Could not push changes to buildout.coredev "
+                    f"on branch {version}"
+                )
+                return attempts
+            logger.info(
+                f"add {self.repo_name} to checkouts.cfg of buildout.coredev {version}"
+            )
+
+        buildout.cleanup()
+        return 10  # success, do not retry anymore
