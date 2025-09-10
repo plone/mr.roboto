@@ -8,3 +8,6 @@ ignore =
     D202,
     # black takes care of spaces around colon
     E203,
+
+per-file-ignores =
+    src/mr.roboto/src/mr/roboto/subscribers/__init__.py: F401
