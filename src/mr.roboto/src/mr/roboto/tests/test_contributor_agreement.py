@@ -1,5 +1,5 @@
 from mr.roboto.events import NewPullRequest
-from mr.roboto.subscriber import ContributorsAgreementSigned
+from mr.roboto.subscribers import ContributorsAgreementSigned
 from unittest import mock
 from unittest.mock import patch
 

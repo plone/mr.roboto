@@ -4,6 +4,8 @@
 
 - Run tests with Python 3.12 @gforcada
 
+- Split subscriber module @gforcada
+
 ## 1.2.11 (2025-09-08)
 
 - Do not ask for contributors agreement or changelog entries for bots @mauritsvanrees

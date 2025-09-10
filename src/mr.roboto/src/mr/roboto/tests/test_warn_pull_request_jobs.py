@@ -1,4 +1,4 @@
-from mr.roboto.subscriber import WarnTestsNeedToRun
+from mr.roboto.subscribers import WarnTestsNeedToRun
 from mr.roboto.tests import default_settings
 from tempfile import NamedTemporaryFile
 from unittest import mock
