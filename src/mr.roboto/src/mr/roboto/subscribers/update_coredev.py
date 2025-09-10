@@ -114,13 +114,21 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         plone.releaser will take care of it.
         """
         for version in versions:
-            try:
-                buildout = PloneCoreBuildout(version)
-            except GitCommandError:
-                logger.error(f"Could not checkout buildout.coredev on branch {version}")
-                continue
-
-            with contextlib.chdir(buildout.location):
-                add_checkout(self.repo_name)
-                logger.info(f"add to checkouts.cfg of buildout.coredev {version}")
-            buildout.cleanup()
+            attempts = 0
+            while attempts < 5:
+                try:
+                    buildout = PloneCoreBuildout(version)
+                except GitCommandError:
+                    attempts += 1
+                    if attempts == 5:
+                        logger.error(
+                            f"Could not checkout buildout.coredev on branch {version}"
+                        )
+                else:
+                    with contextlib.chdir(buildout.location):
+                        add_checkout(self.repo_name)
+                        logger.info(
+                            f"add to checkouts.cfg of buildout.coredev {version}"
+                        )
+                    buildout.cleanup()
+                    break
