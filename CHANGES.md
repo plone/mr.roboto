@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.12 (unreleased)
+
+- Run tests with Python 3.13 [gforcada]
+
 ## 1.2.11 (2025-09-08)
 
 - Do not ask for contributors agreement or changelog entries for bots [mauritsvanrees]
