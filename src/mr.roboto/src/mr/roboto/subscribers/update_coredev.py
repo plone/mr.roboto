@@ -1,4 +1,5 @@
 from .base import PullRequestSubscriber
+from git.exc import GitCommandError
 from mr.roboto.buildout import PloneCoreBuildout
 from mr.roboto.events import MergedPullRequest
 from mr.roboto.utils import get_pickled_data
@@ -113,7 +114,12 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         plone.releaser will take care of it.
         """
         for version in versions:
-            buildout = PloneCoreBuildout(version)
+            try:
+                buildout = PloneCoreBuildout(version)
+            except GitCommandError:
+                logger.error(f"Could not checkout buildout.coredev on branch {version}")
+                continue
+
             with contextlib.chdir(buildout.location):
                 add_checkout(self.repo_name)
                 logger.info(f"add to checkouts.cfg of buildout.coredev {version}")
