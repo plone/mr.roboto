@@ -109,8 +109,9 @@ class CheckoutsFile(UserDict):
 class PloneCoreBuildout:
     PLONE_COREDEV_LOCATION = "https://github.com/plone/buildout.coredev.git"
 
-    def __init__(self, core_version=None):
+    def __init__(self, core_version=None, auth_token=None):
         self.core_version = core_version
+        self.auth_token = auth_token
         self.location = mkdtemp()
         self.clone()
         self.sources = SourcesFile(f"{self.location}/sources.cfg")
@@ -121,8 +122,12 @@ class PloneCoreBuildout:
             f"Commit: cloning github repository {self.location}, "
             f"branch={self.core_version}"
         )
-        git.Repo.clone_from(
-            self.PLONE_COREDEV_LOCATION,
+        remote_url = self.PLONE_COREDEV_LOCATION
+        if self.auth_token:
+            logger.info("Using authentication token")
+            remote_url = remote_url.replace("https://", f"https://{self.auth_token}@")
+        self.git_repo = git.Repo.clone_from(
+            remote_url,
             self.location,
             branch=self.core_version,
             depth=1,
@@ -130,6 +135,9 @@ class PloneCoreBuildout:
 
     def cleanup(self):
         shutil.rmtree(self.location)
+
+    def push_changes(self):
+        self.git_repo.remote().push()
 
 
 def get_sources_and_checkouts(request):
