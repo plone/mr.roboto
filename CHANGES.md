@@ -1,6 +1,10 @@
 # Changelog
 
-## 1.2.12 (unreleased)
+## 1.2.13 (unreleased)
+
+- Nothing changed yet.
+
+## 1.2.12 (2025-10-26)
 
 - Run tests with Python 3.12 @gforcada
 
