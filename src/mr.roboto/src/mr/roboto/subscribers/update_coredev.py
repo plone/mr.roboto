@@ -1,15 +1,20 @@
 from .base import PullRequestSubscriber
-from datetime import datetime
-from github import GithubException
-from github import InputGitAuthor
-from github import InputGitTreeElement
+from git.exc import GitCommandError
+from mr.roboto.buildout import PloneCoreBuildout
 from mr.roboto.events import MergedPullRequest
 from mr.roboto.utils import get_pickled_data
 from mr.roboto.utils import is_skip_commit_message
 from mr.roboto.utils import plone_versions_targeted
+from plone.releaser.manage import add_checkout
 from pyramid.events import subscriber
 
+import contextlib
+import logging
 
+
+logger = logging.getLogger()
+
+# Changes in these repositories should not update buildout.coredev files
 IGNORE_NO_AUTO_CHECKOUT = (
     "documentation",
     "icalendar",
@@ -32,111 +37,119 @@ class UpdateCoredevCheckouts(PullRequestSubscriber):
         - on all Plone coredev versions that track the branch that was
         targeted by the pull request
         """
-        # pull requests on buildout.coredev itself do not need any extra work
-        if self.repo_full_name == "plone/buildout.coredev":
+        if not self.needs_update():
             return
 
-        if self.repo_name in IGNORE_NO_AUTO_CHECKOUT:
+        plone_versions = self.plone_versions()
+        if not plone_versions:
             return
+
+        self.call_plone_releaser(plone_versions)
+
+    def needs_update(self):
+        """Check if we really need to update buildout.coredev"""
+        # pull requests on buildout.coredev itself do not need any extra work
+        if self.repo_full_name == "plone/buildout.coredev":
+            return False
+
+        if self.repo_name in IGNORE_NO_AUTO_CHECKOUT:
+            return False
 
         if self.pull_request_author in IGNORE_PR_AUTHORS:
             self.log(
                 f"no commits on buildout.coredev as "
                 f"user {self.pull_request_author} is ignored"
             )
-            return
+            return False
 
         if self.is_skip_commit():
             self.log("Commit had a skip CI mark. No commit is done in buildout.coredev")
-            return
+            return False
 
-        plone_versions = plone_versions_targeted(
-            self.repo_full_name, self.target_branch, self.event.request
-        )
-        if not plone_versions:
-            self.log(
-                f"no plone coredev version tracks branch {self.target_branch} "
-                f"of {self.repo_name}, checkouts.cfg not updated"
-            )
-            return
-
-        checkouts = get_pickled_data(
-            self.event.request.registry.settings["checkouts_file"]
-        )
-        not_in_checkouts = [
-            version
-            for version in plone_versions
-            if self.repo_name not in checkouts[version]
-        ]
-        if not not_in_checkouts:
-            self.log(
-                f"is already on checkouts.cfg of all plone "
-                f"versions that it targets {plone_versions}"
-            )
-            return
-
-        self.add_package_to_checkouts(not_in_checkouts)
+        return True
 
     def is_skip_commit(self):
         commit_message = self.g_merge_commit.commit.message
         return is_skip_commit_message(commit_message)
 
-    def add_package_to_checkouts(self, versions):
-        """Add package to checkouts.cfg on buildout.coredev plone version"""
-        last_commit = self.get_pull_request_last_commit()
-        user = InputGitAuthor(
-            last_commit.commit.author.name,
-            last_commit.commit.author.email,
-            datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
+    def plone_versions(self):
+        versions = plone_versions_targeted(
+            self.repo_full_name, self.target_branch, self.event.request
         )
-        org = self.github.get_organization("plone")
-        repo = org.get_repo("buildout.coredev")
+        if not versions:
+            self.log(
+                f"no plone coredev version tracks branch {self.target_branch} "
+                f"of {self.repo_name}, checkouts.cfg not updated"
+            )
+            return []
 
+        versions = self._already_in_all_checkouts(versions)
+        return versions
+
+    def _already_in_all_checkouts(self, plone_versions):
+        """Which plone versions are missing the current repository in its checkouts?
+
+        Given the list of plone versions the current repository is targeting,
+        in which of those plone versions is the current repository not in checkouts.cfg?
+        """
+        checkouts = get_pickled_data(
+            self.event.request.registry.settings["checkouts_file"]
+        )
+        plone_versions_missing = [
+            version
+            for version in plone_versions
+            if self.repo_name not in checkouts[version]
+        ]
+        if not plone_versions_missing:
+            self.log(
+                f"is already on checkouts.cfg of all plone "
+                f"versions that it targets {plone_versions}"
+            )
+        return plone_versions_missing
+
+    def call_plone_releaser(self, versions):
+        """Use plone.releaser `add-checkout`
+
+        Add the current package to checkouts.cfg and much more,
+        plone.releaser will take care of it.
+        """
+        token = self.event.request.registry.settings["github_token"]
         for version in versions:
             attempts = 0
             while attempts < 5:
-                try:
-                    self.make_commit(repo, version, user)
-                except GithubException:  # pragma: no cover
-                    attempts += 1
-                    if attempts == 5:
-                        self.log(
-                            f"Could not update checkouts.cfg of {version} "
-                            f"with {self.repo_name}",
-                            level="warn",
-                        )
-                else:
-                    self.log(f"add to checkouts.cfg of buildout.coredev {version}")
+                attempts = self.commit_and_push(token, version, attempts)
+
+                if attempts == 5:
+                    logger.error(
+                        f"Could not checkout buildout.coredev on branch {version}"
+                    )
+
+                if attempts == 5 or attempts == 10:
                     break
 
-    def make_commit(self, repo, version, user):
-        filename = "checkouts.cfg"
-        head_ref = repo.get_git_ref(f"heads/{version}")
-        checkouts_cfg_file = repo.get_contents(filename, head_ref.object.sha)
-        line = f"    {self.repo_name}\n"
-        checkouts_content = checkouts_cfg_file.decoded_content.decode()
-        checkouts_new_data = checkouts_content + line
-        latest_commit = repo.get_git_commit(head_ref.object.sha)
-        base_tree = latest_commit.tree
-        mode = [t.mode for t in base_tree.tree if t.path == filename]
-        if mode:  # pragma: no cover
-            mode = mode[0]
-        else:
-            mode = "100644"
+    def commit_and_push(self, token, version, attempts):
+        attempts += 1
+        try:
+            buildout = PloneCoreBuildout(version, auth_token=token)
+        except GitCommandError:
+            buildout.cleanup()
+            return attempts
 
-        element = InputGitTreeElement(
-            path=filename,
-            mode=mode,
-            type=checkouts_cfg_file.type,
-            content=checkouts_new_data,
-        )
-        new_tree = repo.create_git_tree([element], base_tree)
+        with contextlib.chdir(buildout.location):
+            add_checkout(self.repo_name)
+            try:
+                buildout.commit_changes(message=f"Add {self.repo_name} to checkouts")
+                buildout.push_changes()
+            except GitCommandError:
+                buildout.cleanup()
+                logger.error(
+                    f"Could not push changes to buildout.coredev "
+                    f"on branch {version}"
+                )
+                return attempts
+            logger.info(
+                f"add {self.repo_name} to checkouts.cfg of buildout.coredev {version}"
+            )
 
-        new_commit = repo.create_git_commit(
-            f"[fc] Add {self.repo_name} to {filename}",
-            new_tree,
-            [latest_commit],
-            user,
-            user,
-        )
-        head_ref.edit(sha=new_commit.sha, force=False)
+        buildout.cleanup()
+        return 10  # success, do not retry anymore

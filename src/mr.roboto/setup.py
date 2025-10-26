@@ -31,6 +31,7 @@ setup(
         "cornice",
         "gitpython",
         "PyGithub",
+        "plone.releaser",
         "pyramid_chameleon",
         "requests",
         "setuptools",

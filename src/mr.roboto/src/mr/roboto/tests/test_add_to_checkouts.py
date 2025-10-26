@@ -130,6 +130,7 @@ class MockRequest:
         self._settings = {
             "github": FakeGithub(commit_msg),
             "plone_versions": ["4.3", "5.1"],
+            "github_token": "do-not-share-me",
         }
 
     @property
@@ -177,7 +178,8 @@ def test_buildout_coredev_merge(caplog):
     assert len(caplog.records) == 0
 
 
-def test_not_targeting_any_plone_version(caplog):
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.clone")
+def test_not_targeting_any_plone_version(_clone, caplog):
     event = create_event({}, {}, payload=NO_PLONE_VERSION_PAYLOAD)
     caplog.set_level(logging.INFO)
     UpdateCoredevCheckouts(event)
@@ -190,7 +192,8 @@ def test_not_targeting_any_plone_version(caplog):
     ) in caplog.records[0].msg
 
 
-def test_in_checkouts(caplog):
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.clone")
+def test_in_checkouts(_clone, caplog):
     checkouts = {"5.1": ["plone.uuid"]}
     sources = {("plone/plone.uuid", "master"): ["5.1"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
@@ -204,7 +207,8 @@ def test_in_checkouts(caplog):
     ) in caplog.records[0].msg
 
 
-def test_in_multiple_checkouts(caplog):
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.clone")
+def test_in_multiple_checkouts(_clone, caplog):
     checkouts = {"5.0": ["plone.uuid"], "5.1": ["plone.uuid"]}
     sources = {("plone/plone.uuid", "master"): ["5.1", "5.0"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
@@ -218,7 +222,10 @@ def test_in_multiple_checkouts(caplog):
     ) in caplog.records[0].msg
 
 
-def test_not_in_checkouts(caplog):
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.clone")
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.push_changes")
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.commit_changes")
+def test_not_in_checkouts(_commit_changes, _push_changes, _clone, caplog):
     checkouts = {"5.0": [], "5.1": ["plone.uuid"]}
     sources = {("plone/plone.uuid", "master"): ["5.1", "5.0"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
@@ -227,10 +234,16 @@ def test_not_in_checkouts(caplog):
     event.request.cleanup()
 
     assert len(caplog.records) == 1
-    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[0].msg
+    assert (
+        "add plone.uuid to checkouts.cfg of buildout.coredev 5.0"
+        in caplog.records[0].msg
+    )
 
 
-def test_not_in_multiple_checkouts(caplog):
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.clone")
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.push_changes")
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.commit_changes")
+def test_not_in_multiple_checkouts(_commit_changes, _push_changes, _clone, caplog):
     checkouts = {"4.3": [], "5.0": [], "5.1": ["plone.uuid"]}
     sources = {("plone/plone.uuid", "master"): ["5.1", "5.0", "4.3"]}
     event = create_event(checkouts, sources, payload=PLONE_VERSION_PAYLOAD)
@@ -239,11 +252,18 @@ def test_not_in_multiple_checkouts(caplog):
     event.request.cleanup()
 
     assert len(caplog.records) == 2
-    assert "add to checkouts.cfg of buildout.coredev 5.0" in caplog.records[0].msg
-    assert "add to checkouts.cfg of buildout.coredev 4.3" in caplog.records[1].msg
+    assert (
+        "add plone.uuid to checkouts.cfg of buildout.coredev 5.0"
+        in caplog.records[0].msg
+    )
+    assert (
+        "add plone.uuid to checkouts.cfg of buildout.coredev 4.3"
+        in caplog.records[1].msg
+    )
 
 
-def test_no_pr_commit_for_pre_commit_ci(caplog):
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.clone")
+def test_no_pr_commit_for_pre_commit_ci(_clone, caplog):
     payload = copy.deepcopy(PLONE_VERSION_PAYLOAD)
     payload["user"]["login"] = "pre-commit-ci[bot]"
     event = create_event({}, {}, payload=payload)
@@ -258,7 +278,8 @@ def test_no_pr_commit_for_pre_commit_ci(caplog):
     )
 
 
-def test_skip_coredev_commit(caplog):
+@mock.patch("mr.roboto.buildout.PloneCoreBuildout.clone")
+def test_skip_coredev_commit(_clone, caplog):
     checkouts = {"4.3": [], "5.0": [], "5.1": ["plone.uuid"]}
     sources = {("plone/plone.uuid", "master"): ["5.1", "5.0", "4.3"]}
     event = create_event(

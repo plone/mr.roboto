@@ -3,6 +3,7 @@
 cornice
 gitpython
 PyGithub
+plone.releaser
 pyramid_chameleon
 requests
 unidiff

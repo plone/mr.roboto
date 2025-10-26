@@ -6,6 +6,8 @@
 
 - Split subscriber module @gforcada
 
+- Use `plone.releaser`'s `add-checkout` command to update `checkouts.cfg` file @gforcada
+
 ## 1.2.11 (2025-09-08)
 
 - Do not ask for contributors agreement or changelog entries for bots @mauritsvanrees
