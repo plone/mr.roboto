@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.2.13 (unreleased)
+## 1.2.13 (2025-11-29)
 
-- Nothing changed yet.
+- Fix changelog check, to ignore a few bots @gforcada
 
 ## 1.2.12 (2025-10-26)
 
