@@ -15,7 +15,6 @@ VALID_CHANGELOG_FILES = re.compile(
 IGNORE_NO_CHANGELOG = (
     ".github",
     "buildout.coredev",
-    "dependabot[bot]",
     "documentation",
     "jenkins.plone.org",
     "mockup",
@@ -27,8 +26,12 @@ IGNORE_NO_CHANGELOG = (
     "plone.jenkins_server",
     "ploneorg.core",
     "ploneorg.theme",
-    "pre-commit-ci[bot]",
     "training",
+)
+
+USER_NO_CHANGELOG = (
+    "dependabot[bot]",
+    "pre-commit-ci[bot]",
 )
 
 
@@ -42,6 +45,10 @@ class WarnNoChangelogEntry(PullRequestSubscriber):
     def run(self):
         """If the pull request does not add a changelog entry, warn about it"""
         if self.repo_name in IGNORE_NO_CHANGELOG:
+            self.log("no need to have a changelog entry")
+            return
+
+        if self.pull_request_author in USER_NO_CHANGELOG:
             self.log("no need to have a changelog entry")
             return
 

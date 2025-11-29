@@ -17,10 +17,15 @@ PAYLOAD = {
     "html_url": "https://github.com/plone/mr.roboto/pull/34",
     "diff_url": "https://github.com/plone/mr.roboto/pull/34.diff",
     "base": {"repo": {"name": "Products.CMFPlone", "owner": {"login": "plone"}}},
+    "user": {"login": "random"},
 }
 
 IGNORED_REPO_PAYLOAD = copy.deepcopy(PAYLOAD)
 IGNORED_REPO_PAYLOAD["base"]["repo"]["name"] = "documentation"
+
+IGNORED_USER_PAYLOAD = copy.deepcopy(PAYLOAD)
+IGNORED_USER_PAYLOAD["user"]["login"] = "dependabot[bot]"
+
 
 DIFF_NO_CHANGELOG = """
 diff --git a/src/mr.roboto/setup.py b/src/mr.roboto/setup.py
@@ -106,6 +111,13 @@ class MockDiff:
 
 def test_repo_ignored(caplog):
     event = NewPullRequest(pull_request=IGNORED_REPO_PAYLOAD, request=MockRequest())
+    caplog.set_level(logging.INFO)
+    WarnNoChangelogEntry(event)
+    assert "no need to have a changelog entry" in caplog.records[-1].msg
+
+
+def test_user_ignored(caplog):
+    event = NewPullRequest(pull_request=IGNORED_USER_PAYLOAD, request=MockRequest())
     caplog.set_level(logging.INFO)
     WarnNoChangelogEntry(event)
     assert "no need to have a changelog entry" in caplog.records[-1].msg
