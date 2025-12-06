@@ -20,6 +20,7 @@ IGNORE_NO_TEST_NEEDED = (
     "icalendar",
     "plone.releaser",
     "plone.versioncheck",
+    "plone.reload",
 )
 
 
