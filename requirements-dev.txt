@@ -266,7 +266,7 @@ typing-extensions==4.15.0
     #   pygithub
 unidiff==0.7.5
     # via -r requirements-app.in
-urllib3==2.5.0
+urllib3==2.6.0
     # via
     #   pygithub
     #   requests
