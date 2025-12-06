@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.14 (2025-12-06)
+
+- Bump dependencies @gforcada
+
+- Make code Python 3.13 compatible @gforcada
+
+- Do not trigger Jenkins jobs on `plone.reload` changes @gforcada
+
 ## 1.2.13 (2025-11-29)
 
 - Fix changelog check, to ignore a few bots @gforcada
