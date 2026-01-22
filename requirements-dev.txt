@@ -152,6 +152,7 @@ packaging==25.0
     #   pyroma
     #   pytest
     #   twine
+    #   wheel
     #   zest-releaser
 paste==3.10.1
     # via -r requirements-app.in
@@ -287,7 +288,7 @@ webob==1.8.9
     #   webtest
 webtest==3.0.7
     # via -r requirements-dev.in
-wheel==0.45.1
+wheel==0.46.2
     # via
     #   pip-tools
     #   zest-releaser
