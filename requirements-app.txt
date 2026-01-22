@@ -92,6 +92,7 @@ packaging==25.0
     #   plone-releaser
     #   pyroma
     #   twine
+    #   wheel
     #   zest-releaser
 paste==3.10.1
     # via -r requirements-app.in
@@ -187,7 +188,7 @@ waitress==3.0.2
     # via -r requirements-app.in
 webob==1.8.9
     # via pyramid
-wheel==0.45.1
+wheel==0.46.2
     # via
     #   pip-tools
     #   zest-releaser
