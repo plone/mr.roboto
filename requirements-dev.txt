@@ -52,7 +52,7 @@ coverage[toml]==7.12.0
     #   pytest-cov
 coveralls==4.0.2
     # via -r requirements-dev.in
-cryptography==46.0.3
+cryptography==46.0.5
     # via
     #   pyjwt
     #   secretstorage
