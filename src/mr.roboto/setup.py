@@ -1,4 +1,3 @@
-from setuptools import find_packages
 from setuptools import setup
 
 
@@ -22,9 +21,7 @@ setup(
     author_email="",
     url="https://github.com/plone/mr.roboto",
     license="gpl",
-    packages=find_packages("src"),
     package_dir={"": "src"},
-    namespace_packages=["mr"],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
@@ -34,7 +31,6 @@ setup(
         "plone.releaser",
         "pyramid_chameleon",
         "requests",
-        "setuptools",
         "unidiff",
     ],
     entry_points="""
