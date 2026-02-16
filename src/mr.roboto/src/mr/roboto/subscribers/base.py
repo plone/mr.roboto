@@ -18,6 +18,7 @@ IGNORE_USER_NO_AGREEMENT = (
 
 IGNORE_NO_TEST_NEEDED = (
     "icalendar",
+    "plone.autoinclude",
     "plone.releaser",
     "plone.versioncheck",
     "plone.reload",
