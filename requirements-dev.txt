@@ -215,7 +215,7 @@ pyramid-chameleon==0.3
     # via -r requirements-app.in
 pyroma==5.0.1
     # via zest-releaser
-pytest==9.0.2
+pytest==9.0.3
     # via
     #   -r requirements-dev.in
     #   pytest-cov
