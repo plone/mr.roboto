@@ -253,7 +253,7 @@ shellingham==1.5.4
     # via typer
 smmap==5.0.3
     # via gitdb
-soupsieve==2.8.3
+soupsieve==2.8.4
     # via beautifulsoup4
 supervisor==4.3.0
     # via -r requirements-app.in
