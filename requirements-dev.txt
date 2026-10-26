@@ -20,7 +20,7 @@ build==1.5.0
     #   pip-tools
     #   pyroma
     #   zest-releaser
-certifi==2026.5.20
+certifi==2026.10.19
     # via requests
 cffi==2.0.0
     # via
