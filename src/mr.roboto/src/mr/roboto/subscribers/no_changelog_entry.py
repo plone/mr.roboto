@@ -16,6 +16,7 @@ IGNORE_NO_CHANGELOG = (
     ".github",
     "buildout.coredev",
     "documentation",
+    "icalendar",
     "jenkins.plone.org",
     "mockup",
     "mr.roboto",
