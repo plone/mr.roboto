@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.15 (2026-11-10)
+
+- Bump dependencies
+
+- Ignore `icalendar` for changelog entries
+
+- Switch to native namespace
+
 ## 1.2.14 (2025-12-06)
 
 - Bump dependencies @gforcada
